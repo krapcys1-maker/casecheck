@@ -1,6 +1,6 @@
 # Wdrożenie pilotażu przyjmowania spraw
 
-Istniejący Node.js 22.18+, git, systemd użytkownika, reverse proxy nginx i osobno wskazana domena HTTPS. Brak npm nie wymaga apt: można użyć npm CLI z oficjalnego pakietu rejestru w prywatnym katalogu użytkownika. Zależności instaluj przez `npm ci` z lockfile; pakiety platformowe muszą odpowiadać VPS.
+Istniejący Node.js 22.18+, git, systemd użytkownika, reverse proxy nginx i wybrana domena HTTPS. Może to być własna domena panelu albo tymczasowo ścieżka `/casecheck/` na istniejącej stronie. Brak npm nie wymaga apt: można użyć npm CLI z oficjalnego pakietu rejestru w prywatnym katalogu użytkownika. Zależności instaluj przez `npm ci` z lockfile; pakiety platformowe muszą odpowiadać VPS.
 
 Checkout `~/casecheck`. Stan `~/casecheck-app-state` z prawami 700, poza repo. Konfiguracja `~/casecheck-app.env` z prawami 600 zawiera wyłącznie klucze wybranych dostawców i ustawienia aplikacji. Nie przenoś SMTP ani tokenu GitHub.
 
@@ -15,6 +15,10 @@ curl -fsS http://127.0.0.1:8861/casecheck/healthz
 ```
 
 Publiczny routing dodaje się do wskazanego vhosta HTTPS. Zachowaj kopię nginx, istniejące trasy i strony, sprawdź `nginx -t`, następnie wykonaj reload. Nie restartuj VPS ani innych usług.
+
+[Fragment nginx dla pełnej aplikacji](nginx-casecheck-app.conf) kieruje wyłącznie `/casecheck/` do portu 8861. Nie zastępuje `location /` ani istniejącego formularza kontaktowego. Ustaw `CASECHECK_PUBLIC_ORIGIN` na origin HTTPS (bez ścieżki), zrestartuj tylko `casecheck-app`, a następnie sprawdź logowanie, pliki oraz eksport PDF z tego adresu. Gdy ten sam vhost obsługuje także alias `www`, skieruj ścieżkę panelu na wybrany, kanoniczny host; aplikacja akceptuje jeden skonfigurowany origin.
+
+Przeniesienie na nową domenę: przygotuj jej HTTPS i routing, zmień origin aplikacji, sprawdź działanie, a następnie usuń tylko dodane lokalizacje panelu z wcześniejszego vhosta. Baza i pliki pozostają w tym samym prywatnym katalogu. Strona główna działa przez cały okres tymczasowego wdrożenia, więc nie wymaga przywracania z kopii.
 
 Do czasu wskazania domeny usługę można sprawdzić przez tunel SSH:
 
