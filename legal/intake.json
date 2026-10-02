@@ -1,0 +1,27 @@
+{
+  "version": "intake-pl-2026-10-02",
+  "review_status": "source_checked_requires_lawyer_review_for_real_cases",
+  "fields": [
+    {"key":"client_name","label":"Imię i nazwisko albo nazwa firmy","type":"text","tracks":["consumer","company"],"question":"Jak się nazywasz albo jak brzmi nazwa firmy?"},
+    {"key":"address","label":"Miejsce zamieszkania lub siedziba i adres","type":"text","tracks":["consumer","company"],"question":"Podaj miejsce zamieszkania lub siedzibę oraz adres. W testach użyj danych fikcyjnych."},
+    {"key":"identity","label":"PESEL lub inny identyfikator","type":"text","tracks":["consumer"],"question":"Czy masz PESEL? W zgłoszeniu testowym użyj oznaczenia TEST zamiast danych rzeczywistej osoby."},
+    {"key":"nip_history","label":"NIP posiadany w ostatnich 10 latach","type":"text","tracks":["consumer"],"question":"Czy w ostatnich dziesięciu latach miałeś NIP, np. w związku z działalnością?"},
+    {"key":"registration","label":"Forma prawna NIP KRS albo CEIDG","type":"text","tracks":["company"],"question":"Podaj formę prawną firmy oraz dane rejestrowe do sprawdzenia."},
+    {"key":"representation","label":"Osoba reprezentująca firmę i podstawa","type":"text","tracks":["company"],"question":"Kto reprezentuje firmę i na jakiej podstawie?"},
+    {"key":"declared_total","label":"Deklarowane zadłużenie","type":"money","tracks":["consumer","company"],"question":"Jakie jest łączne zadłużenie według Twojej wiedzy? Podaj walutę i datę salda, jeśli je znasz."},
+    {"key":"monthly_income","label":"Dochód netto albo przychody miesięczne","type":"money","tracks":["consumer","company"],"question":"Jaki jest miesięczny dochód netto albo przychód firmy? Podaj walutę."},
+    {"key":"monthly_expenses","label":"Miesięczne koszty","type":"money","tracks":["consumer","company"],"question":"Jakie są miesięczne koszty utrzymania lub prowadzenia firmy?"},
+    {"key":"income_history","label":"Przychody i utrzymanie za ostatnie 6 miesięcy","type":"text","tracks":["consumer"],"question":"Opisz przychody i koszty utrzymania własnego oraz osób na utrzymaniu w ostatnich sześciu miesiącach, najlepiej miesiąc po miesiącu."},
+    {"key":"assets","label":"Majątek wycena i miejsca położenia","type":"text","tracks":["consumer","company"],"question":"Jakie masz składniki majątku, jaka jest ich przybliżona wartość i gdzie się znajdują? Wskaż też rzeczy używane, których nie jesteś właścicielem."},
+    {"key":"securities","label":"Zabezpieczenia i daty ustanowienia","type":"text","tracks":["consumer","company"],"question":"Czy na majątku ustanowiono zabezpieczenia, np. hipotekę lub zastaw? Podaj znane daty. Jeśli nie wiesz, zaznacz to."},
+    {"key":"causes","label":"Okoliczności i przyczyny trudności","type":"text","tracks":["consumer","company"],"question":"Co spowodowało trudności z płatnościami? Podaj fakty i dokumenty, które mogą je potwierdzić."},
+    {"key":"transactions_real_estate","label":"Nieruchomości akcje i udziały w ostatnich 12 miesiącach","type":"text","tracks":["consumer"],"question":"Czy w ostatnich dwunastu miesiącach dokonywałeś czynności dotyczących nieruchomości, akcji lub udziałów? Opisz je albo wyraźnie potwierdź ich brak."},
+    {"key":"transactions_other","label":"Pozostałe prawa i rzeczy ponad 10 000 zł w ostatnich 12 miesiącach","type":"text","tracks":["consumer"],"question":"Czy w ostatnich dwunastu miesiącach dokonywałeś czynności dotyczących ruchomości, wierzytelności lub innych praw o wartości ponad 10 000 zł?"},
+    {"key":"disputes","label":"Roszczenia sporne i zakres kwestionowania","type":"text","tracks":["consumer","company"],"question":"Które roszczenia kwestionujesz i w jakim zakresie?"},
+    {"key":"prior_proceedings","label":"Wcześniejsze i trwające postępowania","type":"text","tracks":["consumer","company"],"question":"Czy dotyczą Cię trwające lub wcześniejsze postępowania sądowe, egzekucyjne albo upadłościowe?"},
+    {"key":"employees","label":"Pracownicy i zobowiązania wobec nich","type":"text","tracks":["company"],"question":"Ile osób pracuje w firmie i czy występują zaległości wobec pracowników?"},
+    {"key":"financial_statements","label":"Sprawozdania finansowe i dane bieżące","type":"text","tracks":["company"],"question":"Jakie sprawozdania i bieżące zestawienia finansowe możesz dostarczyć? Wskaż ich daty lub powód braku."},
+    {"key":"recovery_measures","label":"Proponowane środki i koszty naprawy","type":"text","tracks":["company"],"question":"Jakie działania naprawcze rozważasz i jakie mogą być ich koszty?"},
+    {"key":"recovery_schedule","label":"Harmonogram działań naprawczych","type":"text","tracks":["company"],"question":"Jaki jest wstępny harmonogram proponowanych działań naprawczych?"}
+  ]
+}

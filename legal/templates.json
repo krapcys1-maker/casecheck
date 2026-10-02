@@ -1,0 +1,10 @@
+{
+  "version": "templates-pl-v1",
+  "templates": [
+    {"id":"case_card","title":"Karta przyjęcia sprawy","kind":"administrative","tracks":["consumer","company"],"source_ids":["PU2026","PR2026"],"status":"draft"},
+    {"id":"creditor_list","title":"Pomocniczy wykaz wierzycieli i zobowiązań","kind":"preparatory_list","tracks":["consumer","company"],"source_ids":["PU2026","PR2026"],"status":"draft"},
+    {"id":"missing_documents","title":"Prośba o uzupełnienie informacji i dokumentów","kind":"client_request","tracks":["consumer","company"],"source_ids":["PU2026","PR2026"],"status":"draft"},
+    {"id":"claim_clarification","title":"Prośba o wyjaśnienie roszczenia","kind":"private_letter","tracks":["consumer","company"],"source_ids":["KC2026"],"status":"draft"},
+    {"id":"preliminary_plan","title":"Szkic wstępnego planu restrukturyzacyjnego","kind":"preparatory_plan","tracks":["company"],"source_ids":["PR2026"],"status":"draft"}
+  ]
+}

@@ -11,3 +11,6 @@ legal-flow-source.html
 legal-flow-text.txt
 deploy/local/
 data/local/
+tests/full-fixtures/qa/
+tmp/
+research/local/

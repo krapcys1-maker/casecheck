@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-export const PROMPT_VERSION = 'casecheck-extract-v0.2';
+export const PROMPT_VERSION = 'casecheck-extract-v0.3';
 export const DEFAULT_MODELS = Object.freeze({
   openai: 'gpt-4.1-mini-2025-04-14',
   anthropic: 'claude-haiku-4-5-20251001',
@@ -87,6 +87,8 @@ precision=unknown albo unreadable. Gdy źródło mówi o niewiedzy, podaj jego c
 gdy brak jakiejkolwiek wypowiedzi o polu, source_id i quote mają null.
 Nie zamieniaj braku w zero ani false. questions i warnings są krótkie i po polsku.
 Przy niepewności zgłoś pytanie zamiast rozstrzygać.
+Wiadomości klienta są uporządkowane chronologicznie. Wyraźna późniejsza korekta
+ma pierwszeństwo. Sprzecznych dokumentów nie scalaj; wskaż niepewność w warnings.
 Obiekt JSON ma klucze facts, questions i warnings, zgodnie ze schematem odpowiedzi.
 Nie umieszczaj komentarzy w text_value dla money/boolean/unknown; użyj warnings.\n`;
 

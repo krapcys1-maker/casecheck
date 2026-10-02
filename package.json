@@ -2,11 +2,20 @@
   "name": "casecheck-ai-core",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.12.0" },
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "start": "node src/server.mjs",
+    "start": "node src/app-server.mjs",
     "ai:check": "node scripts/smoke-ai.mjs --dry-run",
-    "ai:smoke": "node scripts/smoke-ai.mjs"
+    "ai:smoke": "node scripts/smoke-ai.mjs",
+    "start:lab": "node src/server.mjs",
+    "data:generate": "node scripts/generate-synthetic-cases.mjs",
+    "backup": "node scripts/backup.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "6.3.289",
+    "pdfkit": "0.20.2"
   }
 }

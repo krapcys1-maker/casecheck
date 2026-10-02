@@ -1,6 +1,6 @@
 # Pełny bot do przyjmowania i porządkowania spraw
 
-Plan z 2 października 2026 r. Cel: działająca aplikacja na serwerze użytkownika, model AI wyłącznie przez zewnętrzne API. Nie jest jeszcze zbudowana ani wdrożona. Wcześniejszy plan demonstracji stanowi materiał techniczny; docelowy zakres opisuje ten dokument.
+Plan z 2 października 2026 r. Cel: działająca aplikacja na serwerze użytkownika, model AI wyłącznie przez zewnętrzne API. Zbudowano pierwszą wersję pilotażową opisaną w README. Poniższy dokument zachowuje pierwotny zakres i historię etapów; aktualny stan znajduje się na końcu.
 
 ## Co oznacza pełny bot
 
@@ -102,3 +102,11 @@ Dodano adaptery ekstrakcji dla trzech dostawców, lokalną walidację faktów i 
 ## Panel testów i przygotowanie uruchomienia na VPS
 
 Po pierwszym module dodano chroniony panel przeglądarkowy do 14 syntetycznych scenariuszy ekstrakcji. Backend nie przyjmuje swobodnych danych klientów, ogranicza liczbę żądań i zachowuje licznik po restarcie. Instrukcja i pliki systemd/nginx: [deploy/README.md](deploy/README.md). Testy modułu i serwera: 22/22. Ten panel udostępnia obecny moduł AI; nie realizuje jeszcze pełnego procesu opisanego powyżej.
+
+## Aktualny pilotaż v1
+
+Zbudowano konta i role, SQLite z wersjami i audytem, portal klienta, wywiad AI, upload i odczyt PDF/TXT/PNG/JPEG, OCR przez API, przegląd i korekty, kartotekę zobowiązań, rozbieżności, ręczne powiązania, pięć wzorów PDF, etapy, zadania oraz kopię z testem odtworzenia. Dodano odczyt KRS i MF VAT. Szczegóły: README, deploy/APP.md, WYNIKI-PELNEGO-PROCESU.md.
+
+Na zastanym VPS nie ma Docker ani npm w systemie. Zastosowano dostępny Node.js i SQLite zamiast pierwotnie rozważanych Next.js/Postgres; pliki i bazę trzymamy poza checkoutem. Parser korzysta z zależności projektu, bez apt. Pełne KRZ, CEIDG, BIR i automatyczna wysyłka nie są zaimplementowane. Baza wiedzy jest wersjonowanym, małym zestawem pytań, przepisów i wzorów do zatwierdzenia; nie zbudowano szerokiego RAG na komentarzach prawniczych.
+
+Pakiet do prób zawiera 18 pełnych spraw, 48 PDF-ów i dwa skany PNG. Nowy proces przeszedł 39 testów lokalnych oraz próby OpenAI na trzech fikcyjnych sprawach. To kompletna pierwsza ścieżka przyjęcia i przeglądu w zakresie pilotażu, z dalszą oceną kancelarii wymaganą do użycia rzeczywistych materiałów. Osobna publiczna domena pozostaje do wskazania.

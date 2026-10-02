@@ -1,73 +1,59 @@
-# CaseCheck — moduł AI i panel testów
+# CaseCheck — wywiad, dokumenty i przegląd sprawy
 
 [![Tests](https://github.com/krapcys1-maker/casecheck/actions/workflows/tests.yml/badge.svg)](https://github.com/krapcys1-maker/casecheck/actions/workflows/tests.yml)
 
-Publiczny projekt przyjmowania i kontroli danych spraw upadłościowych oraz restrukturyzacyjnych. Fakty mają wskazane źródła, a decyzje i zatwierdzanie pozostają po stronie prawnika. Repozytorium: [krapcys1-maker/casecheck](https://github.com/krapcys1-maker/casecheck). Kod i własna dokumentacja są dostępne na [licencji MIT](LICENSE); zasady współpracy opisuje [CONTRIBUTING.md](CONTRIBUTING.md).
+Otwarty projekt przyjmowania spraw konsumenckich i firmowych. Wersja pilotażowa prowadzi od rozmowy i załączników do kartoteki wierzycieli, przeglądu danych oraz projektów dokumentów. Dane mają źródła; zatwierdzanie należy do konta prawnika.
 
-Cel pełnej aplikacji opisuje [PLAN-PELNEGO-BOTA.md](PLAN-PELNEGO-BOTA.md), a wybór bibliotek i danych [RESEARCH-I-REKOMENDACJE.md](RESEARCH-I-REKOMENDACJE.md).
+## Działające moduły
 
-Aktualny kod to **moduł ekstrakcji danych przez API, runner krótkich prób i chroniony panel testów syntetycznych**. Pełny bot z wywiadem, kontami kancelarii, bazą spraw i OCR jest kolejnym etapem. Działa na Node.js 22.12+ bez dodatkowych zależności. Klucze ładowane są z lokalnego `.env` albo środowiska usługi; plik jest wykluczony z Git. `.env.example` zawiera wyłącznie nazwy konfiguracji.
-
-Pierwsze rzeczywiste próby i ich ograniczenia: [WYNIKI-TESTU-API.md](WYNIKI-TESTU-API.md). Po dopracowaniu kontraktu trzej dostawcy przeszli trzy wskazane scenariusze; lokalne testy: 14/14.
+- Konta administratora, prawnika i pracownika, hasła scrypt, wygasające sesje i link klienta do jednej sprawy. Dostęp sprawdzany według kancelarii oraz zakresu linku.
+- Trwała kartoteka SQLite, rozmowa po polsku, wywiad konsumencki lub firmowy, poprawki i prośba o kontakt z człowiekiem.
+- Ekstrakcja przez OpenAI, Anthropic lub DeepSeek; typy, kwoty w groszach, daty i dosłowne cytaty walidowane na serwerze. Zapis wersji promptu i wejścia oraz zużycia tokenów.
+- Prywatny upload PDF, TXT, PNG i JPEG. Lokalny odczyt PDF.js w ograniczonym procesie roboczym. OCR przez OpenAI po osobnym uruchomieniu i potwierdzeniu przekazania całego wskazanego pliku.
+- Ręczne korekty i przegląd, wcześniejsze wartości, wykrywanie zgodnych numerów umów oraz ręczne powiązanie dokumentów jednego długu. Sumy według waluty i daty.
+- Pięć edytowalnych wzorów: karta sprawy, pomocniczy wykaz wierzycieli, prośba o uzupełnienie, prośba o wyjaśnienie roszczenia i szkic wstępnego planu restrukturyzacyjnego. Eksport PDF; zmiana danych unieważnia poprzedni projekt.
+- Etapy, zadania, przypisanie do konta, dziennik wersji i eksport JSON. Termin prawny wymaga prawnika, podstawy i daty rozpoczynającej bieg.
+- Aktualny odpis KRS i wykaz VAT MF, z adresem źródła, datą i identyfikatorem zapytania. Dla fikcyjnych spraw VAT korzysta ze środowiska testowego.
+- Kopia bazy wraz z plikami, hashe, kontrola integralności i test odtworzenia. Usuwanie aktywnej sprawy wraz z historią i linkami.
 
 ## Uruchomienie
 
-Pobierz projekt i utwórz własną konfigurację dla prób API. Uzupełnij tylko klucze dostawców, których chcesz użyć. Do testów lokalnych `.env` nie jest potrzebny. Projekt nie ma dodatkowych zależności npm.
+Node.js 22.18+ i npm. Modele działają przez zewnętrzne API.
 
 ```powershell
 git clone https://github.com/krapcys1-maker/casecheck.git
 cd casecheck
+npm ci
 Copy-Item .env.example .env
+# Uzupełnij wybrane klucze API i własne długie hasło administratora.
 npm test
-npm run ai:check
-npm run ai:smoke
+npm start
 ```
 
-GitHub Actions uruchamia `npm test` na Node.js 22 i 24 dla zmian w `main` i pull requestów. Nie korzysta z kluczy AI ani z runnera płatnych prób.
+Aplikacja nasłuchuje na `127.0.0.1:8861`, ścieżka `/casecheck/`. Konto początkowe: `admin@casecheck.local`; hasło z `CASECHECK_ADMIN_PASSWORD`. Administrator tworzy konta. Przycisk „Wczytaj 18 testowych spraw” importuje fikcyjne źródła i pliki; nie przedstawia ich jako wyników AI. Odczyt uruchamia się osobno.
 
-## Panel przeglądarkowy i serwer
+Publiczne wdrożenie wymaga wybranej domeny i HTTPS. [Instrukcja VPS](deploy/APP.md) opisuje usługę użytkownika, prywatny stan, kopie i wycofanie. `.env`, hasła, baza, pliki klientów i lokalne raporty są wykluczone z Git.
 
-Panel pokazuje 14 scenariuszy ekstrakcji, fikcyjne źródła, odczytane fakty i cytaty oraz zgodność wybranych pól ze wzorcem. Jedno kliknięcie wywołuje jednego dostawcę. Nie przyjmuje dokumentów ani tekstów rzeczywistych klientów.
+## Dane i pisma
 
-Po ustawieniu osobnego `CASECHECK_ACCESS_TOKEN` (minimum 32 znaki) w lokalnym `.env` można uruchomić `npm start` i otworzyć `http://127.0.0.1:8860/casecheck/`. Hasło panelu nie jest kluczem dostawcy AI. Usługa nasłuchuje tylko na loopback; publiczny dostęp wymaga reverse proxy z HTTPS.
+[18 pełnych spraw testowych](tests/full-fixtures/README.md) zawiera 48 PDF-ów, dwa skany PNG, rozmowy i oczekiwania: cesję, spór, kilka umów jednego banku, różne waluty, brak daty, hipotekę, leasing, zerowy dochód, nieczytelność oraz instrukcję w niezaufanym materiale. Cztery przypadki mają oznaczenie holdout; zestaw nie jest niezależnym badaniem skuteczności.
 
-Wdrożenie na VPS z istniejącym Node.js i nginx opisuje [deploy/README.md](deploy/README.md). Dodano jednostkę systemd użytkownika i fragment konfiguracji nginx. Panel ma domyślnie limit 20 prób na dzień UTC, trwały licznik poza kodem i jedno wywołanie jednocześnie. Jest to limit prób, nie wydatków w walucie. Lokalne testy modułu i serwera: 22/22.
+Wzory i pytania oparto na [oficjalnych źródłach](legal/README.md), sprawdzonych 2 października 2026 r. Są materiałami przygotowawczymi. Karta i wykaz nie zastępują urzędowego formularza lub proceduralnego spisu wierzytelności. Model nie kwalifikuje do postępowania i nie składa pism. Baza pytań oraz wzorów wymaga zatwierdzenia przez kancelarię przed analizą rzeczywistych danych.
 
-`npm test` wykonuje testy lokalne, bez wywołań API. `ai:check` sprawdza obecność konfiguracji i plan próby, również bez połączeń. `ai:smoke` wywołuje skonfigurowanych dostawców na trzech fikcyjnych przypadkach C01/C07/C13. Domyślnie to maksymalnie 9 żądań, limit 1200 tokenów wyjściowych na żądanie, timeout 45 sekund i brak automatycznego retry. Wywołania modeli API są płatne zgodnie z kontem dostawcy.
+Wybrane źródła trafiają do wskazanego API. OCR przekazuje cały wskazany plik do OpenAI. `store:false` nie zapewnia braku retencji u dostawcy. Nie wdrożono pełnego KRZ, CEIDG, BIR ani automatycznej wysyłki. KRS/VAT nie podają prywatnych długów klienta. Obsługiwane pliki nie obejmują DOCX i ZIP.
 
-Można ograniczyć dostawcę i przypadek:
+## Testy i limity
 
-```powershell
-node scripts/smoke-ai.mjs --providers openai --cases C01
-node scripts/smoke-ai.mjs --providers anthropic,deepseek --cases C05,C07
-```
+`npm test` działa bez kluczy i płatnych wywołań. GitHub Actions sprawdza Node 22 i 24. Testy obejmują izolację, role, linki, wyścig wersji, awarię AI, PDF/skany, kopię i odtworzenie, integralność danych, waluty i duplikaty.
 
-Jeden przebieg nie może przekroczyć 9 planowanych żądań. Błąd HTTP zatrzymuje kolejne próby tego dostawcy. Kod wyjścia 1 oznacza błąd API, niezgodność danych albo niewykonanie całego planu; szczegóły są w raporcie.
+Trwały limit: 20 żądań AI na dzień UTC i jedno wywołanie naraz. Błędy także zużywają rezerwację; brak automatycznych powtórek. To limit liczby żądań, nie rachunku w walucie. Wynik starej wersji jest odrzucany. Przerwane zadanie wymaga jawnego ponowienia. Jeden proces aplikacji może posiadać dany katalog stanu.
 
-## Zakres modułu
+`node scripts/smoke-workflow.mjs --prepare` przygotowuje fikcyjny stan bez API. `--run` wykonuje do ośmiu płatnych żądań OpenAI i eksportuje pięć PDF-ów do kontroli. Nie uruchamiaj go równolegle z aplikacją na tym samym stanie. Lokalne hasła i raporty są ignorowane przez Git.
 
-- OpenAI Responses API ze Structured Outputs, Anthropic Messages API z narzędziem zwracającym dane i DeepSeek Chat Completions w trybie JSON.
-- Jeden kontrakt danych, kwoty w groszach/centach, jawne wartości nieznane, waluta, data salda, źródło i cytat.
-- Walidacja formatu, typu wartości, źródeł, cytatów, dat i wymaganych pól po stronie lokalnego kodu.
-- Dokładne uzgodnienie kwot tylko dla tej samej waluty, daty i wartości nieprzybliżonych. Funkcja nie wykrywa samodzielnie, czy roszczenia są duplikatami; do sumowania trzeba przekazać już wybraną listę.
-- Zapis modelu, wersji promptu, hasha wejścia, czasu i zużycia tokenów. Klucze ani całe `.env` nie wchodzą do promptu i raportu.
+Poprzedni panel pojedynczych scenariuszy: `npm run start:lab`, port 8860. Jego [instrukcja](deploy/README.md) i [pierwsze wyniki API](WYNIKI-TESTU-API.md) opisują wcześniejszy etap. Runner `ai:smoke` jest osobną płatną próbą na maksymalnie dziewięciu zadaniach.
 
-Nazwy `requested_fields` tworzą kontrakt pojedynczego zadania. Runner bierze je z fixture, ale nie przekazuje oczekiwanych wartości, obliczeń ani kryteriów zaliczenia do modelu. Test sprawdza wskazane pola, a nie swobodną ekstrakcję wszystkich informacji.
+## Research i licencje
 
-Wyniki znajdują się w `reports/local/`, również wykluczonym z Git. Raport zawiera odpowiedzi modeli na fikcyjne teksty. Obecny runner jest przeznaczony wyłącznie do dołączonego zestawu syntetycznego. Przed przetwarzaniem rzeczywistych spraw potrzebna będzie autoryzacja, izolacja kancelarii, reguły przepływu danych i retencji opisane w planie.
+[Research GitHub](RESEARCH-I-REKOMENDACJE.md), [źródła danych](ZRODLA-DANYCH-BOTA.md) i [zakres procesu](PLAN-PELNEGO-BOTA.md). Użyto PDF.js (Apache-2.0), PDFKit (MIT), SQLite z Node i fontu DejaVu z [odrębną licencją](assets/DejaVu-LICENSE.txt). Własny kod i dokumentacja: [MIT](LICENSE). [Zasady współpracy](CONTRIBUTING.md).
 
-## Jak interpretować wynik
-
-PASS oznacza poprawne wskazane wartości i odwołania do źródeł, po przejściu lokalnej walidacji. Cytat obecny w tekście nie potwierdza automatycznie poprawności każdej interpretacji. Pytania i ostrzeżenia wymagają osobnej oceny jakości. Trzy scenariusze nie wystarczają do wyboru najlepszego modelu ani deklarowania skuteczności produkcyjnej.
-
-Przypadek z instrukcją w PDF mierzy ekstrakcję w obecności niezaufanej treści oraz kontrakt odpowiedzi. Nie jest pełnym testem odporności systemu na prompt injection. Nie ma w tym module możliwości zatwierdzania, wysyłania pism ani czytania innych spraw. Sześć scenariuszy workflow z fixture trzeba później wykonać na backendzie i bazie.
-
-## Dokumentacja dostawców sprawdzona przy implementacji
-
-- [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) i [GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
-- [Anthropic API primer](https://platform.claude.com/docs/en/claude_api_primer).
-- [DeepSeek Chat Completions](https://api-docs.deepseek.com/api/create-chat-completion/).
-
-Domyślne modele to ograniczony kosztowo punkt startowy do sprawdzenia połączeń, nie wybór docelowego dostawcy. Można ustawić `OPENAI_MODEL`, `ANTHROPIC_MODEL` i `DEEPSEEK_MODEL`. Adapter Anthropic używa wymuszonego narzędzia zgodnego z wybranym Haiku 4.5; zmiana na model bez obsługi tego trybu wymaga dostosowania adaptera.
-
-Pobrane na potrzeby researchu kopie strony Legal Flow pozostają lokalne. Repozytorium zawiera własne opracowania z odnośnikami do źródeł oraz syntetyczne scenariusze. Projekt nie jest oficjalną integracją ani produktem Legal Flow/Booster.
+Projekt nie jest produktem ani oficjalną integracją Legal Flow. Research nie daje podstaw do deklarowania równej skuteczności, bezpieczeństwa lub kompletności funkcji komercyjnego systemu.

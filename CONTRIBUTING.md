@@ -2,7 +2,7 @@
 
 Pomysły, zgłoszenia błędów i propozycje zmian można dodawać przez GitHub Issues oraz pull requesty. W zgłoszeniu opisz oczekiwany wynik, rzeczywisty wynik i sposób odtworzenia na fikcyjnych danych.
 
-Przed wysłaniem zmiany uruchom `npm test`. Testy lokalne i GitHub Actions nie potrzebują kluczy oraz nie wykonują płatnych wywołań AI. Runner `ai:smoke` wymaga własnych kluczy i świadomego uruchomienia.
+Przed wysłaniem zmiany wykonaj `npm ci` i `npm test`. Testy lokalne i GitHub Actions nie potrzebują kluczy oraz nie wykonują płatnych wywołań AI. Runnery płatnych prób wymagają własnych kluczy i świadomego uruchomienia.
 
 Materiały testowe muszą być syntetyczne albo mieć wyraźne prawa do publikacji. Nie dodawaj rzeczywistych dokumentów klientów, danych osobowych, kluczy, pliku `.env` ani lokalnych raportów API do repozytorium lub zgłoszeń.
 

@@ -1,0 +1,83 @@
+{
+  "checked_on": "2026-10-02",
+  "jurisdiction": "Poland",
+  "scope": "Administrative intake and draft documents; no automated legal outcome or court filing",
+  "sources": [
+    {
+      "id": "PU2026",
+      "act": "DU/2026/913",
+      "base": "DU/2003/535",
+      "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/913/text.pdf",
+      "articles": [
+        "491(2)",
+        "216aa"
+      ],
+      "title": "Obwieszczenie Marszałka Sejmu Rzeczypospolitej Polskiej z dnia 12 czerwca 2026 r. w sprawie ogłoszenia jednolitego tekstu ustawy - Prawo upadłościowe",
+      "legal_status_date": "2026-06-10",
+      "checked_on": "2026-10-02",
+      "sha256": "773dd1099cb636a5a66eb996240bc8013f70f8d1692f440c10bb4c5448a235c1",
+      "changes_after_snapshot": [
+        {
+          "id": "DU/2026/1206",
+          "date": "2027-01-11"
+        }
+      ],
+      "status": "source_checked_not_lawyer_approved"
+    },
+    {
+      "id": "PR2026",
+      "act": "DU/2026/533",
+      "base": "DU/2015/978",
+      "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/533/text.pdf",
+      "articles": [
+        "9",
+        "10",
+        "76"
+      ],
+      "title": "Obwieszczenie Marszałka Sejmu Rzeczypospolitej Polskiej z dnia 27 marca 2026 r. w sprawie ogłoszenia jednolitego tekstu ustawy - Prawo restrukturyzacyjne",
+      "legal_status_date": "2026-03-25",
+      "checked_on": "2026-10-02",
+      "sha256": "a9a822e56825e1655599f774fada8b6c9c2016abb2e4d9a29be1cd3fc6496f46",
+      "changes_after_snapshot": [
+        {
+          "id": "DU/2026/176",
+          "date": "2027-02-18"
+        },
+        {
+          "id": "DU/2026/1206",
+          "date": "2027-01-11"
+        }
+      ],
+      "status": "source_checked_not_lawyer_approved"
+    },
+    {
+      "id": "KC2026",
+      "act": "DU/2026/795",
+      "base": "DU/1964/93",
+      "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/795/text.pdf",
+      "articles": [
+        "509",
+        "512"
+      ],
+      "title": "Obwieszczenie Marszałka Sejmu Rzeczypospolitej Polskiej z dnia 27 maja 2026 r. w sprawie ogłoszenia jednolitego tekstu ustawy - Kodeks cywilny",
+      "legal_status_date": "2026-05-19",
+      "checked_on": "2026-10-02",
+      "sha256": "c341c7d96481f12a21e3b41deb69a84cab9322bd9888d3e6406dab9e09eeef91",
+      "changes_after_snapshot": [
+        {
+          "id": "DU/2026/507",
+          "date": "2028-11-01"
+        }
+      ],
+      "status": "source_checked_not_lawyer_approved"
+    },
+    {
+      "id": "MS_CONSUMER_FORM",
+      "title": "Urzędowy formularz wniosku dłużnika o ogłoszenie upadłości konsumenckiej",
+      "page_url": "https://www.gov.pl/web/sprawiedliwosc/formularze-konsumenci-od-24-marca-2020",
+      "url": "https://www.gov.pl/attachment/bffdca0e-cc9d-4970-b6b0-34de8e2631b6",
+      "checked_on": "2026-10-02",
+      "status": "official_reference_form_not_modified"
+    }
+  ]
+}
