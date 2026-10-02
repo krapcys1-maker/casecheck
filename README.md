@@ -1,4 +1,4 @@
-# CaseCheck — dokumentacja i pierwszy moduł AI
+# CaseCheck — moduł AI i panel testów
 
 [![Tests](https://github.com/krapcys1-maker/casecheck/actions/workflows/tests.yml/badge.svg)](https://github.com/krapcys1-maker/casecheck/actions/workflows/tests.yml)
 
@@ -6,7 +6,7 @@ Publiczny projekt przyjmowania i kontroli danych spraw upadłościowych oraz res
 
 Cel pełnej aplikacji opisuje [PLAN-PELNEGO-BOTA.md](PLAN-PELNEGO-BOTA.md), a wybór bibliotek i danych [RESEARCH-I-REKOMENDACJE.md](RESEARCH-I-REKOMENDACJE.md).
 
-Aktualny kod to **moduł ekstrakcji danych przez API i runner krótkich prób**, nie pełny bot. Nie ma jeszcze panelu, bazy spraw, logowania, OCR ani wdrożenia. Działa na Node.js 22.12+ bez dodatkowych zależności. Klucze ładowane są z lokalnego `.env`; plik jest wykluczony z Git. `.env.example` zawiera wyłącznie nazwy konfiguracji.
+Aktualny kod to **moduł ekstrakcji danych przez API, runner krótkich prób i chroniony panel testów syntetycznych**. Pełny bot z wywiadem, kontami kancelarii, bazą spraw i OCR jest kolejnym etapem. Działa na Node.js 22.12+ bez dodatkowych zależności. Klucze ładowane są z lokalnego `.env` albo środowiska usługi; plik jest wykluczony z Git. `.env.example` zawiera wyłącznie nazwy konfiguracji.
 
 Pierwsze rzeczywiste próby i ich ograniczenia: [WYNIKI-TESTU-API.md](WYNIKI-TESTU-API.md). Po dopracowaniu kontraktu trzej dostawcy przeszli trzy wskazane scenariusze; lokalne testy: 14/14.
 
@@ -24,6 +24,14 @@ npm run ai:smoke
 ```
 
 GitHub Actions uruchamia `npm test` na Node.js 22 i 24 dla zmian w `main` i pull requestów. Nie korzysta z kluczy AI ani z runnera płatnych prób.
+
+## Panel przeglądarkowy i serwer
+
+Panel pokazuje 14 scenariuszy ekstrakcji, fikcyjne źródła, odczytane fakty i cytaty oraz zgodność wybranych pól ze wzorcem. Jedno kliknięcie wywołuje jednego dostawcę. Nie przyjmuje dokumentów ani tekstów rzeczywistych klientów.
+
+Po ustawieniu osobnego `CASECHECK_ACCESS_TOKEN` (minimum 32 znaki) w lokalnym `.env` można uruchomić `npm start` i otworzyć `http://127.0.0.1:8860/casecheck/`. Hasło panelu nie jest kluczem dostawcy AI. Usługa nasłuchuje tylko na loopback; publiczny dostęp wymaga reverse proxy z HTTPS.
+
+Wdrożenie na VPS z istniejącym Node.js i nginx opisuje [deploy/README.md](deploy/README.md). Dodano jednostkę systemd użytkownika i fragment konfiguracji nginx. Panel ma domyślnie limit 20 prób na dzień UTC, trwały licznik poza kodem i jedno wywołanie jednocześnie. Jest to limit prób, nie wydatków w walucie. Lokalne testy modułu i serwera: 22/22.
 
 `npm test` wykonuje testy lokalne, bez wywołań API. `ai:check` sprawdza obecność konfiguracji i plan próby, również bez połączeń. `ai:smoke` wywołuje skonfigurowanych dostawców na trzech fikcyjnych przypadkach C01/C07/C13. Domyślnie to maksymalnie 9 żądań, limit 1200 tokenów wyjściowych na żądanie, timeout 45 sekund i brak automatycznego retry. Wywołania modeli API są płatne zgodnie z kontem dostawcy.
 

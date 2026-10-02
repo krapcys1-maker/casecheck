@@ -9,3 +9,5 @@ reports/local/
 # Lokalne kopie cudzej strony wykorzystane wyłącznie podczas researchu.
 legal-flow-source.html
 legal-flow-text.txt
+deploy/local/
+data/local/

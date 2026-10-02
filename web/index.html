@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CaseCheck · panel testów AI</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <header><a href="./" class="brand">CaseCheck<span>PRACOWNIA DANYCH SPRAWY</span></a><span class="tag">Wersja testowa</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">OD TEKSTU DO SPRAWDZALNEGO FAKTU</p><h1>Dane, które można<br>sprawdzić u źródła.</h1><p>Odczytaj kwoty i informacje z fikcyjnego zgłoszenia. Zobacz cytaty, brakujące dane i wynik kontroli.</p></section>
+    <section id="login" class="card login"><h2>Dostęp do panelu</h2><p>Wpisz hasło dostępu przekazane przez administratora.</p><form id="login-form"><label for="password">Hasło dostępu</label><div class="inline"><input id="password" type="password" required autocomplete="current-password" minlength="32"><button type="submit">Otwórz panel</button></div></form><p id="login-error" role="alert"></p></section>
+    <section id="workspace" hidden>
+      <div class="toolbar"><span id="budget"></span><button id="logout" class="secondary">Wyloguj</button></div>
+      <div class="layout">
+        <section class="card"><p class="eyebrow">01 / MATERIAŁ</p><h2>Scenariusz testowy</h2><label for="case">Wybierz fikcyjną sprawę</label><select id="case"></select><div id="sources"></div><div class="controls"><label for="provider">Model AI</label><select id="provider"></select><button id="run">Odczytaj i sprawdź</button><p class="small">Jedno kliknięcie wykonuje jedno płatne wywołanie API.</p></div></section>
+        <section class="card result"><p class="eyebrow">02 / KONTROLA</p><h2>Fakty i ich źródła</h2><p id="status" role="status">Wybierz scenariusz i rozpocznij odczyt.</p><div id="facts"></div><div id="arithmetic"></div><div id="questions"></div><p id="metadata" class="small"></p></section>
+      </div>
+    </section>
+    <footer>Panel korzysta wyłącznie z dołączonych, syntetycznych scenariuszy. Wynik testu dotyczy wskazanych pól. Pełny wywiad, pliki klientów, baza spraw i przegląd prawnika są w planie rozwoju.</footer>
+  </main>
+</body>
+</html>

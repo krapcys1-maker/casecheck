@@ -98,3 +98,7 @@ Pierwsze [20 scenariuszy syntetycznych](tests/fixtures/cases.json) służy do bu
 ## Pierwszy wykonany moduł AI
 
 Dodano adaptery ekstrakcji dla trzech dostawców, lokalną walidację faktów i źródeł, dokładne uzgodnienie kwot oraz runner na danych syntetycznych. Po poprawkach kontraktu wykonano udane próby C01/C07/C13 u wszystkich trzech dostawców i 14 lokalnych testów. Wyniki: [WYNIKI-TESTU-API.md](WYNIKI-TESTU-API.md). Jest to komponent do przyszłej aplikacji, bez panelu, bazy spraw, OCR i wdrożenia pełnego procesu.
+
+## Panel testów i przygotowanie uruchomienia na VPS
+
+Po pierwszym module dodano chroniony panel przeglądarkowy do 14 syntetycznych scenariuszy ekstrakcji. Backend nie przyjmuje swobodnych danych klientów, ogranicza liczbę żądań i zachowuje licznik po restarcie. Instrukcja i pliki systemd/nginx: [deploy/README.md](deploy/README.md). Testy modułu i serwera: 22/22. Ten panel udostępnia obecny moduł AI; nie realizuje jeszcze pełnego procesu opisanego powyżej.
