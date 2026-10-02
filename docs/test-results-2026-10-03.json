@@ -1,0 +1,120 @@
+{
+  "verified_on_local": "2026-10-03",
+  "timezone": "Europe/Bucharest",
+  "code_commit": "3bab067",
+  "offline": {
+    "command": "npm test",
+    "tests": 48,
+    "passed": 48,
+    "failed": 0,
+    "local_node": "24.13.0",
+    "vps_node": "22.22.1",
+    "ci_node_versions": [
+      22,
+      24
+    ],
+    "ci_url": "https://github.com/krapcys1-maker/casecheck/actions/runs/37066310540",
+    "ci_tested_commit": "b04091e",
+    "adapter": "deterministic fixtures, no paid API"
+  },
+  "live": {
+    "started_utc": "2026-10-02T21:11:59.517Z",
+    "synthetic": true,
+    "paid_requests": 3,
+    "jobs": [
+      {
+        "case": "S02",
+        "document": "S02-D01.pdf",
+        "status": "completed",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "usage": {
+          "input_tokens": 1512,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          },
+          "output_tokens": 1066,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2578
+        }
+      },
+      {
+        "case": "S02",
+        "document": "S02-D02.pdf",
+        "status": "completed",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "usage": {
+          "input_tokens": 1508,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          },
+          "output_tokens": 1057,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2565
+        }
+      },
+      {
+        "case": "S04",
+        "document": "S04-D01.pdf",
+        "status": "completed",
+        "model": "gpt-4.1-mini-2025-04-14",
+        "usage": {
+          "input_tokens": 1524,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          },
+          "output_tokens": 1014,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 2538
+        }
+      }
+    ],
+    "budget_before": {
+      "day": "2026-10-02",
+      "used": 17,
+      "limit": 20,
+      "remaining": 3
+    },
+    "budget_after": {
+      "day": "2026-10-02",
+      "used": 20,
+      "limit": 20,
+      "remaining": 0
+    },
+    "semantic_corrections": [
+      {
+        "case": "S04",
+        "field": "original_creditor",
+        "before": "current creditor copied into previous creditor",
+        "after": "unknown",
+        "reason": "No assignment or previous creditor indicated in the source",
+        "method": "manual AI-assisted test review",
+        "paid_requests": 0
+      }
+    ],
+    "annotation": "Selected field assertions passed; semantic correction needed in S04. AI-assisted test review, no independent lawyer review."
+  },
+  "ui": {
+    "desktop": true,
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "horizontal_overflow": false,
+    "task_assignment_verified": true,
+    "case_filter_verified": true,
+    "draft_history_verified": true
+  },
+  "backup": {
+    "files_verified": 46,
+    "private_location": true
+  }
+}

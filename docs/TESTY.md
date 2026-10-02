@@ -20,6 +20,8 @@ Pozostałe testy obejmują cytaty i typy, daty i grosze, błędy/odmowy API, bra
 
 [GitHub Actions](https://github.com/krapcys1-maker/casecheck/actions/workflows/tests.yml) uruchamia tę samą komendę na Node 22 i 24. Wynik konkretnego uruchomienia jest widoczny w dzienniku CI; badge w README wskazuje ostatni stan.
 
+Potwierdzony [run 37066310540](https://github.com/krapcys1-maker/casecheck/actions/runs/37066310540) zakończył się sukcesem na obu wersjach Node. VPS: 48/48 testów, Node 22.22.1; lokalnie: 48/48, Node 24.13.0. [Raport JSON](test-results-2026-10-03.json) zachowuje wybrane metadane prób, bez danych dostępu. Dalsze poprawki tekstu i materiały portfolio nie zmieniają wyników wcześniejszej próby API.
+
 ## Nowe testy z rzeczywistym OpenAI
 
 Wykonano trzy wywołania modelu `gpt-4.1-mini-2025-04-14` na już zaimportowanych fikcyjnych dokumentach, bez przekazania modelowi oczekiwanych odpowiedzi. Sprawdzono kwotę całkowitą, walutę, datę salda, numer umowy, występowanie cytatów w źródłach i nieznane zabezpieczenie. W S04 sprawdzono również odczyt sporu.

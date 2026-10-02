@@ -10,6 +10,10 @@ Otwarty projekt przyjmowania spraw konsumenckich i firmowych. Wersja pilotażowa
 
 Dostęp do panelu wymaga konta; danych logowania nie publikujemy. Pokaz korzysta z przygotowanych fikcyjnych spraw i zapisanych odczytów. Projekt powstaje z pomocą agenta AI; testowa symulacja roli prawnika nie jest niezależnym przeglądem prawnym.
 
+[Trzystronicowe portfolio PDF](output/pdf/casecheck-portfolio.pdf) · [Opis projektu do CV](docs/OPIS-DO-CV.md)
+
+![Podsumowanie S01 w działającym panelu, wyłącznie fikcyjne dane](docs/images/podsumowanie-S01.png)
+
 ## Działające moduły
 
 - Konta administratora, prawnika i pracownika, hasła scrypt, wygasające sesje i link klienta do jednej sprawy. Dostęp sprawdzany według kancelarii oraz zakresu linku.

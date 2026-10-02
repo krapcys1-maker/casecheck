@@ -53,7 +53,7 @@ function renderList() {
     filter === 'tasks' && c.summary.open_tasks > 0));
   $('#case-count').textContent = `${visible.length} z ${cases.length} spraw`;
   $('#case-list').innerHTML = visible.map(c =>
-    `<button class="case-item ${selected?.id === c.id ? 'active' : ''}" data-action="open-case" data-value="${c.id}">${escape(c.title)}<small>${c.track === 'consumer' ? 'Konsument' : 'Firma'} · ${escape(labels[c.stage])}${c.synthetic ? ' · fikcyjne dane' : ''}</small></button>`).join('') || '<p class="small">Nie ma jeszcze spraw.</p>';
+    `<button class="case-item ${selected?.id === c.id ? 'active' : ''}" data-action="open-case" data-value="${c.id}">${escape(c.title)}<small>${c.track === 'consumer' ? 'Konsument' : 'Firma'} · ${escape(labels[c.stage])}${c.synthetic ? ' · fikcyjne dane' : ''}</small></button>`).join('') || `<p class="small">${cases.length ? 'Brak wyników dla wybranych filtrów.' : 'Nie ma jeszcze spraw.'}</p>`;
   const sum = key => cases.reduce((n, c) => n + c.summary[key], 0);
   $('#workspace-summary').innerHTML = `<div><strong>${cases.length}</strong><span>Spraw w kartotece</span></div><div><strong>${sum('pending_facts') + sum('pending_claims')}</strong><span>Odczytów do przeglądu</span></div><div><strong>${sum('open_tasks')}</strong><span>Otwartych zadań · ${sum('overdue_tasks')} po dacie docelowej (UTC)</span></div>`;
 }
@@ -80,9 +80,9 @@ function overviewPanel() {
   const s = selected.review_summary, checks = selected.controls;
   const points = [];
   if (checks.difference?.minor_units) points.push(['claims', 'Rozbieżność salda', `Deklaracja klienta różni się od dokumentów o ${valueOf({ ...checks.difference, type: 'money', precision: 'exact' })}. Wyjaśnij różnicę przed dalszą pracą.`]);
-  if (s.duplicate_pairs) points.push(['claims', 'Możliwe dokumenty tego samego długu', `${s.duplicate_pairs} par do powiązania. System pomija je w sumie do czasu przeglądu.`]);
-  if (s.disputed_claims) points.push(['claims', 'Roszczenia sporne', `${s.disputed_claims} pozycji ze sporem. Potwierdzenie odczytu nie oznacza uznania długu.`]);
-  if (s.pending_facts + s.pending_claims) points.push(['facts', 'Odczyty czekają na człowieka', `${s.pending_facts} pól wywiadu i ${s.pending_claims} roszczeń do przeglądu źródeł.`]);
+  if (s.duplicate_pairs) points.push(['claims', 'Możliwe dokumenty tego samego długu', `Pary do powiązania: ${s.duplicate_pairs}. System pomija je w sumie do czasu przeglądu.`]);
+  if (s.disputed_claims) points.push(['claims', 'Roszczenia sporne', `Pozycje ze sporem: ${s.disputed_claims}. Potwierdzenie odczytu nie oznacza uznania długu.`]);
+  if (s.pending_facts + s.pending_claims) points.push(['facts', 'Odczyty czekają na człowieka', `Do przeglądu źródeł: ${s.pending_facts} pól wywiadu; roszczenia: ${s.pending_claims}.`]);
   if (s.unread_documents || s.ocr_documents) points.push(['docs', 'Sprawdź załączniki', `${s.unread_documents} plików bez zakończonego odczytu; ${s.ocr_documents} odczytów OCR do porównania z obrazem.`]);
   if (s.missing_fields) points.push(['chat', 'Uzupełnij wywiad', `${s.missing_fields} obszarów bez danych. Brak informacji pozostaje widoczny.`]);
   if (selected.handoff) points.unshift(['chat', 'Klient prosi o kontakt', 'Przejmij rozmowę i ustal następny krok.']);

@@ -5,6 +5,7 @@ CaseCheck porządkuje przyjęcie sprawy: rozmowę, dokumenty, salda i materiał 
 - [Działający panel HTTPS](https://astrologiapoludzku.com/casecheck/) — wymaga konta. Tymczasowa ścieżka na istniejącej domenie; strona główna działa osobno.
 - [Kod i CI](https://github.com/krapcys1-maker/casecheck) — publiczne repozytorium, licencja MIT.
 - [Scenariusz pokazu](DEMO.md), [architektura](ARCHITEKTURA.md), [obsługa](OBSLUGA.md), [testy i dowody](TESTY.md).
+- [Portfolio PDF](../output/pdf/casecheck-portfolio.pdf) — trzy strony do udostępnienia; [gotowy opis projektu do CV](OPIS-DO-CV.md).
 - [Materiały testowe](../tests/full-fixtures/README.md) — 18 fikcyjnych spraw i dokumenty. Wyniki API oraz testowe przeglądy są opisane oddzielnie.
 
 ## Problem, który można pokazać w minutę
@@ -49,3 +50,7 @@ Wcześniejsza [analiza firmy](../ANALIZA-LEGALFLOW.md) dokumentuje punkt wyjści
 4. Dopiero na tej podstawie wybrać integrację CRM lub kolejne dokumenty. Dla większej instalacji zaprojektować migrację do Postgresa, magazynu plików oraz kolejki zadań.
 
 Kryteria powodzenia należy uzgodnić z zespołem przed testem. Aktualne dane syntetyczne pozwalają sprawdzić mechanikę i regresje; nie dowodzą oszczędności czasu ani jakości modelu na rzeczywistych aktach.
+
+## Odtworzenie materiału PDF
+
+Generator [`scripts/build-portfolio.py`](../scripts/build-portfolio.py) korzysta z ReportLab, osadzonych fontów DejaVu, publicznego raportu testów i zrzutu panelu. Nie czyta `.env`, haseł ani bazy spraw. Z repozytorium: `python scripts/build-portfolio.py`; opcjonalnie `--font-dir` wskazuje katalog fontów. Jeśli pełny zestaw DejaVu nie jest dostępny, generator używa fontu dołączonego w `assets/`. Gotowy PDF został wyrenderowany i wizualnie sprawdzony na wszystkich trzech stronach.
