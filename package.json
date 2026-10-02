@@ -1,0 +1,11 @@
+{
+  "name": "casecheck-ai-core",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "test": "node --test tests/ai-extraction.test.mjs",
+    "ai:check": "node scripts/smoke-ai.mjs --dry-run",
+    "ai:smoke": "node scripts/smoke-ai.mjs"
+  }
+}

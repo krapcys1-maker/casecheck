@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules/
+coverage/
+reports/local/
+*.log
+
+# Lokalne kopie cudzej strony wykorzystane wyłącznie podczas researchu.
+legal-flow-source.html
+legal-flow-text.txt

@@ -1,0 +1,186 @@
+{
+  "checked_on": "2026-10-02",
+  "scope": "Metadata, selected READMEs, license files and selected source files; repositories were not executed.",
+  "repositories": [
+    {
+      "repository": "jhpyle/docassemble",
+      "url": "https://github.com/jhpyle/docassemble",
+      "branch": "master",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-10-02T03:36:59Z",
+      "description": "A free, open-source expert system for guided interviews and document assembly, based on Python, YAML, and Markdown."
+    },
+    {
+      "repository": "SuffolkLITLab/docassemble-AssemblyLine",
+      "url": "https://github.com/SuffolkLITLab/docassemble-AssemblyLine",
+      "branch": "main",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-09-27T16:09:46Z",
+      "description": "Quickly go from a paper court form to a runnable, guided, step-by-step web application powered by Docassemble. Swap out branding and pre-built questions to meet your needs."
+    },
+    {
+      "repository": "mozilla/pdf.js",
+      "url": "https://github.com/mozilla/pdf.js",
+      "branch": "master",
+      "github_license_detection": "Apache-2.0",
+      "archived": false,
+      "pushed_at": "2026-10-02T14:41:10Z",
+      "description": "PDF Reader in JavaScript"
+    },
+    {
+      "repository": "ocrmypdf/OCRmyPDF",
+      "url": "https://github.com/ocrmypdf/OCRmyPDF",
+      "branch": "main",
+      "github_license_detection": "MPL-2.0",
+      "archived": false,
+      "pushed_at": "2026-09-29T07:55:13Z",
+      "description": "OCRmyPDF adds an OCR text layer to scanned PDF files, allowing them to be searched"
+    },
+    {
+      "repository": "tesseract-ocr/tesseract",
+      "url": "https://github.com/tesseract-ocr/tesseract",
+      "branch": "main",
+      "github_license_detection": "Apache-2.0",
+      "archived": false,
+      "pushed_at": "2026-09-28T07:40:38Z",
+      "description": "Tesseract Open Source OCR Engine (main repository)"
+    },
+    {
+      "repository": "tesseract-ocr/tessdata_fast",
+      "url": "https://github.com/tesseract-ocr/tessdata_fast",
+      "branch": "main",
+      "github_license_detection": "Apache-2.0",
+      "archived": false,
+      "pushed_at": "2024-08-01T19:42:06Z",
+      "description": "Fast integer versions of trained LSTM models"
+    },
+    {
+      "repository": "timgit/pg-boss",
+      "url": "https://github.com/timgit/pg-boss",
+      "branch": "master",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-10-02T17:46:48Z",
+      "description": "Queueing jobs in Postgres from Node.js like a boss"
+    },
+    {
+      "repository": "data-privacy-stack/presidio",
+      "url": "https://github.com/data-privacy-stack/presidio",
+      "branch": "main",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-09-29T07:47:22Z",
+      "description": "An open-source framework for detecting, redacting, masking, and anonymizing sensitive data (PII) across text, images, and structured data. Supports NLP, pattern matching, and customizable pipelines."
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "url": "https://github.com/promptfoo/promptfoo",
+      "branch": "main",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-10-02T17:38:19Z",
+      "description": "Test your prompts, agents, and RAGs. Red teaming/pentesting/vulnerability scanning for AI. Compare performance of GPT, Claude, Gemini, DeepSeek, and more. Simple declarative configs with command line and CI/CD integration.  Used by OpenAI and Anthropic."
+    },
+    {
+      "repository": "dolanmiu/docx",
+      "url": "https://github.com/dolanmiu/docx",
+      "branch": "master",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-10-02T17:48:38Z",
+      "description": "Easily generate and modify .docx files with JS/TS with a nice declarative API. Works for Node and on the Browser."
+    },
+    {
+      "repository": "open-xml-templating/docxtemplater",
+      "url": "https://github.com/open-xml-templating/docxtemplater",
+      "branch": "master",
+      "github_license_detection": "NOASSERTION",
+      "archived": false,
+      "pushed_at": "2026-09-21T21:12:21Z",
+      "description": "Generate docx, pptx, and xlsx from templates (Word, Powerpoint and Excel documents), from Node.js or the browser. Demo: https://www.docxtemplater.com/demo. #docx #office #generator #templating #report #json #generate #generation #template #create #pptx #docx #xlsx #react #vuejs #angularjs #browser #typescript #image #html #table #chart"
+    },
+    {
+      "repository": "docling-project/docling",
+      "url": "https://github.com/docling-project/docling",
+      "branch": "main",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-10-02T15:10:27Z",
+      "description": "Get your documents ready for gen AI"
+    },
+    {
+      "repository": "pgvector/pgvector",
+      "url": "https://github.com/pgvector/pgvector",
+      "branch": "master",
+      "github_license_detection": "NOASSERTION",
+      "archived": false,
+      "pushed_at": "2026-10-01T17:26:54Z",
+      "description": "Open-source vector similarity search for Postgres"
+    },
+    {
+      "repository": "brodzik/lqad-pl",
+      "url": "https://github.com/brodzik/lqad-pl",
+      "branch": "master",
+      "github_license_detection": null,
+      "archived": false,
+      "pushed_at": "2021-05-04T23:21:27Z",
+      "description": "Legal Question Answering Dataset for Polish (fork)"
+    },
+    {
+      "repository": "SuffolkLITLab/docassemble-ConsumerDebt",
+      "url": "https://github.com/SuffolkLITLab/docassemble-ConsumerDebt",
+      "branch": "master",
+      "github_license_detection": "NOASSERTION",
+      "archived": false,
+      "pushed_at": "2025-11-26T16:02:20Z",
+      "description": null
+    },
+    {
+      "repository": "PineTreeLegalAssistance/docassemble-DebtValidationLetter",
+      "url": "https://github.com/PineTreeLegalAssistance/docassemble-DebtValidationLetter",
+      "branch": "main",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2025-01-27T16:48:45Z",
+      "description": "A docassemble extension."
+    },
+    {
+      "repository": "byessilyurt/polish-legal-assistant",
+      "url": "https://github.com/byessilyurt/polish-legal-assistant",
+      "branch": "main",
+      "github_license_detection": null,
+      "archived": false,
+      "pushed_at": "2025-11-12T18:06:41Z",
+      "description": "AI-powered Polish Legal Assistant for foreigners - 248 docs, 90%+ response rate, RAG with GPT-4o"
+    },
+    {
+      "repository": "alsk1992/MecenasAi",
+      "url": "https://github.com/alsk1992/MecenasAi",
+      "branch": "main",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-02-16T17:45:22Z",
+      "description": "Polish AI legal assistant. Bielik LLM (Ollama) + RAG over 7 Polish legal codes (5,549 articles from Sejm API). Court document drafting, case management, law search, DOCX export. WebChat + Telegram. Local-first, private, built for lawyers."
+    },
+    {
+      "repository": "pkolawa/krs-poland-mcp-server",
+      "url": "https://github.com/pkolawa/krs-poland-mcp-server",
+      "branch": "main",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2026-08-23T10:28:56Z",
+      "description": "The MCP server for KRS Poland public API."
+    },
+    {
+      "repository": "rolzwy7/RegonAPI",
+      "url": "https://github.com/rolzwy7/RegonAPI",
+      "branch": "master",
+      "github_license_detection": "MIT",
+      "archived": false,
+      "pushed_at": "2025-10-20T08:27:10Z",
+      "description": "Python 3 API Client for Polish REGON database (Baza Internetowa Regon - BIR)"
+    }
+  ]
+}
