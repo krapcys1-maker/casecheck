@@ -119,7 +119,9 @@ export function draftSections(state, templateId, options = {}) {
     const claim = state.claims.find(c => c.id === options.claim_id && !c.merged_into);
     requireValue(claim, 'CLAIM_REQUIRED');
     const creditor = claimFact(claim, 'creditor_name');
-    sections.push({ heading: 'Adresat', text: `${factValue(creditor)}\n${text(options.recipient_address || '[DO UZUPEŁNIENIA: adres wierzyciela]', 500)}` });
+    const address = claimFact(claim, 'creditor_address');
+    const recipientAddress = options.recipient_address || (address?.type === 'text' ? address.text_value : '[DO UZUPEŁNIENIA: adres wierzyciela]');
+    sections.push({ heading: 'Adresat', text: `${factValue(creditor)}\n${text(recipientAddress, 500)}` });
     sections.push({ heading: 'Prośba o wyjaśnienie roszczenia', text: `W związku z informacją dotyczącą umowy lub dokumentu ${factValue(claimFact(claim, 'agreement_number'))} proszę o przedstawienie podstawy dochodzonego roszczenia, kopii umowy oraz szczegółowego rozliczenia kapitału, odsetek i kosztów, z uwzględnieniem wpłat i daty salda.\n\nJeżeli wierzytelność została nabyta od innego podmiotu, proszę również o dokumenty lub informacje pozwalające ustalić następstwo prawne i zidentyfikować wierzytelność objętą przelewem.\n\nNiniejsza prośba służy wyjaśnieniu danych i nie stanowi oświadczenia o uznaniu długu ani jego wysokości. Jej treść należy ocenić w świetle okoliczności konkretnej sprawy przed wysłaniem.\n\n[Podpis osoby uprawnionej — po zatwierdzeniu projektu]` });
   } else if (templateId === 'preliminary_plan') {
     sections.push({ heading: '1. Przyczyny trudnej sytuacji ekonomicznej', text: value('causes') });

@@ -156,6 +156,30 @@ test('draft approval belongs to a reviewed version and corrections invalidate it
   assert.equal(state.drafts[0].status, 'stale');
   assert.throws(() => f.app.approveDraft(lawyer, state.id, { revision: state.revision, draft_id: state.drafts[0].id }), { code: 'DRAFT_OUTDATED' });
 });
+test('claim letter uses the recorded recipient address and keeps other creditors private', async t => {
+  const f = await fixture(t);
+  let state = f.app.create(f.actor, { title: 'Adresat pisma', track: 'consumer', synthetic: true });
+  state = f.app.store.update(f.actor, state.id, state.revision, 'test_claims', s => {
+    for (const [name, address] of [['Bank Wybrany', null], ['Inny Wierzyciel', 'Adres drugiego wierzyciela']]) {
+      const source = addSource(s, { text: name + (address ? ': ' + address : '') });
+      s.claims.push({ id: uid(), document_id: uid(), source_ids: [source.id], review: 'pending', merged_into: null,
+        facts: [textFact('creditor_name', name, source), address ? textFact('creditor_address', address, source) : unknown('creditor_address')] });
+    }
+  });
+  const claimId = state.claims[0].id;
+  const create = options => f.app.draft(f.actor, state.id, { revision: state.revision, template: 'claim_clarification', options: { claim_id: claimId, ...options } });
+  state = create();
+  assert.match(state.drafts.at(-1).sections.find(s => s.heading === 'Adresat').text, /DO UZUPEŁNIENIA/);
+  state = f.app.correctClaim(f.actor, state.id, { revision: state.revision, claim_id: claimId,
+    fact: { ...unknown('creditor_address'), type: 'text', text_value: 'ul. Testowa 7, Miasto Fikcyjne', precision: 'exact' },
+    note: 'Adres z fikcyjnego dokumentu: ul. Testowa 7, Miasto Fikcyjne' });
+  state = create();
+  const letter = state.drafts.at(-1);
+  assert.equal(letter.sections.find(s => s.heading === 'Adresat').text, 'Bank Wybrany\nul. Testowa 7, Miasto Fikcyjne');
+  assert.doesNotMatch(letter.sections.map(s => s.text).join('\n'), /Inny Wierzyciel|Adres drugiego wierzyciela/);
+  state = create({ recipient_address: 'Inny adres do korespondencji' });
+  assert.equal(state.drafts.at(-1).sections.find(s => s.heading === 'Adresat').text, 'Bank Wybrany\nInny adres do korespondencji');
+});
 test('PDF footer stays on the content page and process lock prevents competing workers', async t => {
   const f = await fixture(t);
   assert.throws(() => new Application({ env, stateDir: f.directory }), { code: 'APP_ALREADY_RUNNING' });
