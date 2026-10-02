@@ -1,3 +1,8 @@
+# Status dokumentu
+
+Ten plan zachowuje historię projektowania, w tym wcześniejsze propozycje stosu i etapy przed wdrożeniem. Aktualny zakres, uruchomienie i testy opisuje [README](README.md), a faktyczną architekturę [dokumentacja](docs/ARCHITEKTURA.md). Projekt jest wdrożony pod tymczasową ścieżką HTTPS `/casecheck/`; osobna domena jest możliwym późniejszym krokiem.
+
+
 # Pełny bot do przyjmowania i porządkowania spraw
 
 Plan z 2 października 2026 r. Cel: działająca aplikacja na serwerze użytkownika, model AI wyłącznie przez zewnętrzne API. Zbudowano pierwszą wersję pilotażową opisaną w README. Poniższy dokument zachowuje pierwotny zakres i historię etapów; aktualny stan znajduje się na końcu.

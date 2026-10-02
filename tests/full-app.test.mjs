@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import { createAppServer } from '../src/app-server.mjs';
 import { Application } from '../src/app/application.mjs';
 import { Store, uid } from '../src/app/store.mjs';
-import { claimFields, addSource, putFacts, controls, draftSections } from '../src/app/domain.mjs';
+import { claimFields, addSource, putFacts, controls, draftSections, reviewSummary, emptyCase, publicCase } from '../src/app/domain.mjs';
 import { readDocument, saveFile, safeFile } from '../src/app/files.mjs';
 import { makeBackup, verifyBackup } from '../scripts/backup.mjs';
 import { renderDraft } from '../src/app/pdf.mjs';
@@ -218,4 +218,122 @@ test('origin checks, anonymous API rejection and client response omit review his
   const state = f.app.create(f.actor, { title: 'Zakres', track: 'consumer', synthetic: true }); const link = f.app.store.link(f.actor, state.id);
   const response = await f.request(`/cases/${state.id}`, undefined, link.token);
   assert.equal(response.status, 200); for (const key of ['sources', 'facts', 'jobs', 'drafts', 'claims', 'tasks']) assert.equal(Object.hasOwn(response.body, key), false);
+});
+
+
+test('team directory is scoped, active-only and excludes email, password and client access', async t => {
+  const f = await fixture(t);
+  const staff = await f.app.store.addUser(f.actor, { email: 'team-staff@example.invalid', name: 'Zofia Testowa', role: 'staff', password });
+  const lawyer = await f.app.store.addUser(f.actor, { email: 'team-lawyer@example.invalid', name: 'Anna Testowa', role: 'lawyer', password });
+  const disabled = await f.app.store.addUser(f.actor, { email: 'disabled@example.invalid', name: 'Nieaktywna', role: 'staff', password });
+  f.app.store.disableUser(f.actor, disabled.id);
+  await f.app.store.addUser({ role: 'admin', tenant: uid() }, { email: 'foreign@example.invalid', name: 'Inna kancelaria', role: 'lawyer', password });
+  const login = await f.app.store.login(staff.email, password);
+  const response = await f.request('/team', undefined, login.token);
+  assert.equal(response.status, 200);
+  assert.ok(response.body.team.some(u => u.id === lawyer.id && u.name === 'Anna Testowa'));
+  assert.equal(response.body.team.length, 3);
+  for (const member of response.body.team) assert.deepEqual(Object.keys(member).sort(), ['id', 'name', 'role']);
+  const state = f.app.create(f.actor, { title: 'Zakres linku', track: 'consumer', synthetic: true });
+  const link = f.app.store.link(f.actor, state.id);
+  assert.equal((await f.request('/team', undefined, link.token)).status, 403);
+  assert.equal((await f.request('/team')).status, 401);
+  assert.throws(() => f.app.task(login.user, state.id, { revision: state.revision, title: 'Zadanie', kind: 'administrative', assignee: disabled.id }), { code: 'INVALID_ASSIGNEE' });
+});
+
+test('workspace summaries include own cases and never extend the client response', async t => {
+  const f = await fixture(t);
+  let state = f.app.create(f.actor, { title: 'Podsumowanie', track: 'company', synthetic: true });
+  state = f.app.task(f.actor, state.id, { revision: state.revision, title: 'Uzupełnić dokument', kind: 'administrative' });
+  const other = { id: uid(), role: 'admin', tenant: uid() };
+  f.app.create(other, { title: 'Obca sprawa', track: 'consumer', synthetic: true });
+  const response = await f.request('/cases', undefined, f.token);
+  assert.equal(response.body.cases.length, 1);
+  assert.equal(response.body.cases[0].summary.open_tasks, 1);
+  const link = f.app.store.link(f.actor, state.id);
+  const client = await f.request('/cases/' + state.id, undefined, link.token);
+  assert.equal('review_summary' in client.body, false);
+  assert.equal('tasks' in client.body, false);
+});
+
+test('review counters distinguish absent, rejected, pending and reviewed fields without a readiness claim', () => {
+  const state = emptyCase({ title: 'Stan danych', track: 'consumer', synthetic: true });
+  state.data_revision = 7;
+  putFacts(state, [textFact('client_name', 'Osoba', { id: 'x', text: 'Osoba' })]);
+  putFacts(state, [textFact('address', 'Adres', { id: 'y', text: 'Adres' })], { review: 'rejected' });
+  putFacts(state, [money('monthly_income', 390000)], { review: 'confirmed' });
+  putFacts(state, [unknown('assets')]);
+  state.drafts = [{ status: 'approved', source_revision: 7 }, { status: 'approved', source_revision: 6 }, { status: 'stale', source_revision: 7 }];
+  state.tasks = [{ status: 'open', due: '2026-10-02' }, { status: 'open', due: '2026-10-03' }, { status: 'done', due: '2026-10-01' }];
+  const summary = reviewSummary(state, '2026-10-03');
+  assert.equal(summary.known_fields, 2); assert.equal(summary.confirmed_fields, 1);
+  assert.equal(summary.pending_facts, 1); assert.equal(summary.missing_fields, summary.field_count - 2);
+  assert.equal(summary.current_drafts, 1); assert.equal(summary.approved_drafts, 1);
+  assert.equal(summary.open_tasks, 2); assert.equal(summary.overdue_tasks, 1);
+  assert.equal('legally_ready' in summary, false);
+});
+
+// Deterministic adapter fixtures exercise the full HTTP workflow. They are not LLM accuracy measurements.
+const scenarios = [
+  { name: 'S01 amount discrepancy', declared: 12000000, amounts: [5000000, 4000000, 2000000], agreements: ['A1', 'B1', 'C1'], expected: 11000000 },
+  { name: 'S02 assignment keeps both sources and one balance', amounts: [5000000, 5320000], agreements: ['CESJA-1', 'CESJA-1'], expected: 5320000, merge: true },
+  { name: 'S04 disputed claim remains a disputed reading', amounts: [1900000], agreements: ['SPOR-1'], expected: 1900000, disputed: true },
+  { name: 'S06 currency and balance dates remain separate', amounts: [800000, 300000, 200000], agreements: ['PLN-1', 'EUR-1', 'PLN-OLD'], currencies: ['PLN', 'EUR', 'PLN'], dates: ['2026-09-30', '2026-09-30', '2026-08-31'], groups: 3 },
+  { name: 'Unknown security does not become a negative assertion', amounts: [2500000], agreements: ['BRAK-1'], expected: 2500000 },
+];
+for (const scenario of scenarios) test('HTTP workflow: ' + scenario.name, async t => {
+  const f = await fixture(t, { extract: async ({ requested_fields, sources }) => {
+    const source = sources[0], index = Number(/Document (\d+)/.exec(source.text)?.[1] || 0);
+    const facts = requested_fields.map(field => {
+      if (field === 'declared_total') return { ...money(field, scenario.declared), source_id: source.id, quote: source.text };
+      if (field === 'creditor_name') return textFact(field, 'Wierzyciel Testowy ' + index, source);
+      if (field === 'agreement_number') return textFact(field, scenario.agreements[index], source);
+      if (field === 'total_amount') return { ...money(field, scenario.amounts[index], scenario.dates?.[index] || '2026-09-30', scenario.currencies?.[index] || 'PLN'), source_id: source.id, quote: source.text };
+      if (field === 'disputed' && scenario.disputed) return { ...unknown(field), type: 'boolean', boolean_value: true, precision: 'exact', source_id: source.id, quote: source.text };
+      return unknown(field);
+    });
+    return { output: { facts, questions: [], warnings: [] }, model: 'deterministic-test-adapter', usage: {}, prompt_version: 'test-only' };
+  } });
+  const account = await f.app.store.addUser(f.actor, { email: 'workflow-lawyer@example.invalid', name: 'Przegląd Testowy', role: 'lawyer', password });
+  const login = await f.app.store.login(account.email, password);
+  let r = await f.request('/cases', { title: scenario.name, track: 'consumer', synthetic: true }, login.token), state = r.body;
+  const post = async (action, input) => { const result = await f.request('/cases/' + state.id + '/' + action, { revision: state.revision, ...input }, login.token); assert.equal(result.status, 200, result.body.error); state = result.body; return state; };
+  await post('consent', { accepted: true, provider: 'openai' });
+  if (scenario.declared) {
+    await post('messages', { text: 'Deklaruję 120000 PLN, saldo 2026-09-30.', analyze: false });
+    await post('analyze', { kind: 'intake', fields: ['declared_total'], source_ids: [state.sources.find(s => s.kind === 'message').id] });
+    await post('review-fact', { fact_id: state.current_facts.declared_total.id, review: 'confirmed' });
+  }
+  for (let i = 0; i < scenario.amounts.length; i++) {
+    const content = 'Document ' + i + '\nFikcyjny dokument. Umowa ' + scenario.agreements[i] + '. Kwota w groszach ' + scenario.amounts[i] + '. Saldo ' + (scenario.dates?.[i] || '2026-09-30') + '. Waluta ' + (scenario.currencies?.[i] || 'PLN') + '. Informacja testowa ' + (scenario.disputed ? 'sporne' : 'brak danych o zabezpieczeniu') + '.';
+    const response = await fetch(f.url + '/cases/' + state.id + '/upload', { method: 'POST', headers: { Authorization: 'Bearer ' + login.token, 'X-Case-Revision': String(state.revision), 'X-File-Name': 'dokument-testowy-' + i + '.txt' }, body: content });
+    assert.equal(response.status, 201); state = await response.json();
+    const doc = state.documents.at(-1);
+    await post('analyze', { kind: 'claim', source_ids: state.sources.filter(s => s.document_id === doc.id).map(s => s.id) });
+    assert.equal(state.jobs.at(-1).status, 'completed');
+    await post('review-claim', { claim_id: state.claims.at(-1).id, review: 'confirmed' });
+  }
+  if (scenario.merge) {
+    assert.equal(state.controls.excluded_claims, 2); assert.equal(state.controls.totals.length, 0);
+    const [a, b] = state.claims;
+    await post('merge', { from: a.id, into: b.id, note: 'Test: cesja tej samej umowy; nowsze saldo wymaga przeglądu.' });
+    assert.equal(state.claims[1].source_ids.length, 2);
+    await post('review-claim', { claim_id: b.id, review: 'confirmed' });
+    assert.equal(state.review_summary.duplicate_pairs, 0);
+  }
+  if (scenario.expected) assert.equal(state.controls.totals[0].minor_units, scenario.expected);
+  if (scenario.groups) assert.equal(state.controls.totals.length, scenario.groups);
+  if (scenario.declared) assert.equal(state.controls.difference.minor_units, 1000000);
+  if (scenario.disputed) { assert.equal(state.review_summary.disputed_claims, 1); assert.ok(state.controls.issues.some(i => i.code === 'disputed')); }
+  assert.equal(state.claims.at(-1).facts.find(f => f.field === 'security_description').type, 'unknown');
+  await post('drafts', { template: 'case_card' });
+  await post('approve-draft', { draft_id: state.drafts.at(-1).id });
+  const approved = state.drafts.at(-1), dataRevision = state.data_revision;
+  const pdf = await fetch(f.url + '/cases/' + state.id + '/pdf/' + approved.id, { headers: { Authorization: 'Bearer ' + login.token } });
+  assert.equal(pdf.status, 200); assert.ok(Buffer.from(await pdf.arrayBuffer()).subarray(0, 5).equals(Buffer.from('%PDF-')));
+  await post('tasks', { title: 'Wyjaśnić brakujące dane - test', kind: 'administrative', assignee: account.id });
+  assert.equal(state.data_revision, dataRevision); assert.equal(state.review_summary.approved_drafts, 1);
+  await post('messages', { text: 'Nowa informacja klienta - wymaga przeglądu.', analyze: false });
+  assert.equal(state.review_summary.approved_drafts, 0); assert.equal(state.drafts.at(-1).status, 'stale');
+  assert.ok((await f.request('/cases/' + state.id + '/history', undefined, login.token)).body.history.length > 5);
 });

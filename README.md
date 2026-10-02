@@ -4,6 +4,12 @@
 
 Otwarty projekt przyjmowania spraw konsumenckich i firmowych. Wersja pilotażowa prowadzi od rozmowy i załączników do kartoteki wierzycieli, przeglądu danych oraz projektów dokumentów. Dane mają źródła; zatwierdzanie należy do konta prawnika.
 
+**Projekt portfolio:** klient deklaruje 120 tys. zł, dokumenty wskazują 110 tys. zł. CaseCheck pokazuje różnicę 10 tys. zł, źródła i następne zadania. To działający przykład projektowania obiegu danych z AI, przeglądem człowieka i wdrożeniem.
+
+[Panel HTTPS](https://astrologiapoludzku.com/casecheck/) · [Prezentacja projektu](docs/PORTFOLIO.md) · [Demo w 8 minut](docs/DEMO.md) · [Jak działa](docs/ARCHITEKTURA.md) · [Instrukcja](docs/OBSLUGA.md) · [Wyniki i zakres testów](docs/TESTY.md)
+
+Dostęp do panelu wymaga konta; danych logowania nie publikujemy. Pokaz korzysta z przygotowanych fikcyjnych spraw i zapisanych odczytów. Projekt powstaje z pomocą agenta AI; testowa symulacja roli prawnika nie jest niezależnym przeglądem prawnym.
+
 ## Działające moduły
 
 - Konta administratora, prawnika i pracownika, hasła scrypt, wygasające sesje i link klienta do jednej sprawy. Dostęp sprawdzany według kancelarii oraz zakresu linku.
@@ -13,6 +19,7 @@ Otwarty projekt przyjmowania spraw konsumenckich i firmowych. Wersja pilotażowa
 - Ręczne korekty i przegląd, wcześniejsze wartości, wykrywanie zgodnych numerów umów oraz ręczne powiązanie dokumentów jednego długu. Sumy według waluty i daty.
 - Pięć edytowalnych wzorów: karta sprawy, pomocniczy wykaz wierzycieli, prośba o uzupełnienie, prośba o wyjaśnienie roszczenia i szkic wstępnego planu restrukturyzacyjnego. Eksport PDF; zmiana danych unieważnia poprzedni projekt.
 - Etapy, zadania, przypisanie do konta, dziennik wersji i eksport JSON. Termin prawny wymaga prawnika, podstawy i daty rozpoczynającej bieg.
+- Podsumowanie sprawy: braki, odczyty do przeglądu, rozbieżności, spory i zadania. Filtry kartoteki, przypisywanie do nazwanych osób oraz rozdzielenie aktualnych i wcześniejszych pism.
 - Aktualny odpis KRS i wykaz VAT MF, z adresem źródła, datą i identyfikatorem zapytania. Dla fikcyjnych spraw VAT korzysta ze środowiska testowego.
 - Kopia bazy wraz z plikami, hashe, kontrola integralności i test odtworzenia. Usuwanie aktywnej sprawy wraz z historią i linkami.
 

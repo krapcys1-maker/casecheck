@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { loadEnvFile } from 'node:process';
 import { Application } from './app/application.mjs';
 import { AppError, requireValue } from './app/store.mjs';
-import { root, publicCase, knowledge } from './app/domain.mjs';
+import { root, publicCase, reviewSummary, knowledge } from './app/domain.mjs';
 import { safeFile, deleteFile } from './app/files.mjs';
 import { renderDraft } from './app/pdf.mjs';
 import { KEY_NAMES, providerConfig } from './ai/extraction.mjs';
@@ -88,11 +88,13 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
         if (request.method === 'GET') { send(200, { users: app.store.users(actor) }); return; }
         if (request.method === 'POST') { send(201, await app.store.addUser(actor, await readBody(request, 4096))); return; }
       }
+      if (path === '/api/team' && request.method === 'GET') { send(200, { team: app.store.team(actor) }); return; }
       if (path === '/api/users/disable' && request.method === 'POST') { const input = await readBody(request, 4096); app.store.disableUser(actor, input.user_id); send(200, { ok: true }); return; }
       if (path === '/api/knowledge/approve' && request.method === 'POST') { send(200, app.store.approveKnowledge(actor, knowledge)); return; }
       if (path === '/api/seed' && request.method === 'POST') { send(200, app.seed(actor)); return; }
       if (path === '/api/cases') {
-        if (request.method === 'GET') { send(200, { cases: app.store.list(actor) }); return; }
+        if (request.method === 'GET') { send(200, { cases: app.store.list(actor).map(c => ({ ...c,
+          summary: reviewSummary(app.store.get(actor, c.id), app.store.now().toISOString().slice(0, 10)) })) }); return; }
         if (request.method === 'POST') { send(201, publicCase(app.create(actor, await readBody(request, 4096)), actor)); return; }
       }
       const match = /^\/api\/cases\/([a-f0-9-]{36})(?:\/([a-z-]+)(?:\/([a-f0-9-]{36}))?)?$/.exec(path);

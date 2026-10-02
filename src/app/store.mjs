@@ -78,6 +78,10 @@ export class Store {
     requireValue(actor.role === 'admin', 'FORBIDDEN', 403);
     return this.db.prepare('SELECT id,email,name,role,active FROM users WHERE tenant=?').all(actor.tenant);
   }
+  team(actor) {
+    requireValue(['admin', 'lawyer', 'staff'].includes(actor.role), 'FORBIDDEN', 403);
+    return this.db.prepare('SELECT id,name,role FROM users WHERE tenant=? AND active=1 ORDER BY name,id').all(actor.tenant);
+  }
   disableUser(actor, id) {
     requireValue(actor.role === 'admin' && id !== actor.id, 'FORBIDDEN', 403);
     this.tx(() => {

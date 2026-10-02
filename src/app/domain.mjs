@@ -91,12 +91,31 @@ export function controls(state) {
       ? { ...comparable, minor_units: declared.minor_units - comparable.minor_units } : null,
     missing_fields: missing(state).map(({ key, label, question }) => ({ key, label, question })) };
 }
+// Operational counts, not a legal assessment or an AI confidence score.
+export function reviewSummary(state, today = new Date().toISOString().slice(0, 10)) {
+  const checks = controls(state), facts = Object.values(currentFacts(state));
+  const known = facts.filter(f => f.type !== 'unknown' && f.review !== 'rejected');
+  const active = state.claims.filter(c => !c.merged_into);
+  const open = state.tasks.filter(t => t.status === 'open');
+  const currentDrafts = state.drafts.filter(d => d.source_revision === state.data_revision && d.status !== 'stale');
+  return { field_count: fieldSet(state).length, known_fields: known.length,
+    confirmed_fields: known.filter(f => f.review === 'confirmed').length,
+    pending_facts: known.filter(f => f.review === 'pending').length, missing_fields: checks.missing_fields.length,
+    active_claims: active.length, pending_claims: active.filter(c => c.review === 'pending').length,
+    duplicate_pairs: checks.candidates.length,
+    disputed_claims: active.filter(c => claimFact(c, 'disputed')?.boolean_value === true).length,
+    unread_documents: (state.documents || []).filter(d => !['read', 'ocr_review'].includes(d.status)).length,
+    ocr_documents: (state.documents || []).filter(d => d.status === 'ocr_review').length,
+    difference: checks.difference, open_tasks: open.length,
+    overdue_tasks: open.filter(t => t.due && t.due < today).length,
+    current_drafts: currentDrafts.length, approved_drafts: currentDrafts.filter(d => d.status === 'approved').length };
+}
 export function publicCase(state, actor) {
   const checks = controls(state);
   if (actor.role === 'client') return { id: state.id, title: state.title, track: state.track, synthetic: state.synthetic,
     stage: state.stage, revision: state.revision, messages: state.messages, consent: state.consent, handoff: state.handoff,
     documents: state.documents || [], next_question: nextQuestion(state), missing: checks.missing_fields };
-  return { ...state, controls: checks, current_facts: currentFacts(state), next_question: nextQuestion(state) };
+  return { ...state, controls: checks, review_summary: reviewSummary(state), current_facts: currentFacts(state), next_question: nextQuestion(state) };
 }
 export function draftSections(state, templateId, options = {}) {
   const facts = currentFacts(state), value = key => factValue(facts[key]);
