@@ -2,6 +2,7 @@ import { openDocumentReview } from './document-review.js';
 import { portalPanel, responseForm, templateManager, templateEditor, parseTemplateText } from './workspace.js';
 import { trackFormEdits, captureForms, restoreForms } from './form-state.js';
 import { conversationPanel } from './conversation.js';
+import { workflowEditor } from './workflow.js';
 trackFormEdits(document);
 const base = new URL('.', location.href).pathname.replace(/\/$/, '');
 const $ = selector => document.querySelector(selector);
@@ -21,6 +22,11 @@ const errors = { PROVIDER_DISABLED: 'Dozwolony jest wyłącznie DeepSeek V4.1 Fl
   REGISTRY_INVALID_RESPONSE: 'Rejestr zwrócił odpowiedź, której nie można odczytać. Nie zapisano danych. Spróbuj później.',
   REGISTRY_RESPONSE_LIMIT: 'Odpowiedź rejestru przekroczyła dopuszczalny rozmiar. Nie zapisano danych.',
   INVALID_DATE: 'Podaj prawidłową datę w kalendarzu.',
+  COMPANY_NIP_REQUIRED: 'Włącz pobieranie danych i podaj w rozmowie NIP firmy. Potrzebny jest jednoznaczny numer o poprawnej sumie kontrolnej.',
+  COMPANY_CANDIDATE_STALE: 'Dane zmieniły się. Pobierz firmę ponownie przed potwierdzeniem.',
+  INTAKE_NOT_READY: 'Dodaj wiadomość do wywiadu. Przekazanie jest dostępne w etapach Wywiad i Przegląd.',
+  INTAKE_JOB_PENDING: 'Poczekaj na odczyt lub odzyskaj jego zapisany wynik przed zakończeniem wywiadu.',
+  INVALID_WORKFLOW: 'Sprawdź wzory, osoby i liczbę dni (0–30) w ustawieniach automatyzacji.',
   DRAFT_NOT_SHAREABLE: 'Udostępnienie wymaga zatwierdzenia aktualnej wersji pisma.', ALREADY_SHARED: 'Ta wersja pisma jest już udostępniona klientowi.',
   DOCUMENT_UNAVAILABLE: 'Pismo zmieniło się lub udostępnienie odwołano. Odśwież sprawę.', OPEN_TASKS_OR_ROLE: 'Zamknięcie sprawy wymaga prawnika i zakończenia zadań oraz próśb do klienta.',
   TEMPLATE_REVIEW_REQUIRED: 'Prawnik musi zatwierdzić wzór kancelarii.', TEMPLATE_OUTDATED: 'Wzór zmienił się. Utwórz pismo z aktualnego zatwierdzonego wzoru.',
@@ -206,7 +212,7 @@ function draftsPanel() {
   return `<div class="card"><div class="row"><h3>Projekty dokumentów</h3>${button('Wzory kancelarii', 'firm-templates')}</div><form id="draft-form"><label for="template">Wzór</label><div class="row"><select id="template">${(config.firm_templates || []).filter(t => t.status === 'approved' && t.tracks.includes(selected.track)).map(t => `<option value="firm:${t.id}">Kancelaria: ${escape(t.title)} · v${t.revision}</option>`).join('')}${config.knowledge.templates.templates.filter(t => t.tracks.includes(selected.track) && t.id !== 'claim_clarification').map(t => `<option value="${t.id}">${escape(t.title)}</option>`).join('')}</select><button>Utwórz projekt</button></div></form><p class="small">Wzory pomocnicze zachowują brakujące dane. Wniosek sądowy przygotowuje się na właściwym formularzu i w odpowiednim trybie.</p><h3>Aktualna wersja danych</h3>${cards(current) || '<p class="small">Utwórz projekt na podstawie aktualnych danych.</p>'}${previous.length ? `<details class="draft-history"><summary>Poprzednie wersje · ${previous.length} projektów</summary>${cards(previous)}</details>` : ''}</div>`;
 }
 function tasksPanel() {
-  return `<div class="card"><h3>Etap i zadania</h3><form id="stage-form"><label for="stage">Etap</label><div class="row"><select id="stage">${['intake', 'review', 'documents', 'closed'].map(s => `<option value="${s}" ${selected.stage === s ? 'selected' : ''}>${labels[s]}</option>`).join('')}</select><button>Zapisz etap</button></div></form><form id="task-form"><label for="task-title">Nowe zadanie</label><input id="task-title" required maxlength="200"><div class="row"><div><label for="task-kind">Rodzaj terminu</label><select id="task-kind"><option value="administrative">Administracyjny</option>${isLawyer() ? '<option value="legal">Prawny — ręczne potwierdzenie</option>' : ''}</select></div><div><label for="task-due">Data docelowa</label><input id="task-due" type="date"></div></div>${isLawyer() ? '<label for="task-basis">Podstawa prawna / sposób obliczenia (dla terminu prawnego)</label><input id="task-basis"><label for="task-start">Potwierdzona data początku biegu</label><input id="task-start" type="date">' : ''}<label for="task-assignee">Osoba odpowiedzialna</label><select id="task-assignee"><option value="">Bez przypisania</option>${team.map(u => `<option value="${u.id}">${escape(u.name)} · ${escape({admin: "administrator", lawyer: "prawnik", staff: "pracownik"}[u.role])}</option>`).join('')}</select><button>Dodaj zadanie</button></form>${selected.tasks.map(t => `<div class="task"><strong>${escape(t.title)}</strong><p class="small">${t.kind === 'legal' ? 'Termin prawny · ' + escape(t.basis) : 'Termin administracyjny'} · ${escape(t.due || 'bez daty')} · ${t.status === 'done' ? 'wykonane' : 'otwarte'}${t.assignee ? ' · ' + escape(team.find(u => u.id === t.assignee)?.name || 'Konto nieaktywne') : ''}</p>${button(t.status === 'done' ? 'Otwórz ponownie' : 'Oznacz jako wykonane', 'toggle-task', t.id)}</div>`).join('')}</div>`;
+  return `<div class="card"><h3>Etap i zadania</h3>${button('Ustaw automatyzację etapów', 'workflow-editor')}<p class="small">Zmiana na Przegląd lub Dokumenty uruchamia skonfigurowane projekty i zadania. Pisma czekają na zatwierdzenie.</p><form id="stage-form"><label for="stage">Etap</label><div class="row"><select id="stage">${['intake', 'review', 'documents', 'closed'].map(s => `<option value="${s}" ${selected.stage === s ? 'selected' : ''}>${labels[s]}</option>`).join('')}</select><button>Zapisz etap</button></div></form><form id="task-form"><label for="task-title">Nowe zadanie</label><input id="task-title" required maxlength="200"><div class="row"><div><label for="task-kind">Rodzaj terminu</label><select id="task-kind"><option value="administrative">Administracyjny</option>${isLawyer() ? '<option value="legal">Prawny — ręczne potwierdzenie</option>' : ''}</select></div><div><label for="task-due">Data docelowa</label><input id="task-due" type="date"></div></div>${isLawyer() ? '<label for="task-basis">Podstawa prawna / sposób obliczenia (dla terminu prawnego)</label><input id="task-basis"><label for="task-start">Potwierdzona data początku biegu</label><input id="task-start" type="date">' : ''}<label for="task-assignee">Osoba odpowiedzialna</label><select id="task-assignee"><option value="">Bez przypisania</option>${team.map(u => `<option value="${u.id}">${escape(u.name)} · ${escape({admin: "administrator", lawyer: "prawnik", staff: "pracownik"}[u.role])}</option>`).join('')}</select><button>Dodaj zadanie</button></form>${selected.tasks.map(t => `<div class="task"><strong>${escape(t.title)}</strong><p class="small">${t.kind === 'legal' ? 'Termin prawny · ' + escape(t.basis) : 'Termin administracyjny'} · ${escape(t.due || 'bez daty')} · ${t.status === 'done' ? 'wykonane' : 'otwarte'}${t.assignee ? ' · ' + escape(team.find(u => u.id === t.assignee)?.name || 'Konto nieaktywne') : ''}</p>${button(t.status === 'done' ? 'Otwórz ponownie' : 'Oznacz jako wykonane', 'toggle-task', t.id)}</div>`).join('')}</div>`;
 }
 function historyPanel() {
   const recovery = (selected.recoverable_jobs || []).map(r => `<div class="review-point"><div><strong>Zapis odczytu czeka na odzyskanie</strong><p class="small">Zapisano ${escape(r.captured_at)}. Odzyskanie nie wywołuje API. Dane nadal wymagają zwykłego przeglądu.</p></div>${button('Odzyskaj zapisany wynik', 'recover-job', r.job_id)}</div>`).join('');
@@ -295,6 +301,12 @@ document.addEventListener('click', event => {
     else if (action === 'download-release') await download('/cases/' + selected.id + '/client-pdf/' + value, 'casecheck-sprawdzone-pismo.pdf');
     else if (action === 'download-docx') await download('/cases/' + selected.id + '/docx/' + value, 'casecheck-projekt.docx');
     else if (action === 'tab') { tab = value; render(); }
+    else if (action === 'registry-auto') await mutate('registry-automation', { enabled: value === 'on' });
+    else if (action === 'company-lookup') await mutate('company-lookup', {});
+    else if (action === 'confirm-company') await mutate('confirm-company', { candidate_id: value });
+    else if (action === 'finish-intake') { await mutate('finish-intake', {}); if (!isClient()) { tab = 'drafts'; render(); } }
+    else if (action === 'workflow-editor') modal('Automatyzacja etapów', workflowEditor(selected.workflow_rules || config.workflow_defaults,
+      config.knowledge.templates.templates.filter(t => t.tracks.includes(selected.track) && t.id !== 'claim_clarification'), team, escape));
     else if (action === 'open-case') { tab = 'chat'; await openCase(value); }
     else if (action === 'consent') await mutate('consent', { accepted: true, provider: $('#provider').value });
     else if (action === 'handoff') await mutate('messages', { text: 'Proszę o kontakt z człowiekiem — prawnikiem.', analyze: false, request_handoff: true });
@@ -397,6 +409,14 @@ document.addEventListener('submit', event => {
     else if (form.id === 'edit-draft-form') { const draft = selected.drafts.find(d => d.id === form.dataset.draft), sections = draft.sections.map((s, i) => ({ ...s, text: $('#section-' + i).value })); await mutate('edit-draft', { draft_id: draft.id, sections }); $('#modal').close(); }
     else if (form.id === 'task-form') await mutate('tasks', { title: $('#task-title').value, kind: $('#task-kind').value, due: $('#task-due').value || null, basis: $('#task-basis')?.value, start_date: $('#task-start')?.value || null, assignee: $('#task-assignee').value || null });
     else if (form.id === 'stage-form') await mutate('stage', { stage: $('#stage').value, resume: true });
+    else if (form.id === 'workflow-form') {
+      const rules = Object.fromEntries(['review', 'documents'].map(stage => [stage, {
+        templates: [...form.querySelectorAll(`[name="workflow-template-${stage}"]:checked`)].map(el => el.value),
+        tasks: Array.from({ length: 5 }, (_, i) => ({ title: $(`#workflow-title-${stage}-${i}`).value.trim(),
+          days: Number($(`#workflow-days-${stage}-${i}`).value), assignee: $(`#workflow-assignee-${stage}-${i}`).value || null })).filter(t => t.title)
+      }]));
+      await mutate('workflow', { rules }); $('#modal').close();
+    }
     else if (form.id === 'user-form') { await api('/users', { name: $('#user-name').value, email: $('#user-email').value, role: $('#user-role').value, password: $('#user-password').value }); team = (await api('/team')).team; await showSettings(); }
     else if (form.id === 'registry-form') await mutate('registry', { kind: $('#registry-kind').value, identifier: $('#registry-id').value, date: $('#registry-date').value || undefined });
   });

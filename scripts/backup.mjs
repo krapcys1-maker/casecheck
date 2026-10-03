@@ -1,5 +1,5 @@
 import { DatabaseSync, backup } from 'node:sqlite';
-import { mkdirSync, copyFileSync, readFileSync, writeFileSync, chmodSync } from 'node:fs';
+import { mkdirSync, copyFileSync, readFileSync, writeFileSync, chmodSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { digest, requireValue } from '../src/app/store.mjs';
@@ -24,13 +24,24 @@ export async function makeBackup(stateDir, destination) {
     chmodSync(safeFile(target, file.id), 0o600);
     requireValue(digest(readFileSync(safeFile(target, file.id))) === file.sha256, 'BACKUP_FILE_MISMATCH');
   }
+  let spendHash = null;
+  // The production cost ledger lives beside the case database and must survive recovery.
+  const spendPath = resolve(source, 'ai-spend.sqlite');
+  if (existsSync(spendPath)) {
+    const spending = new DatabaseSync(spendPath, { readOnly: true });
+    try { await backup(spending, resolve(target, 'ai-spend.sqlite')); } finally { spending.close(); }
+    chmodSync(resolve(target, 'ai-spend.sqlite'), 0o600);
+    spendHash = digest(readFileSync(resolve(target, 'ai-spend.sqlite')));
+  }
   writeFileSync(resolve(target, 'manifest.json'), JSON.stringify({ version: 1, created_at: new Date().toISOString(),
-    database_sha256: digest(readFileSync(resolve(target, 'casecheck.sqlite'))), files: files.map(({ id, sha256 }) => ({ id, sha256 })) }, null, 2) + '\n', { mode: 0o600 });
+    database_sha256: digest(readFileSync(resolve(target, 'casecheck.sqlite'))), ...(spendHash ? { spending_sha256: spendHash } : {}),
+    files: files.map(({ id, sha256 }) => ({ id, sha256 })) }, null, 2) + '\n', { mode: 0o600 });
   return { files: files.length };
 }
 export function verifyBackup(directory) {
   const manifest = JSON.parse(readFileSync(resolve(directory, 'manifest.json'), 'utf8'));
   requireValue(digest(readFileSync(resolve(directory, 'casecheck.sqlite'))) === manifest.database_sha256, 'BACKUP_DB_MISMATCH');
+  if (manifest.spending_sha256) requireValue(digest(readFileSync(resolve(directory, 'ai-spend.sqlite'))) === manifest.spending_sha256, 'BACKUP_SPENDING_MISMATCH');
   for (const file of manifest.files) requireValue(digest(readFileSync(safeFile(directory, file.id))) === file.sha256, 'BACKUP_FILE_MISMATCH');
   const db = new DatabaseSync(resolve(directory, 'casecheck.sqlite'), { readOnly: true });
   try { requireValue(db.prepare('PRAGMA integrity_check').get().integrity_check === 'ok', 'BACKUP_INVALID'); }

@@ -39,6 +39,8 @@ node scripts/backup.mjs verify /home/web/casecheck-backups/20261002-2100
 
 Kopia zawiera spójną migawkę SQLite i pliki wskazane w tej migawce, sprawdzane po hashach. Docelowy katalog ma nie istnieć. Przy błędzie kopiowania kopia jest niekompletna. Chroni ją ten sam poziom dostępu co dane spraw. Klucze API przechowuj osobno.
 
+Jeżeli `ai-spend.sqlite` leży w katalogu stanu, kopia zawiera też jego migawkę i hash. Rejestr kosztów w niestandardowym katalogu kopiuj osobno przez mechanizm kopii SQLite. Przy odtwarzaniu danych spraw zachowaj najnowszy rejestr kosztów — starsza kopia nie może przywrócić już wykorzystanego budżetu. Testowe odtworzenie nie może uruchamiać płatnego API z drugim przydziałem.
+
 Odtworzenie najpierw sprawdź w osobnym katalogu: `verify`, logowanie, liczba spraw i odczyt załącznika. Następnie zatrzymaj wyłącznie `casecheck-app`, zachowaj stary stan, skopiuj bazę i `uploads/`, nadaj prawa i uruchom tę usługę. Nie kopiuj `app.lock` z innego procesu ani aktywnych plików WAL zamiast migawki.
 
 Kopie mogą zawierać sprawę usuniętą później z aktywnej bazy. Ustal okres ich przechowywania dla rzeczywistych spraw. Aplikacja usuwa aktywną sprawę wraz z wersjami, linkami i plikami; nie usuwa kopii automatycznie. Administrator może usuwać przez `DELETE /api/cases/{id}` z nagłówkiem aktualnej wersji.

@@ -15,6 +15,7 @@ import { templateFields } from './app/firm-templates.mjs';
 import { clientFileVisible, releaseAvailable } from './app/portal.mjs';
 import { KEY_NAMES, providerConfig, ExtractionError } from './ai/extraction.mjs';
 import { Spend } from './ai/spend.mjs';
+import { defaultWorkflow } from './app/workflow.mjs';
 
 export function readBody(request, max = 512 * 1024, json = true) {
   if (json) requireValue(/^application\/json(?:;|$)/i.test(request.headers['content-type'] || ''), 'JSON_REQUIRED', 415);
@@ -57,6 +58,7 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
     ['/workspace.js', ['workspace.js', 'text/javascript; charset=utf-8']],
     ['/form-state.js', ['form-state.js', 'text/javascript; charset=utf-8']],
     ['/conversation.js', ['conversation.js', 'text/javascript; charset=utf-8']],
+    ['/workflow.js', ['workflow.js', 'text/javascript; charset=utf-8']],
     ['/style.css', ['style.css', 'text/css; charset=utf-8']]].map(([path, [name, type]]) => [path, { body: readFileSync(resolve(root, 'web-app', name)), type }]));
   for (const name of ['pdf.mjs', 'pdf.worker.mjs']) assets.set('/' + name, {
     body: readFileSync(resolve(root, 'node_modules/pdfjs-dist/build', name)), type: 'text/javascript; charset=utf-8' });
@@ -99,7 +101,7 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
         let spend = null;
         if (staff && env.CASECHECK_AI_USD_LIMIT !== undefined) { const ledger = new Spend(env); try { spend = ledger.state(); } finally { ledger.close(); } }
         send(200, { providers, budget: staff ? app.store.budget() : null, busy: app.busy,
-          spend,
+          spend, ...(staff ? { workflow_defaults: defaultWorkflow() } : {}),
           knowledge: staff ? app.store.knowledge(actor, knowledge) : { intake: knowledge.intake },
           ...(staff ? { firm_templates: app.firmTemplates.list(actor), template_fields: templateFields } : {}),
           notice: 'Asystent przekazuje do DeepSeek V4.1 Flash Twoją wiadomość, do 12 poprzednich wiadomości tej rozmowy oraz zapisane, widoczne dla klienta ustalenia. Odczyt dokumentu przekazuje wybrane fragmenty, a OCR obrazy wszystkich stron wskazanego pliku do DeepSeek. Klucze pozostają na serwerze. W pilotażu używaj danych fikcyjnych.',
@@ -169,6 +171,11 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
       const actions = {
         consent: () => app.consent(actor, id, input), messages: () => app.chat(actor, id, input),
         'assistant-message': () => app.assistantMessage(actor, id, input),
+        'registry-automation': () => app.registryAutomation(actor, id, input),
+        'company-lookup': () => app.companyLookup(actor, id, input),
+        'confirm-company': () => app.confirmCompany(actor, id, input),
+        'finish-intake': () => app.finishIntake(actor, id, input),
+        workflow: () => app.workflow(actor, id, input),
         'staff-reply': () => app.portal.reply(actor, id, input),
         'client-request': () => app.portal.request(actor, id, input),
         'request-response': () => app.portal.respond(actor, id, input),

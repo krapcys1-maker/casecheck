@@ -1,6 +1,8 @@
 import { requireValue, digest, validDate } from './store.mjs';
 
 const staffEvents = {
+  intake_completed: ['Wywiad zakończony — sprawdź projekty i zadania', 'drafts'],
+  company_confirmed: ['Potwierdzono firmę z rejestru', 'facts'],
   client_message: ['Nowa wiadomość w wywiadzie', 'chat'], staff_reply: ['Odpowiedź kancelarii', 'chat'],
   client_request_answered: ['Klient odpowiedział na prośbę', 'portal'], client_document_read: ['Klient potwierdził odbiór pisma', 'portal'],
   client_request_created: ['Nowa prośba do klienta', 'portal'], client_request_reviewed: ['Sprawdzono odpowiedź klienta', 'portal'],

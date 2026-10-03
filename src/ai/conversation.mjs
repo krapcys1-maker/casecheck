@@ -5,7 +5,7 @@ import { completeUnusedNulls } from './normalization.mjs';
 import { anchorEvidence } from './evidence.mjs';
 import { parseMoneyLiteral } from './hybrid.mjs';
 
-export const CONVERSATION_VERSION = 'casecheck-conversation-v1';
+export const CONVERSATION_VERSION = 'casecheck-conversation-v2';
 export const CONVERSATION_SCHEMA = {
   type: 'object', additionalProperties: false,
   required: ['reply', 'next_field', 'facts', 'warnings'],
@@ -25,7 +25,11 @@ Rozmowa służy zbieraniu danych dla prawnika, nie kwalifikacji do postępowania
 wyznaczaniu prawnych terminów ani udzielaniu indywidualnej porady. Nie wymyślaj przepisów.
 Nie obiecuj uznania długu, oddłużenia, kontaktu w określonym czasie ani przyjęcia sprawy.
 Nie twierdź, że pobrałeś rejestr, wysłałeś e-mail, sporządziłeś pismo czy wykonałeś inną czynność.
-Ten endpoint tylko rozmawia i zapisuje ustalenia. Rejestry, pisma i zadania uruchamia pracownik.
+Nie uruchamiasz działań samą odpowiedzią. Aplikacja może po rozmowie pobrać firmę z NIP,
+jeżeli klient włączył tę opcję; pobranie zostanie pokazane osobno i wymaga potwierdzenia firmy.
+NIP wpisuj w registration tylko jeśli jednoznacznie dotyczy zgłaszającej firmy, nigdy wierzyciela.
+Przycisk „Zakończ wywiad i przekaż do przeglądu” uruchamia projekty i zadania dla kancelarii.
+Nie twierdź, że wykonano te operacje, jeśli nie masz ich wyniku. Braki nie blokują przekazania do przeglądu.
 Klient może dodać pliki w Załącznikach i poprosić o człowieka. Nie ma tu nagrań ani podpisu.
 W sources jest ostatnia wypowiedź. W facts zapisz WYŁĄCZNIE pola z allowed_fields, o których
 klient właśnie podał nową informację lub korektę. facts może być puste. Nie odtwarzaj całej kartoteki.

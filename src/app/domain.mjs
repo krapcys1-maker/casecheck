@@ -160,6 +160,8 @@ export function reviewSummary(state, today = new Date().toISOString().slice(0, 1
     current_drafts: currentDrafts.length, approved_drafts: hasSourceReviewBlockers(state) ? 0 : currentDrafts.filter(d => d.status === 'approved').length };
 }
 export function publicCase(state, actor) {
+  if (state.company_candidate?.status === 'ready' && state.company_candidate.data_revision !== state.data_revision)
+    state = { ...state, company_candidate: { ...state.company_candidate, status: 'stale' } };
   const checks = controls(state);
   const conversationFacts = Object.values(currentFacts(state)).filter(f => {
     const source = state.sources.find(s => s.id === f.source_id);
@@ -168,6 +170,8 @@ export function publicCase(state, actor) {
   });
   if (actor.role === 'client') return { id: state.id, title: state.title, track: state.track, synthetic: state.synthetic,
     stage: state.stage, revision: state.revision, messages: state.messages, consent: state.consent, handoff: state.handoff,
+    registry_auto: state.registry_auto || false, company_candidate: state.company_candidate || null,
+    intake_completion: state.intake_completion ? { at: state.intake_completion.at, outdated: state.intake_completion.data_revision !== state.data_revision } : null,
     conversation_facts: conversationFacts, documents: (state.documents || []).filter(clientFileVisible), portal: portalView(state), next_question: nextQuestion(state), missing: checks.missing_fields };
   return { ...state, conversation_facts: conversationFacts, portal: portalView(state), controls: checks, review_summary: reviewSummary(state), current_facts: currentFacts(state), next_question: nextQuestion(state) };
 }

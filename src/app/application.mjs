@@ -15,9 +15,11 @@ import { Portal, clientFileVisible } from './portal.mjs';
 import { FirmTemplates, fillFirmTemplate } from './firm-templates.mjs';
 import { Activity } from './activity.mjs';
 import { converse, validateConversation } from '../ai/conversation.mjs';
+import { validateWorkflow, applyWorkflow } from './workflow.mjs';
+import { proposedCompanyNip, saveCompanyConfirmation } from './company-intake.mjs';
 
 export class Application {
-  constructor({ env = process.env, stateDir, now, extract = extractFacts, conversation = converse, ocr = ocrDocument, reader = readDocument, limit = 20 }) {
+  constructor({ env = process.env, stateDir, now, extract = extractFacts, conversation = converse, lookup = registryLookup, ocr = ocrDocument, reader = readDocument, limit = 20 }) {
     mkdirSync(stateDir, { recursive: true, mode: 0o700 });
     this.lockPath = resolve(stateDir, 'app.lock');
     try { writeFileSync(this.lockPath, String(process.pid), { flag: 'wx', mode: 0o600 }); }
@@ -33,17 +35,19 @@ export class Application {
     this.portal = new Portal(this.store); this.firmTemplates = new FirmTemplates(this.store);
     this.activity = new Activity(this.store);
     this.conversation = conversation;
+    this.registryLookup = lookup;
     this.busy = false;
     // Saved results need explicit recovery; an interrupted request never calls AI again automatically.
     for (const row of this.store.db.prepare('SELECT tenant,state FROM cases').all()) {
       const state = JSON.parse(row.state);
-      if (state.jobs.some(j => j.status === 'running') || (state.documents || []).some(d => d.status === 'reading')) {
+      if (state.company_candidate?.status === 'running' || state.jobs.some(j => j.status === 'running') || (state.documents || []).some(d => d.status === 'reading')) {
         this.store.update({ tenant: row.tenant, id: 'system', role: 'admin' }, state.id, state.revision, 'interrupted_jobs', s => {
           const pending = new Set(this.store.pendingJobResults({ tenant: row.tenant, role: 'admin' }, state.id).map(r => r.job_id));
           s.jobs.filter(j => j.status === 'running').forEach(j => {
             j.status = 'interrupted'; j.error = pending.has(j.id) ? 'SAVED_RESULT_AVAILABLE' : 'RETRY_REQUIRED';
           });
           (s.documents || []).filter(d => d.status === 'reading').forEach(d => { d.status = 'read_failed'; d.error = 'RETRY_REQUIRED'; });
+          if (s.company_candidate?.status === 'running') { s.company_candidate.status = 'failed'; s.company_candidate.error = 'REGISTRY_INTERRUPTED'; }
         }, { invalidate: false });
       }
     }
@@ -314,8 +318,86 @@ export class Application {
     try { result = await this.conversation({ provider, task, env: this.env }); validateConversation(result.output, task); }
     catch (error) { failure = /^[A-Z_]{3,60}$/.test(error.code || '') ? error.code : 'AI_FAILED'; }
     finally { this.busy = false; }
-    return this.captureJobResult(actor, id, job, started, { task, failure,
+    const finished = this.captureJobResult(actor, id, job, started, { task, failure,
       result: failure ? null : { output: result.output, metadata: result.metadata || {} } });
+    if (finished.jobs.find(j => j.id === job.id)?.status === 'completed' && proposedCompanyNip(finished, source.id)) {
+      return this.companyLookup(actor, id, { revision: finished.revision }, { automatic: true });
+    }
+    return finished;
+  }
+  registryAutomation(actor, id, input) {
+    const current = this.store.get(actor, id);
+    requireValue(current.track === 'company' && typeof input.enabled === 'boolean');
+    return this.store.update(actor, id, input.revision, 'registry_automation_changed', s => { s.registry_auto = input.enabled; }, { invalidate: false });
+  }
+  async companyLookup(actor, id, input, { automatic = false } = {}) {
+    const state = this.store.get(actor, id);
+    requireValue(state.revision === input.revision, 'VERSION_CONFLICT', 409);
+    const nip = proposedCompanyNip(state, currentFacts(state).registration?.source_id);
+    requireValue(nip, 'COMPANY_NIP_REQUIRED');
+    const previous = state.company_candidate;
+    if (automatic && previous?.nip === nip) return state;
+    requireValue(previous?.status !== 'running', 'REGISTRY_BUSY', 429);
+    const candidate = { id: uid(), nip, status: 'running', data_revision: state.data_revision,
+      requested_at: this.store.now().toISOString(), results: [] };
+    this.store.update(actor, id, state.revision, 'company_lookup_started', s => { s.company_candidate = candidate; }, { invalidate: false });
+    let error = null;
+    try {
+      const date = this.store.now().toISOString().slice(0, 10);
+      const mf = await this.fetchRegistry({ kind: 'vat', identifier: nip, date, test: state.synthetic });
+      requireValue(String(mf.summary.nip).replace(/\D/g, '') === nip, 'REGISTRY_IDENTITY_MISMATCH', 502);
+      candidate.results.push(mf);
+      // Test MF records must never be joined with unrelated production KRS records.
+      if (!state.synthetic && /^\d{10}$/.test(mf.summary.krs || '')) {
+        const krs = await this.fetchRegistry({ kind: 'krs', identifier: mf.summary.krs, date, test: false });
+        requireValue(String(krs.summary.nip).replace(/\D/g, '') === nip && krs.summary.krs === mf.summary.krs, 'REGISTRY_IDENTITY_MISMATCH', 502);
+        candidate.results.push(krs);
+      }
+    } catch (e) { error = /^[A-Z_]{3,60}$/.test(e.code || '') ? e.code : 'REGISTRY_UNAVAILABLE'; }
+    const latest = this.store.get(actor, id);
+    return this.store.update(actor, id, latest.revision, 'company_lookup_finished', s => {
+      if (s.company_candidate?.id !== candidate.id) return;
+      const stale = s.data_revision !== candidate.data_revision || !s.registry_auto;
+      s.company_candidate = { ...candidate, status: stale ? 'stale' : error && !candidate.results.length ? 'failed' : 'ready',
+        error, finished_at: this.store.now().toISOString() };
+    }, { invalidate: false });
+  }
+  confirmCompany(actor, id, input) {
+    const state = this.store.get(actor, id);
+    requireValue(state.company_candidate?.id === input.candidate_id && state.company_candidate?.data_revision === state.data_revision &&
+      state.company_candidate.status === 'ready', 'COMPANY_CANDIDATE_STALE', 409);
+    return this.store.update(actor, id, input.revision, 'company_confirmed', s => saveCompanyConfirmation(s, actor, this.store.now()));
+  }
+  fetchRegistry(query, lookup = this.registryLookup) {
+    requireValue(!this.registryBusy, 'REGISTRY_BUSY', 429);
+    const day = this.store.now().toISOString().slice(0, 10);
+    this.store.tx(() => {
+      const used = this.store.db.prepare('SELECT count FROM registry_budget WHERE day=?').get(day)?.count || 0;
+      requireValue(used < 20, 'REGISTRY_DAILY_LIMIT', 429);
+      this.store.db.prepare('INSERT INTO registry_budget VALUES(?,1) ON CONFLICT(day) DO UPDATE SET count=count+1').run(day);
+    });
+    this.registryBusy = true;
+    return Promise.resolve().then(() => lookup(query)).finally(() => { this.registryBusy = false; });
+  }
+  workflow(actor, id, input) {
+    requireValue(actor.role !== 'client', 'FORBIDDEN', 403);
+    const state = this.store.get(actor, id), team = this.store.team(actor);
+    const rules = validateWorkflow(input.rules, state, team);
+    return this.store.update(actor, id, input.revision, 'workflow_configured', s => { s.workflow_rules = rules; }, { invalidate: false });
+  }
+  finishIntake(actor, id, input) {
+    const state = this.store.get(actor, id);
+    requireValue(state.revision === input.revision, 'VERSION_CONFLICT', 409);
+    requireValue(['intake', 'review'].includes(state.stage) && state.messages.some(m => m.role === 'user'), 'INTAKE_NOT_READY', 409);
+    requireValue(!state.jobs.some(j => j.status === 'running') && !this.store.hasPendingJobResults(actor, id) && state.company_candidate?.status !== 'running', 'INTAKE_JOB_PENDING', 409);
+    if (state.intake_completion?.data_revision === state.data_revision) return state;
+    const team = this.store.team({ ...actor, role: 'staff' });
+    return this.store.update(actor, id, input.revision, 'intake_completed', s => {
+      applyWorkflow(s, 'review', this.store.now(), team);
+      s.stage = 'review'; s.intake_completion = { at: this.store.now().toISOString(), by: actor.id, data_revision: s.data_revision };
+      s.messages.push({ id: uid(), role: 'assistant', kind: 'service_notice', at: this.store.now().toISOString(),
+        text: 'Wywiad przekazano do przeglądu. Przygotowano pakiet zgodnie z ustawieniami sprawy; projekty i brakujące informacje sprawdzi kancelaria. Możesz nadal uzupełniać rozmowę i dokumenty.' });
+    }, { invalidate: false });
   }
   async upload(actor, id, revision, buffer, name) {
     const current = this.store.get(actor, id); requireValue(current.revision === revision, 'VERSION_CONFLICT', 409);
@@ -527,6 +609,7 @@ export class Application {
       if (input.stage === 'closed') requireValue(actor.role === 'lawyer' && !s.tasks.some(t => t.status === 'open') &&
         !(s.client_requests || []).some(r => r.status !== 'accepted'), 'OPEN_TASKS_OR_ROLE', 409);
       s.stage = input.stage; if (input.resume === true) s.handoff = false;
+      applyWorkflow(s, input.stage, this.store.now(), this.store.team(actor));
     }, { invalidate: false });
   }
   seed(actor) {
@@ -556,22 +639,14 @@ export class Application {
     }
     return { imported };
   }
-  async registry(actor, id, input, lookup = registryLookup) {
+  async registry(actor, id, input, lookup = this.registryLookup) {
     requireValue(actor.role !== 'client', 'FORBIDDEN', 403);
     const state = this.store.get(actor, id);
     requireValue(state.track === 'company' && state.revision === input.revision, 'VERSION_CONFLICT', 409);
     requireValue(['krs', 'vat'].includes(input.kind) && /^\d{10}$/.test(input.identifier || ''), 'INVALID_REGISTRY_QUERY');
     const date = input.date || this.store.now().toISOString().slice(0, 10);
     requireValue(validDate(date), 'INVALID_DATE');
-    requireValue(!this.registryBusy, 'REGISTRY_BUSY', 429);
-    const day = this.store.now().toISOString().slice(0, 10);
-    const used = this.store.db.prepare('SELECT count FROM registry_budget WHERE day=?').get(day)?.count || 0;
-    requireValue(used < 20, 'REGISTRY_DAILY_LIMIT', 429);
-    this.store.db.prepare('INSERT INTO registry_budget VALUES(?,1) ON CONFLICT(day) DO UPDATE SET count=count+1').run(day);
-    this.registryBusy = true;
-    let result;
-    try { result = await lookup({ kind: input.kind, identifier: input.identifier, date, test: state.synthetic }); }
-    finally { this.registryBusy = false; }
+    const result = await this.fetchRegistry({ kind: input.kind, identifier: input.identifier, date, test: state.synthetic }, lookup);
     const latest = this.store.get(actor, id);
     return this.store.update(actor, id, latest.revision, 'registry_checked', s => {
       const source = addSource(s, { text: JSON.stringify(result.summary, null, 2), title: `${input.kind.toUpperCase()} — ${input.identifier}`, kind: 'registry' });
