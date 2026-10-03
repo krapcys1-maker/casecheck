@@ -1,5 +1,15 @@
 # Testy i dowody działania
 
+## Aktualizacja po audycie: 3 października 2026
+
+Aktualnie `npm test` obejmuje **70 testów**. Dodano 22 sprawdzenia od poprzednich 48: kontakt z człowiekiem, odrzucone dane, porównywanie sald, walidacja dat, równoległa praca, awarie transakcji, limity źródeł, aktualność bazy wiedzy, eksport po przeglądzie, kotwiczenie cytatów i zachowawcze filtry semantyczne. [Audyt](AUDYT.md) opisuje odtworzone problemy i naprawy; wcześniejsza sekcja poniżej zachowuje wynik poprzedniego etapu.
+
+[Nowa próba jakości AI](quality-bench-2026-10-03.json): 7 rzeczywistych wywołań na tekstach odczytanych z PDF-ów, 49 zaplanowanych pól. Przed końcowymi poprawkami cytowania i filtrów: 3 odpowiedzi zablokowane, 4 przyjęte, 25/28 dokładnych zgodności w przyjętych odpowiedziach. Dwa odstępstwa są formatowaniem nazw, jedno błędem znaczenia. To mała diagnostyczna próba, nie potwierdzenie trafności całego modelu. Nieczytelne skany i wywiad konwersacyjny nie należą do tej próby. Późniejsze zabezpieczenia zweryfikowano bez API; ich efektu na całej próbie jeszcze nie zmierzono.
+
+Plan: `npm run ai:bench`. Płatne uruchomienie: `node scripts/quality-bench.mjs --run`, maksymalnie 9 prób/dzień UTC w `data/local/quality-bench`. Oczekiwania pozostają poza wejściem modelu, raport zapisuje wersję promptu, hashe PDF/wejścia, tokeny i czas. Nie ma automatycznych ponowień. Limit runnera i limit aplikacji VPS są odrębne.
+
+## Poprzedni etap: pokaz portfolio i 48 testów
+
 Stan weryfikacji: 3 października 2026 czasu Europe/Bucharest. Trzy nowe wywołania API zakończyły się 2 października według czasu UTC. Testy syntetyczne i kontrola techniczna nie zastępują oceny rzeczywistych spraw przez niezależny zespół.
 
 ## Automatyczne testy bez płatnego API

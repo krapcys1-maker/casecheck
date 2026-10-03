@@ -1,5 +1,7 @@
 # Krótka instrukcja obsługi
 
+Po audycie w podsumowaniu sprawy konto prawnika ma przycisk **Pobierz pakiet JSON**. Plik zawiera tylko potwierdzone wartości, źródła oraz listę braków i blokad. To przygotowanie do dalszej pracy; nie wysyła danych do zewnętrznego systemu. [Opis formatu](INTEGRACJA.md).
+
 ## Administrator
 
 Zaloguj się kontem początkowym skonfigurowanym w prywatnym pliku środowiska. „Konta i wiedza” pozwala dodać pracownika lub prawnika oraz wyłączyć konto. Rola administratora sama nie pozwala zatwierdzać pism. Wyłączenie konta usuwa jego sesje; osoba nie będzie dostępna jako nowy wykonawca zadania.

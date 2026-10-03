@@ -6,10 +6,12 @@ import { resolve } from 'node:path';
 import { createAppServer } from '../src/app-server.mjs';
 import { Application } from '../src/app/application.mjs';
 import { Store, uid } from '../src/app/store.mjs';
-import { claimFields, addSource, putFacts, controls, draftSections, reviewSummary, emptyCase, publicCase } from '../src/app/domain.mjs';
+import { claimFields, addSource, putFacts, controls, draftSections, reviewSummary, emptyCase, publicCase, knowledge } from '../src/app/domain.mjs';
 import { readDocument, saveFile, safeFile } from '../src/app/files.mjs';
 import { makeBackup, verifyBackup } from '../scripts/backup.mjs';
 import { renderDraft } from '../src/app/pdf.mjs';
+import { reviewPackage } from '../src/app/review-package.mjs';
+import { digest } from '../src/app/store.mjs';
 
 const password = 'test-only-password-that-is-long-enough';
 const env = { CASECHECK_ADMIN_PASSWORD: password, OPENAI_API_KEY: 'test-key-not-live', CASECHECK_PUBLIC_ORIGIN: 'https://casecheck.example.invalid' };
@@ -34,6 +36,202 @@ async function fixture(t, options = {}) {
   t.after(async () => { await new Promise(r => server.close(r)); rmSync(directory, { recursive: true, force: true }); });
   return { server, app: server.app, directory, request, token: login.body.token, actor: login.body.user, url };
 }
+
+test('handoff button and Polish inflections create one open contact task', async t => {
+  const f = await fixture(t);
+  let state = f.app.create(f.actor, { title: 'Przejęcie rozmowy', track: 'consumer', synthetic: true });
+  for (const text of ['Proszę o kontakt z człowiekiem — prawnikiem.', 'Chcę porozmawiać z prawnikiem.']) {
+    const reply = await f.request(`/cases/${state.id}/messages`, { revision: state.revision, text, analyze: false }, f.token);
+    assert.equal(reply.status, 200); state = reply.body;
+    assert.equal(state.handoff, true); assert.equal(state.tasks.filter(t => t.status === 'open').length, 1);
+    assert.match(state.next_question, /przekazano/);
+  }
+});
+
+test('mixed balance groups and rejected declarations never produce a whole-debt difference', () => {
+  const state = emptyCase({ title: 'Nieporównywalne salda', track: 'consumer', synthetic: true });
+  putFacts(state, [money('declared_total', 1000000)], { review: 'confirmed' });
+  state.claims = ['2026-09-30', '2026-08-31'].map((date, i) => ({ id: String(i), review: 'confirmed',
+    facts: [money('total_amount', 300000, date)], source_ids: [], merged_into: null }));
+  assert.equal(controls(state).difference, null);
+  state.claims.pop(); state.facts[0].review = 'rejected';
+  assert.equal(controls(state).difference, null);
+});
+
+test('rejected values and claims remain in history but never populate new drafts or duplicates', async t => {
+  const f = await fixture(t);
+  let state = f.app.create(f.actor, { title: 'Odrzucone dane', track: 'consumer', synthetic: true });
+  state = f.app.store.update(f.actor, state.id, state.revision, 'test_rejected', s => {
+    const source = addSource(s, { text: 'Błędna Osoba, błędne roszczenie' });
+    putFacts(s, [textFact('client_name', 'Błędna Osoba', source)], { review: 'rejected' });
+    for (const review of ['confirmed', 'rejected']) s.claims.push({ id: uid(), review, source_ids: [source.id], merged_into: null,
+      facts: [textFact('creditor_name', review === 'rejected' ? 'Błędny Wierzyciel' : 'Wierzyciel', source),
+        textFact('agreement_number', 'UM/1', source), money('total_amount', 100000)] });
+  });
+  const draft = draftSections(state, 'case_card').sections.map(s => s.text).join('\n');
+  assert.doesNotMatch(draft, /Błędna Osoba|Błędny Wierzyciel/); assert.match(draft, /DO UZUPEŁNIENIA/);
+  assert.equal(controls(state).candidates.length, 0); assert.equal(controls(state).totals[0].minor_units, 100000);
+  assert.throws(() => draftSections(state, 'claim_clarification', { claim_id: state.claims[1].id }), { code: 'CLAIM_REJECTED' });
+  assert.equal(state.claims.length, 2); assert.equal(state.facts[0].text_value, 'Błędna Osoba');
+});
+
+test('invalid calendar dates return a validation error through HTTP without altering a case', async t => {
+  const f = await fixture(t); const state = f.app.create(f.actor, { title: 'Daty', track: 'company', synthetic: true });
+  for (const due of ['2026-99-99', '2026-02-30']) {
+    const reply = await f.request(`/cases/${state.id}/tasks`, { revision: state.revision, title: 'Termin', kind: 'administrative', due }, f.token);
+    assert.equal(reply.status, 400); assert.equal(reply.body.error, 'INVALID_DATE');
+  }
+  assert.equal(f.app.store.get(f.actor, state.id).revision, state.revision);
+});
+
+test('administrative changes during extraction preserve a valid result and the new task', async t => {
+  let finish, signal; const ready = new Promise(r => signal = r);
+  const f = await fixture(t, { extract: args => { signal(); return new Promise(r => finish = () => r(mock(args))); } });
+  let state = f.app.create(f.actor, { title: 'AI i zadanie', track: 'consumer', synthetic: true });
+  state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Osoba Testowa' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  const pending = f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] });
+  await ready; const latest = f.app.store.get(f.actor, state.id);
+  f.app.task(f.actor, state.id, { revision: latest.revision, title: 'Telefon', kind: 'administrative' });
+  finish(); const result = await pending;
+  assert.equal(result.jobs.at(-1).status, 'completed'); assert.equal(result.tasks.length, 1);
+  assert.equal(result.facts.find(f => f.current).text_value, 'Osoba Testowa');
+});
+
+test('failed extraction preserves approved drafts and their data revision', async t => {
+  const f = await fixture(t, { extract: async () => { throw Object.assign(new Error(), { code: 'API_TIMEOUT' }); } });
+  const lawyer = { ...f.actor, role: 'lawyer' };
+  let state = f.app.create(f.actor, { title: 'Awaria bez nowych danych', track: 'consumer', synthetic: true });
+  state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Nie wiem' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.draft(lawyer, state.id, { revision: state.revision, template: 'case_card' });
+  state = f.app.approveDraft(lawyer, state.id, { revision: state.revision, draft_id: state.drafts[0].id });
+  const version = state.data_revision;
+  state = await f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] });
+  assert.equal(state.data_revision, version); assert.equal(state.drafts[0].status, 'approved');
+  assert.equal(state.jobs.at(-1).status, 'failed'); assert.equal(f.app.store.budget().used, 1);
+});
+
+test('partial claim extraction preserves manual evidence and correction history', async t => {
+  const f = await fixture(t);
+  let state = f.app.create(f.actor, { title: 'Pochodzenie korekty', track: 'consumer', synthetic: true });
+  state = await f.app.upload(f.actor, state.id, state.revision, Buffer.from('Osoba Testowa. Dokument fikcyjny do sprawdzenia pochodzenia danych.'), 'test.txt');
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  const source_ids = state.sources.filter(s => s.document_id).map(s => s.id);
+  state = await f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'claim', source_ids, fields: ['creditor_name'] });
+  state = f.app.correctClaim(f.actor, state.id, { revision: state.revision, claim_id: state.claims.at(-1).id,
+    fact: { ...unknown('creditor_name'), type: 'text', text_value: 'Poprawny Bank', precision: 'exact' }, note: 'Poprawny Bank — ręczna korekta testowa' });
+  const manualSource = state.sources.at(-1).id;
+  state = await f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'claim', source_ids, fields: ['creditor_address'] });
+  const current = state.claims.find(c => !c.merged_into);
+  assert.ok(current.source_ids.includes(manualSource)); assert.equal(current.facts.find(f => f.field === 'creditor_name').text_value, 'Poprawny Bank');
+  assert.equal(current.fact_history.length, 1);
+});
+
+test('a failed job-start transaction neither spends budget nor locks subsequent AI', async t => {
+  const f = await fixture(t);
+  let state = f.app.create(f.actor, { title: 'Awaria zapisu', track: 'consumer', synthetic: true });
+  state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Osoba Testowa' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  f.app.store.db.exec("CREATE TRIGGER test_write_failure BEFORE UPDATE ON cases BEGIN SELECT RAISE(ABORT, 'simulated write failure'); END;");
+  await assert.rejects(f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] }));
+  assert.equal(f.app.store.budget().used, 0); assert.equal(f.app.busy, false);
+  assert.equal(f.app.store.get(f.actor, state.id).jobs.length, 0);
+  f.app.store.db.exec('DROP TRIGGER test_write_failure');
+  const result = await f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] });
+  assert.equal(result.jobs[0].status, 'completed'); assert.equal(f.app.store.budget().used, 1);
+});
+
+test('OCR accepts concurrent administrative work and keeps the image for review', async t => {
+  let finish, signal; const ready = new Promise(r => signal = r);
+  const f = await fixture(t, { ocr: () => { signal(); return new Promise(r => finish = () => r({ pages: [{ page: 1, text: 'Tekst testowy OCR' }], model: 'mock' })); } });
+  let state = f.app.create(f.actor, { title: 'OCR i zadanie', track: 'consumer', synthetic: true });
+  state = await f.app.upload(f.actor, state.id, state.revision, readFileSync('tests/full-fixtures/documents/S11-D01-scan.pdf'), 'skan.pdf');
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  const pending = f.app.runOCR(f.actor, state.id, { revision: state.revision, document_id: state.documents[0].id });
+  await ready; const latest = f.app.store.get(f.actor, state.id);
+  f.app.task(f.actor, state.id, { revision: latest.revision, title: 'Porównać skan', kind: 'administrative' });
+  finish(); const result = await pending;
+  assert.equal(result.jobs[0].status, 'completed'); assert.equal(result.documents[0].status, 'ocr_review');
+  assert.equal(result.sources[0].text, ''); assert.equal(result.tasks.length, 1);
+});
+
+test('source capacity during file read records failure without a stuck reading status', async t => {
+  const f = await fixture(t, { reader: async () => ({ pages: [{ page: 1, text: 'Nowa strona' }, { page: 2, text: 'Druga strona' }] }) });
+  let state = f.app.create(f.actor, { title: 'Limit źródeł', track: 'consumer', synthetic: true });
+  state = f.app.store.update(f.actor, state.id, state.revision, 'test_sources', s => { for (let i = 0; i < 239; i++) addSource(s, { text: 'Test' }); });
+  state = await f.app.upload(f.actor, state.id, state.revision, Buffer.from('Tekst fikcyjny'), 'test.txt');
+  assert.equal(state.documents[0].status, 'read_failed'); assert.equal(state.documents[0].error, 'SOURCE_LIMIT');
+  assert.equal(state.sources.length, 239);
+});
+
+test('source capacity after paid OCR records one failed job and preserves approved data version', async t => {
+  const f = await fixture(t, { ocr: async () => ({ pages: [{ page: 1, text: 'Tekst OCR' }], model: 'mock' }) });
+  let state = f.app.create(f.actor, { title: 'Limit po OCR', track: 'consumer', synthetic: true });
+  state = await f.app.upload(f.actor, state.id, state.revision, readFileSync('tests/full-fixtures/documents/S11-D01-scan.pdf'), 'skan.pdf');
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.store.update(f.actor, state.id, state.revision, 'test_sources', s => { while (s.sources.length < 240) addSource(s, { text: 'Test' }); });
+  const version = state.data_revision;
+  state = await f.app.runOCR(f.actor, state.id, { revision: state.revision, document_id: state.documents[0].id });
+  assert.equal(state.jobs[0].status, 'failed'); assert.equal(state.jobs[0].error, 'SOURCE_LIMIT');
+  assert.equal(state.sources.length, 240); assert.equal(state.data_revision, version); assert.equal(f.app.store.budget().used, 1);
+});
+
+test('review package is lawyer-only, excludes pending and rejected values, preserves provenance and does not mutate', async t => {
+  const f = await fixture(t); const lawyer = await f.app.store.addUser(f.actor, { email: 'package@example.invalid', name: 'Prawnik Testowy', role: 'lawyer', password });
+  const login = await f.app.store.login(lawyer.email, password);
+  let state = f.app.create(f.actor, { title: 'Integracja', track: 'consumer', synthetic: true });
+  state = await f.app.upload(f.actor, state.id, state.revision, Buffer.from('Osoba Testowa. Adres oczekuje na przegląd.'), 'test.txt');
+  state = f.app.store.update(f.actor, state.id, state.revision, 'test_review', s => {
+    const source = s.sources[0];
+    putFacts(s, [textFact('client_name', 'Osoba Testowa', source)], { review: 'confirmed' });
+    putFacts(s, [textFact('address', 'Adres oczekuje na przegląd', source)]);
+    putFacts(s, [textFact('causes', 'Odrzucona informacja', source)], { review: 'rejected' });
+  });
+  const path = `/cases/${state.id}/review-package`;
+  const response = await f.request(path, undefined, login.token); assert.equal(response.status, 200);
+  const p = response.body; assert.equal(p.schema, 'casecheck-reviewed-data-v1'); assert.equal(p.review_status, 'blocked');
+  assert.deepEqual(p.case_facts.map(f => f.field), ['client_name']); assert.equal(p.sources[0].document.sha256, state.documents[0].sha256);
+  assert.equal(p.case_facts[0].quote, state.sources[0].text); assert.ok(p.blockers.some(b => b.field === 'address'));
+  const { payload_sha256, ...payload } = p; assert.equal(payload_sha256, digest(JSON.stringify(payload)));
+  assert.equal(f.app.store.get(f.actor, state.id).revision, state.revision);
+  const link = f.app.store.link(f.actor, state.id);
+  assert.equal((await f.request(path)).status, 401); assert.equal((await f.request(path, undefined, f.token)).status, 403);
+  assert.equal((await f.request(path, undefined, link.token)).status, 403);
+  const other = await f.app.store.addUser({ tenant: uid(), role: 'admin' }, { email: 'other-package@example.invalid', name: 'Inna kancelaria', role: 'lawyer', password });
+  const otherLogin = await f.app.store.login(other.email, password);
+  assert.equal((await f.request(path, undefined, otherLogin.token)).status, 404);
+});
+
+test('review package excludes unsupported values and outdated approvals', () => {
+  const state = emptyCase({ title: 'Brak dowodu', track: 'consumer', synthetic: true });
+  state.data_revision = 2; putFacts(state, [money('declared_total', 100000)], { review: 'confirmed' });
+  state.drafts = [{ id: 'old', status: 'approved', source_revision: 1 }];
+  const p = reviewPackage(state, '2026-10-03T00:00:00Z');
+  assert.equal(p.case_facts.length, 0); assert.equal(p.review_status, 'blocked');
+  assert.equal(p.blockers[0].code, 'missing_evidence'); assert.equal(p.approved_drafts.length, 0);
+});
+
+test('approval of an earlier knowledge bundle cannot authorise a changed questionnaire or templates', async t => {
+  const f = await fixture(t); const lawyer = { ...f.actor, role: 'lawyer', name: 'Prawnik Testowy' };
+  let state = f.app.create(f.actor, { title: 'Zmiana pytań', track: 'consumer', synthetic: false });
+  state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Fikcyjny tekst do testu blokady' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  f.app.store.approveKnowledge(lawyer, { ...knowledge, intake: { ...knowledge.intake, version: 'previous-version' } });
+  assert.equal(f.app.store.knowledge(lawyer, knowledge).approval_stale, true);
+  await assert.rejects(f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] }), { code: 'KNOWLEDGE_REVIEW_REQUIRED' });
+  assert.equal(f.app.store.budget().used, 0);
+  f.app.store.approveKnowledge(lawyer, knowledge);
+  state = await f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] });
+  assert.equal(state.jobs.at(-1).status, 'completed');
+});
+
+test('whole-debt difference cannot silently overflow integer precision', () => {
+  const state = emptyCase({ title: 'Granica kwoty', track: 'consumer', synthetic: true });
+  putFacts(state, [money('declared_total', Number.MAX_SAFE_INTEGER)], { review: 'confirmed' });
+  state.claims = [{ id: 'c', review: 'confirmed', merged_into: null, source_ids: [], facts: [money('total_amount', -1)] }];
+  assert.throws(() => controls(state), { code: 'MONEY_OVERFLOW' });
+});
 
 test('accounts, tenant isolation, link scope and expiry are enforced', async t => {
   let clock = new Date('2026-10-02T12:00:00Z');

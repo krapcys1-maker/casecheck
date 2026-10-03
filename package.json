@@ -10,6 +10,7 @@
     "start": "node src/app-server.mjs",
     "ai:check": "node scripts/smoke-ai.mjs --dry-run",
     "ai:smoke": "node scripts/smoke-ai.mjs",
+    "ai:bench": "node scripts/quality-bench.mjs --dry-run",
     "start:lab": "node src/server.mjs",
     "data:generate": "node scripts/generate-synthetic-cases.mjs",
     "backup": "node scripts/backup.mjs"

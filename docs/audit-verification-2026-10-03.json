@@ -1,0 +1,26 @@
+{
+  "created_at": "2026-10-03T04:30:41.454Z",
+  "node": "v24.13.0",
+  "tests": 70,
+  "passed": 70,
+  "failed": 0,
+  "initial_reproduced_regressions": 7,
+  "initial_regression_failures": 7,
+  "dependency_audit": {
+    "command": "npm audit --omit=dev",
+    "reported_vulnerabilities": 0
+  },
+  "api_diagnostic_report": "quality-bench-2026-10-03.json",
+  "api_diagnostic_is_before_final_guards": true,
+  "normalized_lf_code_sha256": {
+    "src/app/application.mjs": "64c67306ada72b0a32038a4cb84ae28888f116bd027448f70538dd37e806713b",
+    "src/app/store.mjs": "27e2ff1c5aaa080af40d149bd847a51c0d837eb4da04de45ee815ac62a2cfa14",
+    "src/app/domain.mjs": "e60e65fd52aee508d1574cb5a7ed5f22911f6c7c88c1a7b78e8882f63f72392c",
+    "src/app/review-package.mjs": "e2ca151dc65b28a142f58883675ce3306f63ab973fed533c1cf9c697aa3771be",
+    "src/ai/extraction.mjs": "4ac007372a731fe6123e634c6931bfbf242226cb8f7ad4d6b5df43000c9f24d1",
+    "src/ai/evidence.mjs": "3ba13fa958fab9b9ce28f782410a9013f49f15b8299912bdcab344bf56298659",
+    "src/ai/semantics.mjs": "09c9a0f3c6ba3412899fff2fd3b750199c9c4ee24c3fc5d0bf84f7390c9616f6",
+    "web-app/app.js": "9fdced7aeae51eba4706a908bb9343f5260ae1ef88dc1b9ba8e403b006fa3ffb"
+  },
+  "scope": "Engineering verification on synthetic data; no independent legal review or general LLM accuracy certification."
+}

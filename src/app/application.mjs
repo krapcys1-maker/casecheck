@@ -1,11 +1,12 @@
 import { readFileSync, writeFileSync, unlinkSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { extractFacts, providerConfig, validateExtraction } from '../ai/extraction.mjs';
-import { Store, AppError, uid, text, requireValue, digest } from './store.mjs';
+import { Store, AppError, uid, text, requireValue, digest, validDate } from './store.mjs';
 import { root, emptyCase, knowledge, currentFacts, fieldSet, addSource, putFacts, validateManualFact,
   claimFields, extraClaimFields, templates, draftSections, nextQuestion, controls, validateFieldTypes } from './domain.mjs';
 import { saveFile, readDocument, ocrDocument, deleteFile } from './files.mjs';
 import { registryLookup } from './registries.mjs';
+import { guardClaimSemantics } from '../ai/semantics.mjs';
 
 export class Application {
   constructor({ env = process.env, stateDir, now, extract = extractFacts, ocr = ocrDocument, reader = readDocument, limit = 20 }) {
@@ -48,9 +49,12 @@ export class Application {
       if (input.field) requireValue(fieldSet(state).some(f => f.key === input.field), 'INVALID_FIELD');
       const content = text(input.text, 12000), source = addSource(state, { text: content, title: `Wiadomość ${state.messages.length + 1}` });
       state.messages.push({ id: uid(), role: 'user', text: content, source_id: source.id, field: input.field || null, at: this.store.now().toISOString() });
-      if (/\b(człowiek|czlowiek|prawnik|konsultant)\b/i.test(content) && /rozmow|kontakt|połącz|polacz|prosz/i.test(content)) {
+      requireValue(input.request_handoff === undefined || typeof input.request_handoff === 'boolean');
+      if (input.request_handoff === true || /(?:człowie[kc]|czlowie[kc]|prawnik|konsultant)\p{L}*/iu.test(content) &&
+        /rozmow|rozmaw|kontakt|połącz|polacz|prosz/i.test(content)) {
         state.handoff = true;
-        state.tasks.push({ id: uid(), title: 'Kontakt z klientem: prośba o obsługę przez człowieka', kind: 'administrative', due: null, status: 'open', assignee: null });
+        if (!state.tasks.some(t => t.purpose === 'client_handoff' && t.status === 'open')) state.tasks.push({ id: uid(),
+          title: 'Kontakt z klientem: prośba o obsługę przez człowieka', purpose: 'client_handoff', kind: 'administrative', due: null, status: 'open', assignee: null });
       }
     });
   }
@@ -85,9 +89,9 @@ export class Application {
     this.checkAI(actor, state, provider);
     const job = { id: uid(), kind: input.kind, provider, status: 'running', requested_fields: task.requested_fields,
       source_ids: task.sources.map(s => s.id), input_sha256: digest(JSON.stringify(task)), started_at: this.store.now().toISOString() };
-    this.store.reserve(); this.busy = true;
-    const started = this.store.update(actor, id, state.revision, 'ai_started', s => { s.jobs.push(job); });
-    let result, failure;
+    const started = this.store.update(actor, id, state.revision, 'ai_started', s => { s.jobs.push(job); }, { invalidate: false, reserveAI: true });
+    this.busy = true;
+    let result, failure, failureDetails;
     try {
       result = await this.extract({ provider, ...task, env: this.env, maxOutputTokens: 2000 });
       result.normalized_absence_fields = [];
@@ -96,31 +100,39 @@ export class Application {
       }
       validateExtraction(result.output, task);
       validateFieldTypes(state, result.output.facts, input.kind);
+      result.semantic_flags = input.kind === 'claim' ? guardClaimSemantics(result.output, task.sources) : [];
     }
-    catch (error) { failure = /^[A-Z_]{3,60}$/.test(error.code || '') ? error.code : 'AI_FAILED'; }
+    catch (error) {
+      failure = /^[A-Z_]{3,60}$/.test(error.code || '') ? error.code : 'AI_FAILED';
+      failureDetails = { usage: error.usage || null, prompt_version: error.prompt_version || null,
+        model: error.model || null, elapsed_ms: error.elapsed_ms || null, diagnostics: error.diagnostics || null };
+    }
     finally { this.busy = false; }
     let current;
     try { current = this.store.get(actor, id); } catch { throw new AppError(409, 'CASE_REMOVED_DURING_JOB'); }
     return this.store.update(actor, id, current.revision, 'ai_finished', s => {
       const saved = s.jobs.find(j => j.id === job.id);
       saved.finished_at = this.store.now().toISOString();
-      if (failure) { saved.status = 'failed'; saved.error = failure; return; }
+      if (failure) { saved.status = 'failed'; saved.error = failure; Object.assign(saved, failureDetails); return; }
       saved.model = result.model; saved.usage = result.usage; saved.prompt_version = result.prompt_version;
       saved.elapsed_ms = result.elapsed_ms; saved.request_contract_sha256 = result.request_contract_sha256;
       saved.normalized_absence_fields = result.normalized_absence_fields;
-      if (current.revision !== started.revision) { saved.status = 'discarded'; saved.error = 'STALE_CASE_VERSION'; return; }
+      saved.evidence_repairs = result.evidence_repairs || [];
+      saved.semantic_flags = result.semantic_flags;
+      if (current.data_revision !== started.data_revision) { saved.status = 'discarded'; saved.error = 'STALE_CASE_VERSION'; return; }
       saved.status = 'completed'; saved.warnings = result.output.warnings;
       if (input.kind === 'intake') putFacts(s, result.output.facts);
       else {
         const documentId = s.sources.find(source => source.id === task.sources[0].id).document_id;
         const existing = s.claims.find(c => c.document_id === documentId && !c.merged_into);
         if (existing) existing.review = 'superseded';
-        s.claims.push({ id: uid(), document_id: documentId, source_ids: job.source_ids, facts: result.output.facts,
+        s.claims.push({ id: uid(), document_id: documentId, source_ids: [...new Set([...(existing?.source_ids || []), ...job.source_ids])], facts: result.output.facts,
           review: 'pending', merged_into: null, supersedes: existing?.id || null });
         if (existing) s.claims.at(-1).facts = [...existing.facts.filter(f => !task.requested_fields.includes(f.field)), ...result.output.facts];
+        if (existing?.fact_history) s.claims.at(-1).fact_history = existing.fact_history;
         if (existing) existing.merged_into = s.claims.at(-1).id;
       }
-    });
+    }, { invalidate: !failure && current.data_revision === started.data_revision });
   }
   async chat(actor, id, input) {
     let state = this.message(actor, id, input), warning = '';
@@ -153,6 +165,7 @@ export class Application {
     let latest;
     try { latest = this.store.get(actor, id); }
     catch { deleteFile(this.store.directory, doc.id); throw new AppError(409, 'CASE_REMOVED_DURING_JOB'); }
+    if (!error && latest.sources.length + output.pages.length > 240) error = 'SOURCE_LIMIT';
     return this.store.update(actor, id, latest.revision, 'file_read', s => {
       const saved = s.documents.find(d => d.id === doc.id);
       if (error) { saved.status = 'read_failed'; saved.error = error; return; }
@@ -167,23 +180,24 @@ export class Application {
     requireValue(document && document.status === 'ocr_required', 'OCR_NOT_REQUIRED');
     requireValue(['pdf', 'png', 'jpeg'].includes(document.kind) && document.size <= 3 * 1024 * 1024 && document.pages <= 5, 'OCR_FILE_LIMIT', 413);
     this.checkAI(actor, state, 'openai');
-    this.store.reserve(); this.busy = true;
     const job = { id: uid(), kind: 'ocr', provider: 'openai', status: 'running', document_id: document.id, started_at: this.store.now().toISOString() };
-    const started = this.store.update(actor, id, state.revision, 'ocr_started', s => { s.jobs.push(job); });
+    const started = this.store.update(actor, id, state.revision, 'ocr_started', s => { s.jobs.push(job); }, { invalidate: false, reserveAI: true });
+    this.busy = true;
     let result, error;
     try { result = await this.ocr(this.store.directory, document, this.env); } catch (e) { error = e.code || 'OCR_FAILED'; }
     finally { this.busy = false; }
     const latest = this.store.get(actor, id);
+    if (!error && latest.sources.length + result.pages.length > 240) error = 'SOURCE_LIMIT';
     return this.store.update(actor, id, latest.revision, 'ocr_finished', s => {
       const saved = s.jobs.find(j => j.id === job.id); saved.finished_at = this.store.now().toISOString();
       if (error) { saved.status = 'failed'; saved.error = error; return; }
-      if (latest.revision !== started.revision) { saved.status = 'discarded'; saved.error = 'STALE_CASE_VERSION'; return; }
+      if (latest.data_revision !== started.data_revision) { saved.status = 'discarded'; saved.error = 'STALE_CASE_VERSION'; return; }
       saved.status = 'completed'; saved.model = result.model; saved.usage = result.usage;
       s.documents.find(d => d.id === document.id).status = 'ocr_review';
       // Original text pages remain available; the OCR transcription is a separate source.
       for (const page of result.pages) addSource(s, { text: page.text, title: document.name, page: page.page,
         kind: 'document', document_id: document.id, read_method: 'ai_ocr_requires_image_review' });
-    });
+    }, { invalidate: !error && latest.data_revision === started.data_revision });
   }
   reviewFact(actor, id, input) {
     requireValue(actor.role === 'lawyer', 'LAWYER_REQUIRED', 403);
@@ -191,6 +205,7 @@ export class Application {
       const fact = state.facts.find(f => f.id === input.fact_id && f.current);
       requireValue(fact && ['confirmed', 'rejected'].includes(input.review));
       fact.review = input.review; fact.reviewed_by = actor.name;
+      fact.reviewed_at = this.store.now().toISOString();
     });
   }
   correction(actor, id, input) {
@@ -207,6 +222,7 @@ export class Application {
       const claim = s.claims.find(c => c.id === input.claim_id && !c.merged_into);
       requireValue(claim && ['confirmed', 'rejected', 'pending'].includes(input.review));
       claim.review = input.review; claim.reviewed_by = actor.name;
+      claim.reviewed_at = this.store.now().toISOString();
     });
   }
   correctClaim(actor, id, input) {
@@ -273,8 +289,7 @@ export class Application {
       }
       requireValue(['administrative', 'legal'].includes(input.kind));
       if (input.kind === 'legal') requireValue(actor.role === 'lawyer' && input.basis?.trim() && input.start_date?.trim(), 'LEGAL_DEADLINE_REVIEW_REQUIRED', 403);
-      for (const date of [input.due, input.start_date].filter(Boolean)) requireValue(/^\d{4}-\d{2}-\d{2}$/.test(date) &&
-        new Date(date).toISOString().slice(0, 10) === date, 'INVALID_DATE');
+      for (const date of [input.due, input.start_date].filter(Boolean)) requireValue(validDate(date), 'INVALID_DATE');
       if (input.assignee) requireValue(this.store.db.prepare('SELECT id FROM users WHERE tenant=? AND id=? AND active=1').get(actor.tenant, input.assignee), 'INVALID_ASSIGNEE');
       s.tasks.push({ id: uid(), title: text(input.title, 200), kind: input.kind, due: input.due || null, status: 'open',
         basis: input.kind === 'legal' ? text(input.basis, 1000) : null, start_date: input.start_date || null,
@@ -322,6 +337,7 @@ export class Application {
     requireValue(state.track === 'company' && state.revision === input.revision, 'VERSION_CONFLICT', 409);
     requireValue(['krs', 'vat'].includes(input.kind) && /^\d{10}$/.test(input.identifier || ''), 'INVALID_REGISTRY_QUERY');
     const date = input.date || this.store.now().toISOString().slice(0, 10);
+    requireValue(validDate(date), 'INVALID_DATE');
     requireValue(!this.registryBusy, 'REGISTRY_BUSY', 429);
     const day = this.store.now().toISOString().slice(0, 10);
     const used = this.store.db.prepare('SELECT count FROM registry_budget WHERE day=?').get(day)?.count || 0;

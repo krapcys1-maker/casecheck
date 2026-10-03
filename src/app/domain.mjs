@@ -54,7 +54,7 @@ export function validateFieldTypes(state, facts, kind) {
   }
 }
 export const factValue = fact => {
-  if (!fact || fact.type === 'unknown') return '[DO UZUPEŁNIENIA]';
+  if (!fact || fact.type === 'unknown' || fact.review === 'rejected') return '[DO UZUPEŁNIENIA]';
   if (fact.type === 'money') return `${fact.precision === 'approximate' ? 'około ' : ''}${(fact.minor_units / 100).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} ${fact.currency}${fact.as_of ? ' (saldo ' + fact.as_of + ')' : ''}`;
   if (fact.type === 'boolean') return fact.boolean_value ? 'tak' : 'nie';
   return fact.text_value;
@@ -62,7 +62,7 @@ export const factValue = fact => {
 export const claimFact = (claim, field) => claim.facts.find(f => f.field === field);
 export function controls(state) {
   const candidates = [], sums = new Map(), issues = [];
-  const active = state.claims.filter(claim => !claim.merged_into);
+  const active = state.claims.filter(claim => !claim.merged_into && claim.review !== 'rejected');
   for (let i = 0; i < active.length; i++) for (let j = i + 1; j < active.length; j++) {
     const a = claimFact(active[i], 'agreement_number')?.text_value, b = claimFact(active[j], 'agreement_number')?.text_value;
     if (a && b && a.trim().toLowerCase() === b.trim().toLowerCase()) candidates.push([active[i].id, active[j].id]);
@@ -86,9 +86,19 @@ export function controls(state) {
   });
   const declared = currentFacts(state).declared_total;
   const comparable = totals.find(t => declared?.type === 'money' && declared.precision === 'exact' && t.currency === declared.currency && t.as_of === declared.as_of);
-  return { candidates, totals, issues, excluded_claims: issues.filter(i => ['possible_duplicate', 'amount_requires_review'].includes(i.code)).length,
-    difference: comparable && !issues.some(i => ['possible_duplicate', 'amount_requires_review'].includes(i.code))
-      ? { ...comparable, minor_units: declared.minor_units - comparable.minor_units } : null,
+  const excluded = issues.filter(i => ['possible_duplicate', 'amount_requires_review'].includes(i.code)).length;
+  const reasons = [];
+  if (!comparable || declared.review === 'rejected') reasons.push('declaration_not_comparable');
+  if (totals.length > 1) reasons.push('mixed_balance_groups');
+  if (excluded) reasons.push('excluded_claims');
+  if (!active.length) reasons.push('no_claims');
+  let difference = null;
+  if (!reasons.length) {
+    const minor = BigInt(declared.minor_units) - BigInt(comparable.minor_units);
+    requireValue(minor <= BigInt(Number.MAX_SAFE_INTEGER) && minor >= BigInt(Number.MIN_SAFE_INTEGER), 'MONEY_OVERFLOW');
+    difference = { ...comparable, minor_units: Number(minor) };
+  }
+  return { candidates, totals, issues, excluded_claims: excluded, difference, comparison_reasons: reasons,
     missing_fields: missing(state).map(({ key, label, question }) => ({ key, label, question })) };
 }
 // Operational counts, not a legal assessment or an AI confidence score.
@@ -125,7 +135,7 @@ export function draftSections(state, templateId, options = {}) {
   const sections = [{ heading: templateId === 'claim_clarification' ? 'Nadawca' : 'Dane sprawy', text: templateId === 'claim_clarification'
     ? `${value('client_name')}\n${value('address')}` : `Sprawa: ${state.title}\nOsoba lub firma: ${value('client_name')}\nAdres: ${value('address')}\nŚcieżka: ${state.track === 'consumer' ? 'konsumencka' : 'firmowa'}` }];
   if (templateId === 'claim_clarification') sections.unshift({ heading: 'Miejscowość i data', text: `[DO UZUPEŁNIENIA: miejscowość], ${new Date().toISOString().slice(0, 10)}` });
-  const listed = state.claims.filter(c => !c.merged_into).map((claim, i) => `${i + 1}. ${factValue(claimFact(claim, 'creditor_name'))}; adres: ${factValue(claimFact(claim, 'creditor_address'))}; umowa: ${factValue(claimFact(claim, 'agreement_number'))}; kwota: ${factValue(claimFact(claim, 'total_amount'))}; termin wymagalności: ${factValue(claimFact(claim, 'due_date'))}; zabezpieczenie: ${factValue(claimFact(claim, 'security_description'))}; data ustanowienia: ${factValue(claimFact(claim, 'security_creation_date'))}; spór: ${factValue(claimFact(claim, 'disputed'))}; zakres sporu: ${factValue(claimFact(claim, 'disputed_scope'))}; przegląd: ${reviewLabel(claim.review)}.`).join('\n\n') || '[DO UZUPEŁNIENIA: wierzyciele i dokumenty]';
+  const listed = state.claims.filter(c => !c.merged_into && c.review !== 'rejected').map((claim, i) => `${i + 1}. ${factValue(claimFact(claim, 'creditor_name'))}; adres: ${factValue(claimFact(claim, 'creditor_address'))}; umowa: ${factValue(claimFact(claim, 'agreement_number'))}; kwota: ${factValue(claimFact(claim, 'total_amount'))}; termin wymagalności: ${factValue(claimFact(claim, 'due_date'))}; zabezpieczenie: ${factValue(claimFact(claim, 'security_description'))}; data ustanowienia: ${factValue(claimFact(claim, 'security_creation_date'))}; spór: ${factValue(claimFact(claim, 'disputed'))}; zakres sporu: ${factValue(claimFact(claim, 'disputed_scope'))}; przegląd: ${reviewLabel(claim.review)}.`).join('\n\n') || '[DO UZUPEŁNIENIA: wierzyciele i dokumenty]';
   if (templateId === 'case_card') {
     sections.push({ heading: 'Informacje z wywiadu', text: fieldSet(state).map(f => `${f.label}: ${value(f.key)}${facts[f.key] ? ' [' + reviewLabel(facts[f.key].review) + ']' : ''}`).join('\n\n') });
     sections.push({ heading: 'Zobowiązania', text: listed });
@@ -137,6 +147,7 @@ export function draftSections(state, templateId, options = {}) {
   } else if (templateId === 'claim_clarification') {
     const claim = state.claims.find(c => c.id === options.claim_id && !c.merged_into);
     requireValue(claim, 'CLAIM_REQUIRED');
+    requireValue(claim.review !== 'rejected', 'CLAIM_REJECTED', 409);
     const creditor = claimFact(claim, 'creditor_name');
     const address = claimFact(claim, 'creditor_address');
     const recipientAddress = options.recipient_address || (address?.type === 'text' ? address.text_value : '[DO UZUPEŁNIENIA: adres wierzyciela]');

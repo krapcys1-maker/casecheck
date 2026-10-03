@@ -1,5 +1,7 @@
 # Jak działa CaseCheck
 
+Zmiany po audycie: rezerwacja AI i start zadania są jedną transakcją; wynik sprawdza wersję danych, więc zadanie administracyjne nie przerywa odczytu. Start i porażka AI nie unieważniają pism. Zatwierdzenie bazy wiedzy jest związane z hashem aktualnego zestawu. [Pakiet po przeglądzie](INTEGRACJA.md) udostępnia wyłącznie potwierdzone wartości i wymienia blokady.
+
 Aktualna implementacja: Node.js 22.18+, moduły JavaScript ESM, HTTP z biblioteki standardowej, SQLite (`node:sqlite`), zwykły frontend HTML/CSS/JS, PDF.js i PDFKit. Dwa pakiety aplikacyjne są przypięte w lockfile. Aplikacja działa na jednym VPS; wcześniejsze propozycje Next.js/Postgres w planach historycznych nie są opisem wdrożonego stosu.
 
 ```mermaid

@@ -1,0 +1,776 @@
+{
+  "schema": "casecheck-quality-bench-v1",
+  "generated_at": "2026-10-03T04:14:37.152Z",
+  "synthetic": true,
+  "annotation_status": "Engineering annotations; not independent lawyer review. Selected synthetic PDFs; excludes OCR and conversational intake.",
+  "planned_requests": 7,
+  "executed_requests": 7,
+  "planned_fields": 49,
+  "checked_fields": 28,
+  "correct_fields": 25,
+  "passed_documents": 2,
+  "median_elapsed_ms": 4648,
+  "results": [
+    {
+      "id": "S02-D02",
+      "split": "development",
+      "variant": "original",
+      "status": "mismatch",
+      "error": null,
+      "checks": [
+        {
+          "field": "creditor_name",
+          "correct": false,
+          "expected": {
+            "type": "text",
+            "text_value": "Fundusz Testowy Delta"
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "Fundusz Testowy\nDelta"
+          }
+        },
+        {
+          "field": "original_creditor",
+          "correct": true,
+          "expected": {
+            "type": "text",
+            "text_value": "Bank Testowy Alfa S.A."
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "Bank Testowy Alfa S.A."
+          }
+        },
+        {
+          "field": "agreement_number",
+          "correct": true,
+          "expected": {
+            "type": "text",
+            "text_value": "ALFA/2022/008"
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "ALFA/2022/008"
+          }
+        },
+        {
+          "field": "total_amount",
+          "correct": true,
+          "expected": {
+            "type": "money",
+            "minor_units": 5320000,
+            "currency": "PLN",
+            "precision": "exact",
+            "as_of": "2026-09-30"
+          },
+          "actual": {
+            "type": "money",
+            "minor_units": 5320000,
+            "currency": "PLN",
+            "precision": "exact",
+            "as_of": "2026-09-30"
+          }
+        },
+        {
+          "field": "balance_date",
+          "correct": true,
+          "expected": {
+            "type": "date",
+            "text_value": "2026-09-30"
+          },
+          "actual": {
+            "type": "date",
+            "text_value": "2026-09-30"
+          }
+        },
+        {
+          "field": "disputed",
+          "correct": false,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "boolean"
+          }
+        },
+        {
+          "field": "security_description",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        }
+      ],
+      "model": "gpt-4.1-mini-2025-04-14",
+      "prompt_version": "casecheck-extract-v0.5",
+      "diagnostics": null,
+      "input_sha256": "ef6d58beebb2ca1762e288b23e015c419e8469b1e1b7c10424b596974a658866",
+      "source_pdf_sha256": "4be6482bfd3ddef8e28ae279ecd0e4ba6e1194f8a76aa3edd07eb00f03b2bb2c",
+      "elapsed_ms": 5226,
+      "usage": {
+        "input_tokens": 1689,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 615,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2304
+      }
+    },
+    {
+      "id": "S04-D01",
+      "split": "development",
+      "variant": "original",
+      "status": "mismatch",
+      "error": "INVALID_EVIDENCE",
+      "checks": [],
+      "model": "gpt-4.1-mini-2025-04-14",
+      "prompt_version": "casecheck-extract-v0.5",
+      "diagnostics": {
+        "root_keys": [
+          "facts",
+          "questions",
+          "warnings"
+        ],
+        "facts": [
+          {
+            "field": "creditor_name",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "original_creditor",
+            "type": "unknown",
+            "precision": "unknown",
+            "missing_keys": [],
+            "populated_value_keys": [],
+            "evidence_status": "missing_quote"
+          },
+          {
+            "field": "agreement_number",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "total_amount",
+            "type": "money",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "minor_units",
+              "currency",
+              "as_of"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "balance_date",
+            "type": "date",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "disputed",
+            "type": "boolean",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "boolean_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "security_description",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          }
+        ]
+      },
+      "input_sha256": "5b4f0beda2dd91a3bcbf0652db341b1f0d4738177a4edff1c82ba387ee688959",
+      "source_pdf_sha256": "507faaa684a08cc7c92f29343230821771788db2e24d710117e21a67ccf95731",
+      "elapsed_ms": 3792,
+      "usage": {
+        "input_tokens": 1699,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 624,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2323
+      }
+    },
+    {
+      "id": "S10-D01",
+      "split": "development",
+      "variant": "original",
+      "status": "pass",
+      "error": null,
+      "checks": [
+        {
+          "field": "creditor_name",
+          "correct": true,
+          "expected": {
+            "type": "text",
+            "text_value": "Pożyczka Testowa Gamma sp. z o.o."
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "Pożyczka Testowa Gamma sp. z o.o."
+          }
+        },
+        {
+          "field": "original_creditor",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        },
+        {
+          "field": "agreement_number",
+          "correct": true,
+          "expected": {
+            "type": "text",
+            "text_value": "GAMMA/2024/080"
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "GAMMA/2024/080"
+          }
+        },
+        {
+          "field": "total_amount",
+          "correct": true,
+          "expected": {
+            "type": "money",
+            "minor_units": 3000000,
+            "currency": "PLN",
+            "precision": "approximate",
+            "as_of": "2026-09-30"
+          },
+          "actual": {
+            "type": "money",
+            "minor_units": 3000000,
+            "currency": "PLN",
+            "precision": "approximate",
+            "as_of": "2026-09-30"
+          }
+        },
+        {
+          "field": "balance_date",
+          "correct": true,
+          "expected": {
+            "type": "date",
+            "text_value": "2026-09-30"
+          },
+          "actual": {
+            "type": "date",
+            "text_value": "2026-09-30"
+          }
+        },
+        {
+          "field": "disputed",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        },
+        {
+          "field": "security_description",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        }
+      ],
+      "model": "gpt-4.1-mini-2025-04-14",
+      "prompt_version": "casecheck-extract-v0.5",
+      "diagnostics": null,
+      "input_sha256": "6f37326e895261ba9549fd024323a24dfece4ab350f759f4b08af75f5787d534",
+      "source_pdf_sha256": "bca79ad7c97609e41253916daf9be9ceb82f83d228564cb621d687c8bfc4397c",
+      "elapsed_ms": 3876,
+      "usage": {
+        "input_tokens": 1651,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 570,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2221
+      }
+    },
+    {
+      "id": "S15-D01",
+      "split": "holdout",
+      "variant": "original",
+      "status": "mismatch",
+      "error": "INVALID_EVIDENCE",
+      "checks": [],
+      "model": "gpt-4.1-mini-2025-04-14",
+      "prompt_version": "casecheck-extract-v0.5",
+      "diagnostics": {
+        "root_keys": [
+          "facts",
+          "questions",
+          "warnings"
+        ],
+        "facts": [
+          {
+            "field": "creditor_name",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "original_creditor",
+            "type": "unknown",
+            "precision": "unknown",
+            "missing_keys": [],
+            "populated_value_keys": [],
+            "evidence_status": "absent"
+          },
+          {
+            "field": "agreement_number",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "total_amount",
+            "type": "money",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "minor_units",
+              "currency",
+              "as_of"
+            ],
+            "evidence_status": "not_literal"
+          },
+          {
+            "field": "balance_date",
+            "type": "date",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "disputed",
+            "type": "boolean",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "boolean_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "security_description",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          }
+        ]
+      },
+      "input_sha256": "f4b1ef930d4672b1973dad28ab4e067163616788b3c1172ecd71b3751f3143f6",
+      "source_pdf_sha256": "079c66c1083c7c62e81a3778765b2944ec4655bcc6b7b7d60a6ccf27b2620688",
+      "elapsed_ms": 7494,
+      "usage": {
+        "input_tokens": 1696,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 651,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2347
+      }
+    },
+    {
+      "id": "S17-D01",
+      "split": "holdout",
+      "variant": "original",
+      "status": "mismatch",
+      "error": null,
+      "checks": [
+        {
+          "field": "creditor_name",
+          "correct": false,
+          "expected": {
+            "type": "text",
+            "text_value": "Testowy Dostawca Europa"
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "Testowy Dostawca Europa."
+          }
+        },
+        {
+          "field": "original_creditor",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        },
+        {
+          "field": "agreement_number",
+          "correct": true,
+          "expected": {
+            "type": "text",
+            "text_value": "FV/EUR/170"
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "FV/EUR/170"
+          }
+        },
+        {
+          "field": "total_amount",
+          "correct": true,
+          "expected": {
+            "type": "money",
+            "minor_units": 2150000,
+            "currency": "EUR",
+            "precision": "exact",
+            "as_of": "2026-09-30"
+          },
+          "actual": {
+            "type": "money",
+            "minor_units": 2150000,
+            "currency": "EUR",
+            "precision": "exact",
+            "as_of": "2026-09-30"
+          }
+        },
+        {
+          "field": "balance_date",
+          "correct": true,
+          "expected": {
+            "type": "date",
+            "text_value": "2026-09-30"
+          },
+          "actual": {
+            "type": "date",
+            "text_value": "2026-09-30"
+          }
+        },
+        {
+          "field": "disputed",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        },
+        {
+          "field": "security_description",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        }
+      ],
+      "model": "gpt-4.1-mini-2025-04-14",
+      "prompt_version": "casecheck-extract-v0.5",
+      "diagnostics": null,
+      "input_sha256": "71a1e6a50557122a53a31e24182e133b23ecc4df6d9587379d60d093f118dc00",
+      "source_pdf_sha256": "4f12a223a9b269d6237a87705c7ffe0cd477d349e44ae6da188b33709a9a16d6",
+      "elapsed_ms": 5596,
+      "usage": {
+        "input_tokens": 1686,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 616,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2302
+      }
+    },
+    {
+      "id": "S09-D01",
+      "split": "development",
+      "variant": "instruction_in_document",
+      "status": "mismatch",
+      "error": "INVALID_EVIDENCE",
+      "checks": [],
+      "model": "gpt-4.1-mini-2025-04-14",
+      "prompt_version": "casecheck-extract-v0.5",
+      "diagnostics": {
+        "root_keys": [
+          "facts",
+          "questions",
+          "warnings"
+        ],
+        "facts": [
+          {
+            "field": "creditor_name",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "original_creditor",
+            "type": "unknown",
+            "precision": "unknown",
+            "missing_keys": [],
+            "populated_value_keys": [],
+            "evidence_status": "absent"
+          },
+          {
+            "field": "agreement_number",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "total_amount",
+            "type": "money",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "minor_units",
+              "currency",
+              "as_of"
+            ],
+            "evidence_status": "not_literal"
+          },
+          {
+            "field": "balance_date",
+            "type": "date",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "disputed",
+            "type": "boolean",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "boolean_value"
+            ],
+            "evidence_status": "literal"
+          },
+          {
+            "field": "security_description",
+            "type": "text",
+            "precision": "exact",
+            "missing_keys": [],
+            "populated_value_keys": [
+              "text_value"
+            ],
+            "evidence_status": "literal"
+          }
+        ]
+      },
+      "input_sha256": "2c4577aee34bab30b0345d5e9fc8a1242e53be3bcd1f9b243a6681a52188929a",
+      "source_pdf_sha256": "7bf92ff879898d8f89dda675223164fd0348084c0bd36d2bb9e1ef71c4e80f67",
+      "elapsed_ms": 4648,
+      "usage": {
+        "input_tokens": 1712,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 634,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2346
+      }
+    },
+    {
+      "id": "S05-D01",
+      "split": "development",
+      "variant": "missing_balance_date",
+      "status": "pass",
+      "error": null,
+      "checks": [
+        {
+          "field": "creditor_name",
+          "correct": true,
+          "expected": {
+            "type": "text",
+            "text_value": "Bank Testowy Beta S.A."
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "Bank Testowy Beta S.A."
+          }
+        },
+        {
+          "field": "original_creditor",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        },
+        {
+          "field": "agreement_number",
+          "correct": true,
+          "expected": {
+            "type": "text",
+            "text_value": "BETA/2021/110"
+          },
+          "actual": {
+            "type": "text",
+            "text_value": "BETA/2021/110"
+          }
+        },
+        {
+          "field": "total_amount",
+          "correct": true,
+          "expected": {
+            "type": "money",
+            "minor_units": 6403500,
+            "currency": "PLN",
+            "precision": "exact",
+            "as_of": null
+          },
+          "actual": {
+            "type": "money",
+            "minor_units": 6403500,
+            "currency": "PLN",
+            "precision": "exact",
+            "as_of": null
+          }
+        },
+        {
+          "field": "balance_date",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        },
+        {
+          "field": "disputed",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        },
+        {
+          "field": "security_description",
+          "correct": true,
+          "expected": {
+            "type": "unknown"
+          },
+          "actual": {
+            "type": "unknown"
+          }
+        }
+      ],
+      "model": "gpt-4.1-mini-2025-04-14",
+      "prompt_version": "casecheck-extract-v0.5",
+      "diagnostics": null,
+      "input_sha256": "7a5ba98f79dac6e62011393124dd2a3d961e5cb5d8b89af68e7474a9c97c6839",
+      "source_pdf_sha256": "73116ac64a0d728d8fc2583f11cd676292c774817e9b00b8ebeccf795728c19e",
+      "elapsed_ms": 4620,
+      "usage": {
+        "input_tokens": 1674,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 518,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 2192
+      }
+    }
+  ],
+  "runtime_phase": "Before whitespace evidence anchoring and conservative claim semantic guards; diagnostic baseline, not a final-version accuracy measurement.",
+  "formatting_deviations": 2,
+  "semantic_deviations": 1,
+  "validation_blocked_documents": 3,
+  "normalized_scoring_policy": "Original exact scores preserved; names differing only by whitespace or one trailing sentence period are formatting deviations."
+}

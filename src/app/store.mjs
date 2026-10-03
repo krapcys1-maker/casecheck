@@ -13,6 +13,11 @@ export class AppError extends Error {
 export const requireValue = (condition, code = 'INVALID_INPUT', status = 400) => {
   if (!condition) throw new AppError(status, code);
 };
+export function validDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
 export function text(value, max = 4000, optional = false) {
   requireValue(typeof value === 'string' && value.length <= max && (optional || value.trim().length));
   return value.trim();
@@ -137,10 +142,11 @@ export class Store {
     this.db.prepare('INSERT INTO versions VALUES(?,?,?)').run(state.id, state.revision, JSON.stringify(state));
     this.db.prepare('INSERT INTO audit VALUES(?,?,?,?,?,?)').run(uid(), state.id, state.revision, actor.id, event, this.now().toISOString());
   }
-  update(actor, id, revision, event, mutate, { invalidate = true } = {}) {
+  update(actor, id, revision, event, mutate, { invalidate = true, reserveAI = false } = {}) {
     return this.tx(() => {
       const state = this.get(actor, id);
       requireValue(Number.isSafeInteger(revision) && state.revision === revision, 'VERSION_CONFLICT', 409);
+      if (reserveAI) this.reserve({ inTransaction: true });
       if (invalidate) { for (const draft of state.drafts) draft.status = 'stale'; state.data_revision++; }
       mutate(state);
       state.revision++; state.updated_at = this.now().toISOString();
@@ -176,14 +182,19 @@ export class Store {
     const used = this.db.prepare('SELECT count FROM budget WHERE day=?').get(day)?.count || 0;
     return { day, used, limit: this.limit, remaining: Math.max(0, this.limit - used) };
   }
-  reserve() {
-    this.tx(() => {
+  reserve({ inTransaction = false } = {}) {
+    const reserve = () => {
       const state = this.budget(); requireValue(state.remaining, 'DAILY_LIMIT', 429);
       this.db.prepare('INSERT INTO budget VALUES(?,1) ON CONFLICT(day) DO UPDATE SET count=count+1').run(state.day);
-    });
+    };
+    return inTransaction ? reserve() : this.tx(reserve);
   }
   knowledge(actor, base) {
-    return JSON.parse(this.db.prepare('SELECT state FROM knowledge WHERE tenant=?').get(actor.tenant)?.state || JSON.stringify(base));
+    const row = this.db.prepare('SELECT state FROM knowledge WHERE tenant=?').get(actor.tenant);
+    if (!row) return base;
+    const saved = JSON.parse(row.state);
+    return saved.hash === digest(JSON.stringify(base)) ? saved : {
+      ...base, approval_stale: true, previously_approved_at: saved.approved_at || null };
   }
   approveKnowledge(actor, base) {
     requireValue(actor.role === 'lawyer', 'LAWYER_REQUIRED', 403);

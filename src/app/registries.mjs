@@ -1,8 +1,8 @@
-import { requireValue, AppError } from './store.mjs';
+import { requireValue, AppError, validDate } from './store.mjs';
 
 export async function registryLookup({ kind, identifier, date, test = false }, fetchImpl = fetch) {
   requireValue(['krs', 'vat'].includes(kind) && typeof identifier === 'string' && /^\d{10}$/.test(identifier), 'INVALID_REGISTRY_QUERY');
-  requireValue(typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date) && new Date(date).toISOString().slice(0, 10) === date, 'INVALID_DATE');
+  requireValue(validDate(date), 'INVALID_DATE');
   const url = kind === 'krs' ? `https://api-krs.ms.gov.pl/api/krs/OdpisAktualny/${identifier}?rejestr=P&format=json`
     : `https://${test ? 'wl-test' : 'wl-api'}.mf.gov.pl/api/search/nip/${identifier}?date=${date}`;
   let response;

@@ -12,6 +12,8 @@ Dostęp do panelu wymaga konta; danych logowania nie publikujemy. Pokaz korzysta
 
 [Trzystronicowe portfolio PDF](output/pdf/casecheck-portfolio.pdf) · [Opis projektu do CV](docs/OPIS-DO-CV.md)
 
+[Aktualny audyt i plan testów](docs/AUDYT.md) · [Przygotowanie rozmowy z Booster](docs/ROZMOWA-BOOSTER.md) · [Pakiet do integracji](docs/INTEGRACJA.md). Portfolio PDF zachowuje wcześniejszy pokaz; audyt opisuje późniejsze naprawy i trudniejszą próbę AI, również jej niepowodzenia.
+
 ![Podsumowanie S01 w działającym panelu, wyłącznie fikcyjne dane](docs/images/podsumowanie-S01.png)
 
 ## Działające moduły
@@ -24,6 +26,7 @@ Dostęp do panelu wymaga konta; danych logowania nie publikujemy. Pokaz korzysta
 - Pięć edytowalnych wzorów: karta sprawy, pomocniczy wykaz wierzycieli, prośba o uzupełnienie, prośba o wyjaśnienie roszczenia i szkic wstępnego planu restrukturyzacyjnego. Eksport PDF; zmiana danych unieważnia poprzedni projekt.
 - Etapy, zadania, przypisanie do konta, dziennik wersji i eksport JSON. Termin prawny wymaga prawnika, podstawy i daty rozpoczynającej bieg.
 - Podsumowanie sprawy: braki, odczyty do przeglądu, rozbieżności, spory i zadania. Filtry kartoteki, przypisywanie do nazwanych osób oraz rozdzielenie aktualnych i wcześniejszych pism.
+- Pakiet JSON dla prawnika: potwierdzone wartości, cytaty, strony, hashe plików, braki i blokady. Eksport jest punktem startowym integracji, bez automatycznej transmisji.
 - Aktualny odpis KRS i wykaz VAT MF, z adresem źródła, datą i identyfikatorem zapytania. Dla fikcyjnych spraw VAT korzysta ze środowiska testowego.
 - Kopia bazy wraz z plikami, hashe, kontrola integralności i test odtworzenia. Usuwanie aktywnej sprawy wraz z historią i linkami.
 
@@ -56,6 +59,8 @@ Wybrane źródła trafiają do wskazanego API. OCR przekazuje cały wskazany pli
 ## Testy i limity
 
 `npm test` działa bez kluczy i płatnych wywołań. GitHub Actions sprawdza Node 22 i 24. Testy obejmują izolację, role, linki, wyścig wersji, awarię AI, PDF/skany, kopię i odtworzenie, integralność danych, waluty i duplikaty.
+
+Aktualny zestaw zawiera **70 testów**. `npm run ai:bench` pokazuje plan bez API, a `node scripts/quality-bench.mjs --run` wykonuje płatną próbę na siedmiu syntetycznych PDF-ach. Osobny trwały limit runnera: 9 prób/dzień UTC. [Wyniki próby przed ostatnimi poprawkami](docs/quality-bench-2026-10-03.json) zawierają także odrzucone odczyty i błędną interpretację; nie są pomiarem ogólnej skuteczności.
 
 Trwały limit: 20 żądań AI na dzień UTC i jedno wywołanie naraz. Błędy także zużywają rezerwację; brak automatycznych powtórek. To limit liczby żądań, nie rachunku w walucie. Wynik starej wersji jest odrzucany. Przerwane zadanie wymaga jawnego ponowienia. Jeden proces aplikacji może posiadać dany katalog stanu.
 

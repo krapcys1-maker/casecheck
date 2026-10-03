@@ -8,6 +8,7 @@ import { AppError, requireValue } from './app/store.mjs';
 import { root, publicCase, reviewSummary, knowledge } from './app/domain.mjs';
 import { safeFile, deleteFile } from './app/files.mjs';
 import { renderDraft } from './app/pdf.mjs';
+import { reviewPackage } from './app/review-package.mjs';
 import { KEY_NAMES, providerConfig } from './ai/extraction.mjs';
 
 export function readBody(request, max = 512 * 1024, json = true) {
@@ -107,6 +108,10 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
         send(200, { ok: true }); return;
       }
       if (action === 'history' && request.method === 'GET') { send(200, { history: app.store.history(actor, id) }); return; }
+      if (action === 'review-package' && request.method === 'GET') {
+        requireValue(actor.role === 'lawyer', 'LAWYER_REQUIRED', 403);
+        send(200, reviewPackage(state, app.store.now().toISOString())); return;
+      }
       if (action === 'export' && request.method === 'GET') { requireValue(staff, 'FORBIDDEN', 403); send(200, { schema: 'casecheck-export-v1', case: state }); return; }
       if (action === 'files' && resourceId && request.method === 'GET') {
         const doc = state.documents?.find(d => d.id === resourceId); requireValue(doc, 'NOT_FOUND', 404);
