@@ -42,13 +42,13 @@ To dowód działania filtrów na tych materiałach. Anotacje są inżynierskie, 
 
 ## GitHub i prezentacja
 
-Kod portalu i korekt opublikowano w `693ed7a`. [GitHub Actions](https://github.com/krapcys1-maker/casecheck/actions/runs/37119209888) potwierdził 119/119 na Node 22 oraz 24. Kolejne poprawki rejestrów mają lokalnie 121/121. [Raport publikacji](publication-check-2026-10-03.json) zachowuje zakres kolejnych prób.
+Kod, raporty i prezentację opublikowano na `main`. Commit `dd32a3b` zawiera także poprawki rejestrów. [GitHub Actions](https://github.com/krapcys1-maker/casecheck/actions/runs/37120399973) potwierdził **121/121 na Node 22 oraz 24**. Wcześniejszy commit `693ed7a` przeszedł 119/119. [Raport publikacji](publication-check-2026-10-03.json) zachowuje zakres kolejnych prób.
 
 Gotowa [prezentacja 22 slajdy](../output/presentation/README.md) opisuje działanie, funkcje, porównanie z oficjalną ofertą LegalFlow i kierunki poprawy.
 
 ## Wdrożenie i następny etap
 
-Dokumentacja zawiera istniejący [panel HTTPS](https://astrologiapoludzku.com/casecheck/) i wcześniejsze dowody wdrożenia. Najnowsze zmiany w tej kontynuacji zweryfikowano lokalnie; pierwszy commit tej aktualizacji przeszedł CI na Node 22 i 24, a na VPS nie wdrażano tych zmian. Nie publikowano danych dostępu i nie zmieniano prywatnego stanu działającego serwera.
+Dokumentacja zawiera istniejący [panel HTTPS](https://astrologiapoludzku.com/casecheck/) i wcześniejsze dowody wdrożenia. Najnowsze zmiany zweryfikowano lokalnie oraz w GitHub Actions na Node 22 i 24. Na VPS nie wdrażano tych zmian. Nie publikowano danych dostępu i nie zmieniano prywatnego stanu działającego serwera.
 
 Kolejność dalszej pracy:
 

@@ -1,6 +1,14 @@
 {
   "schema": "casecheck-publication-check-v1",
   "date": "2026-10-03",
+  "latest_product_commit": "dd32a3b1e34555783f0e68b4b38d9ee75b666c87",
+  "latest_verified_ci": {
+    "url": "https://github.com/krapcys1-maker/casecheck/actions/runs/37120399973",
+    "node": [22, 24],
+    "result": "success",
+    "tests_per_job": 121,
+    "failures_per_job": 0
+  },
   "product_commit": "693ed7ac9f1ecf7e25d1f9470562cdce10b8e381",
   "verified_ci": {
     "url": "https://github.com/krapcys1-maker/casecheck/actions/runs/37119209888",

@@ -4,7 +4,7 @@ Dalsza ręczna kontrola ujawniła błędną klasyfikację HTTP 400 z KRS i niew�
 
 ## Bieżąca weryfikacja lokalna: 3 października 2026
 
-**Aktualnie 121/121 testów**. Pięć najnowszych regresji dotyczy ręcznego wycofania wartości, zależności roszczenia, częściowej odpowiedzi AI, pustej edycji i starego pustego zatwierdzenia. Cztery najpierw odtworzyły błąd na wcześniejszym kodzie. [Ręczna kontrola korekt i eksportów](RECZNE-TESTY-KOREKT.md) oraz [raport](correction-review-2026-10-03.json) obejmują rzeczywisty interfejs, restart i odtworzenie 6/6 scenariuszy HTTP, bez nowego API.
+**Aktualnie 121/121 testów**. Dwie najnowsze regresje dotyczą klasyfikacji odpowiedzi rejestru i etykiety środowiska. Pięć regresji korekt dotyczy ręcznego wycofania wartości, zależności roszczenia, częściowej odpowiedzi AI, pustej edycji i starego pustego zatwierdzenia. Cztery najpierw odtworzyły błąd na wcześniejszym kodzie. [Ręczna kontrola korekt i eksportów](RECZNE-TESTY-KOREKT.md) oraz [raport](correction-review-2026-10-03.json) obejmują rzeczywisty interfejs, restart i odtworzenie 6/6 scenariuszy HTTP, bez nowego API.
 
 Poprzedni etap: 114/114. Osiem nowych sprawdzeń dotyczy portalu/wzorów (6), kwarantanny typu pola (1) i związku adresu z wierzycielem (1). [Ręczny przegląd najnowszego etapu](RECZNY-PRZEGLAD-PORTALU.md) opisuje rzeczywiste odczyty, błędy, korekty i cały obieg portalu. Trzy dodatkowe operacje API podniosły licznik kopii z 17 do 20; żadnego wywołania nie wykonuje `npm test`.
 
