@@ -100,20 +100,20 @@ test('refusal, truncated output, malformed JSON and unexpected tool are failures
 
 test('HTTP error never includes provider response body or credential in error', async () => {
   let bodyRead = false;
-  await assert.rejects(extractFacts({ provider: 'openai', ...input,
-    env: { OPENAI_API_KEY: 'fake-sensitive-test-key' },
+  await assert.rejects(extractFacts({ provider: 'deepseek', ...input,
+    env: { DEEPSEEK_API_KEY: 'fake-sensitive-test-key' },
     fetchImpl: async () => ({ ok: false, status: 401, json() { bodyRead = true; return { message: 'fake-sensitive-test-key' }; } }),
   }), error => error.code === 'HTTP_ERROR' && error.status === 401 && !String(error).includes('fake-sensitive'));
   assert.equal(bodyRead, false);
 });
 
 test('successful request returns validated facts and usage without credentials', async () => {
-  const result = await extractFacts({ provider: 'openai', ...input,
-    env: { OPENAI_API_KEY: 'fake-sensitive-test-key' },
+  const result = await extractFacts({ provider: 'deepseek', ...input,
+    env: { DEEPSEEK_API_KEY: 'fake-sensitive-test-key' },
     fetchImpl: async (_url, options) => {
       assert.equal(options.redirect, 'error');
       return { ok: true, json: async () => ({ status: 'completed', model: 'test-model', usage: { input_tokens: 100, output_tokens: 50 },
-        output: [{ content: [{ type: 'output_text', text: JSON.stringify(output(moneyFact())) }] }] }) };
+        choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(output(moneyFact())) } }] }) };
     },
   });
   assert.equal(result.output.facts[0].minor_units, 10001);
@@ -123,8 +123,8 @@ test('successful request returns validated facts and usage without credentials',
 
 test('transport failure yields a safe code, without implicit retries', async () => {
   let attempts = 0;
-  await assert.rejects(extractFacts({ provider: 'openai', ...input,
-    env: { OPENAI_API_KEY: 'fake' }, fetchImpl: async () => {
+  await assert.rejects(extractFacts({ provider: 'deepseek', ...input,
+    env: { DEEPSEEK_API_KEY: 'fake' }, fetchImpl: async () => {
       attempts++; const error = new Error('unsafe network details'); error.name = 'TimeoutError'; throw error;
     },
   }), expectCode('API_TIMEOUT'));

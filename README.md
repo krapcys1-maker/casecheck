@@ -1,5 +1,7 @@
 # CaseCheck — wywiad, dokumenty i przegląd sprawy
 
+**Aktualizacja 3.10.2026:** swobodny czat Asystent AI, wyłącznie DeepSeek V4.1 Flash, OCR DeepSeek i powiadomienia w aplikacji. 136/136 testów i 11 nowych rzeczywistych wywołań. [Odbiór czatu](docs/RECZNY-ODBIOR-CZATU.md) i [porównanie LegalFlow](docs/POROWNANIE-LEGALFLOW.md). Brakuje automatycznego NIP z rozmowy, pism po wywiadzie i reguł etapów. Poniższe wyniki wcześniejszych etapów są historyczne.
+
 [![Tests](https://github.com/krapcys1-maker/casecheck/actions/workflows/tests.yml/badge.svg)](https://github.com/krapcys1-maker/casecheck/actions/workflows/tests.yml)
 
 Otwarty projekt przyjmowania spraw konsumenckich i firmowych. Wersja pilotażowa prowadzi od rozmowy i załączników do kartoteki wierzycieli, przeglądu danych oraz projektów dokumentów. Dane mają źródła; zatwierdzanie należy do konta prawnika.
@@ -26,7 +28,7 @@ Dostęp do panelu wymaga konta; danych logowania nie publikujemy. Pokaz korzysta
 - Własne wzory kancelarii: edytor sekcji i pól, niezmienna historia wersji, zatwierdzanie, podstawianie potwierdzonych informacji i cytatów. Eksport PDF oraz edytowalnego DOCX; brak importu dowolnych szablonów Word i podpisu elektronicznego.
 - Konta administratora, prawnika i pracownika, hasła scrypt, wygasające sesje i link klienta do jednej sprawy. Dostęp sprawdzany według kancelarii oraz zakresu linku.
 - Trwała kartoteka SQLite, rozmowa po polsku, wywiad konsumencki lub firmowy, poprawki i prośba o kontakt z człowiekiem.
-- Hybrydowy odczyt roszczeń: lokalne reguły dla jednoznacznych pól, OpenAI, Anthropic lub DeepSeek dla pozostałych. Typy, kwoty w groszach, daty i dosłowne cytaty walidowane na serwerze. Zapis wersji promptu i reguł, wejścia oraz zużycia tokenów.
+- Hybrydowy odczyt roszczeń: lokalne reguły dla jednoznacznych pól, wyłącznie DeepSeek V4.1 Flash dla pozostałych. Typy, kwoty w groszach, daty i dosłowne cytaty walidowane na serwerze. Zapis wersji promptu i reguł, wejścia oraz zużycia tokenów.
 - Trwały zapis wyniku przed zastosowaniem do sprawy; jawne odzyskanie po awarii końcowego zapisu lub restarcie. Bez ponownego wywołania API, podwójnych danych i nadpisywania ręcznych korekt. [Jak odzyskać wynik](docs/ODZYSKIWANIE-WYNIKOW.md).
 - Prywatny upload PDF, TXT, PNG i JPEG. Lokalny odczyt PDF.js w ograniczonym procesie roboczym. OCR przez OpenAI po osobnym uruchomieniu i potwierdzeniu przekazania całego wskazanego pliku.
 - Oryginał i transkrypcja obok siebie, przegląd każdej strony OCR, korekty z historią i powiązanie zatwierdzenia z hashami. Zmieniony odczyt wycofuje zależne zatwierdzenia, sumy i pisma do ponownego sprawdzenia.
@@ -62,7 +64,7 @@ Publiczne wdrożenie wymaga wybranej domeny i HTTPS. [Instrukcja VPS](deploy/APP
 
 Wzory i pytania oparto na [oficjalnych źródłach](legal/README.md), sprawdzonych 2 października 2026 r. Są materiałami przygotowawczymi. Karta i wykaz nie zastępują urzędowego formularza lub proceduralnego spisu wierzytelności. Model nie kwalifikuje do postępowania i nie składa pism. Baza pytań oraz wzorów wymaga zatwierdzenia przez kancelarię przed analizą rzeczywistych danych.
 
-Wybrane źródła trafiają do wskazanego API. OCR przekazuje cały wskazany plik do OpenAI. `store:false` nie zapewnia braku retencji u dostawcy. Nie wdrożono pełnego KRZ, CEIDG, BIR ani automatycznej wysyłki. KRS/VAT nie podają prywatnych długów klienta. Upload nie obejmuje DOCX i ZIP; eksport projektów do DOCX jest dostępny.
+Wybrane źródła trafiają do wskazanego API. OCR przekazuje obrazy wszystkich stron do DeepSeek. Nie deklarujemy zerowej retencji u dostawcy. Nie wdrożono pełnego KRZ, CEIDG, BIR ani automatycznej wysyłki. KRS/VAT nie podają prywatnych długów klienta. Upload nie obejmuje DOCX i ZIP; eksport projektów do DOCX jest dostępny.
 
 ## Testy i limity
 

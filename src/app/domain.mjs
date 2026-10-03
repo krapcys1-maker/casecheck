@@ -34,9 +34,9 @@ export function addSource(state, { text: content, kind = 'message', title = 'Wia
   const source = { id: uid(), text: text(content, 20000, true), kind, title: text(title, 200), page, document_id, read_method };
   state.sources.push(source); return source;
 }
-export function putFacts(state, facts, { method = 'ai', review = 'pending', actor = null } = {}) {
+export function putFacts(state, facts, { method = 'ai', review = 'pending', actor = null, replaceKnownWithUnknown = false } = {}) {
   for (const fact of facts) {
-    if (method !== 'manual' && fact.type === 'unknown' && currentFacts(state)[fact.field]?.type !== 'unknown' && currentFacts(state)[fact.field] && !currentFacts(state)[fact.field].source_invalidated) {
+    if (!replaceKnownWithUnknown && method !== 'manual' && fact.type === 'unknown' && currentFacts(state)[fact.field]?.type !== 'unknown' && currentFacts(state)[fact.field] && !currentFacts(state)[fact.field].source_invalidated) {
       state.facts.push({ ...fact, id: uid(), current: false, method, review, actor }); continue;
     }
     for (const previous of state.facts.filter(f => f.field === fact.field && f.current)) previous.current = false;
@@ -161,10 +161,15 @@ export function reviewSummary(state, today = new Date().toISOString().slice(0, 1
 }
 export function publicCase(state, actor) {
   const checks = controls(state);
+  const conversationFacts = Object.values(currentFacts(state)).filter(f => {
+    const source = state.sources.find(s => s.id === f.source_id);
+    return f.review !== 'rejected' && !f.source_invalidated && !sourceProblem(state, f.source_id) &&
+      (actor.role !== 'client' || source?.kind === 'message' || source?.kind === 'registry' || source?.document_id && clientFileVisible(state.documents?.find(d => d.id === source.document_id)));
+  });
   if (actor.role === 'client') return { id: state.id, title: state.title, track: state.track, synthetic: state.synthetic,
     stage: state.stage, revision: state.revision, messages: state.messages, consent: state.consent, handoff: state.handoff,
-    documents: (state.documents || []).filter(clientFileVisible), portal: portalView(state), next_question: nextQuestion(state), missing: checks.missing_fields };
-  return { ...state, portal: portalView(state), controls: checks, review_summary: reviewSummary(state), current_facts: currentFacts(state), next_question: nextQuestion(state) };
+    conversation_facts: conversationFacts, documents: (state.documents || []).filter(clientFileVisible), portal: portalView(state), next_question: nextQuestion(state), missing: checks.missing_fields };
+  return { ...state, conversation_facts: conversationFacts, portal: portalView(state), controls: checks, review_summary: reviewSummary(state), current_facts: currentFacts(state), next_question: nextQuestion(state) };
 }
 export function draftSections(state, templateId, options = {}) {
   const facts = currentFacts(state), value = key => factValue(facts[key]);

@@ -10,7 +10,7 @@ import { digest, uid } from '../src/app/store.mjs';
 import { makeBackup, verifyBackup } from '../scripts/backup.mjs';
 
 const password = 'test-recovery-password-with-enough-characters';
-const env = { OPENAI_API_KEY: 'not-a-live-key', CASECHECK_ADMIN_PASSWORD: password };
+const env = { DEEPSEEK_API_KEY: 'not-a-live-key', CASECHECK_ADMIN_PASSWORD: password };
 const unknown = field => ({ field, type: 'unknown', text_value: null, boolean_value: null, minor_units: null,
   currency: null, as_of: null, precision: 'unknown', source_id: null, quote: null });
 const response = ({ requested_fields, sources }) => ({ model: 'mock-recovery', usage: { input_tokens: 10, output_tokens: 5 },
@@ -33,7 +33,7 @@ async function fixture(t, options = {}) {
 function intake(f) {
   let state = f.app.create(f.actor, { title: 'Fikcyjna sprawa odzyskiwania', track: 'consumer', synthetic: true });
   state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Osoba Testowa' });
-  return f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  return f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
 }
 const analyze = (f, state, extra = {}) => f.app.analyze(f.actor, state.id,
   { revision: state.revision, kind: 'intake', fields: ['client_name'], ...extra });
@@ -86,7 +86,7 @@ test('a hard process exit after receipt commit survives restart without a second
   const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
     import { Application } from './src/app/application.mjs';
     const { directory, actor, state } = JSON.parse(process.argv[1]);
-    const app = new Application({ stateDir: directory, env: { OPENAI_API_KEY: 'not-a-live-key' },
+    const app = new Application({ stateDir: directory, env: { DEEPSEEK_API_KEY: 'not-a-live-key' },
       extract: async ({ sources }) => ({ model: 'crash-mock', usage: {}, output: { warnings: [], questions: [], facts: [{
         field: 'client_name', type: 'text', text_value: 'Osoba Testowa', boolean_value: null, minor_units: null,
         currency: null, as_of: null, precision: 'exact', source_id: sources[0].id, quote: sources[0].text }] } }) });
@@ -233,7 +233,7 @@ test('interrupted jobs without a receipt keep their data revision and never retr
   state = f.app.draft(lawyer, state.id, { revision: state.revision, template: 'case_card' });
   state = f.app.approveDraft(lawyer, state.id, { revision: state.revision, draft_id: state.drafts[0].id });
   state = f.app.store.update(f.actor, state.id, state.revision, 'test_legacy_job', s => {
-    s.jobs.push({ id: uid(), kind: 'intake', provider: 'openai', status: 'running' });
+    s.jobs.push({ id: uid(), kind: 'intake', provider: 'deepseek', status: 'running' });
   }, { invalidate: false, reserveAI: true });
   const version = state.data_revision;
   f.reopen(); state = f.app.store.get(f.actor, state.id);

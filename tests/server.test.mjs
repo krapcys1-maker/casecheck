@@ -11,7 +11,7 @@ const token = 'synthetic-panel-password-for-local-tests-only';
 const apiKey = 'synthetic-provider-key-for-local-tests-only';
 const dataset = JSON.parse(readFileSync(new URL('./fixtures/cases.json', import.meta.url), 'utf8'));
 const unknown = dataset.cases.find(item => item.id === 'C07').expected.facts[0];
-const result = () => ({ provider: 'openai', model: 'test-model', elapsed_ms: 1, prompt_version: 'test',
+const result = () => ({ provider: 'deepseek', model: 'test-model', elapsed_ms: 1, prompt_version: 'test',
   output: { facts: [{ field: unknown.field, type: 'unknown', text_value: null, boolean_value: null,
     minor_units: null, currency: null, as_of: null, precision: 'unknown',
     source_id: unknown.source_id, quote: unknown.quote ?? null }], questions: [], warnings: [] } });
@@ -20,7 +20,7 @@ async function app(t, options = {}) {
   const directory = options.stateDir ?? mkdtempSync(join(tmpdir(), 'casecheck-test-'));
   if (!options.stateDir) t.after(() => rmSync(directory, { recursive: true, force: true }));
   const env = { CASECHECK_ACCESS_TOKEN: token, CASECHECK_PUBLIC_ORIGIN: 'https://casecheck.example',
-    OPENAI_API_KEY: apiKey, ...options.env };
+    DEEPSEEK_API_KEY: apiKey, ...options.env };
   const server = createCasecheckServer({ extract: async () => result(), ...options, env, stateDir: directory });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
@@ -32,7 +32,7 @@ async function app(t, options = {}) {
   }) };
 }
 const post = (body, headers = {}) => ({ method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
-const selection = { provider: 'openai', case_id: 'C07' };
+const selection = { provider: 'deepseek', case_id: 'C07' };
 
 test('startup requires a strong token and refuses corrupt persistent budget', () => {
   assert.throws(() => createCasecheckServer({ env: {} }), /ACCESS_TOKEN_REQUIRED/);
@@ -64,7 +64,7 @@ test('API requires authorization and rejects credential query strings', async t 
   const config = await request('/api/config');
   const text = await config.text();
   assert.ok(!text.includes(token) && !text.includes(apiKey));
-  assert.equal(JSON.parse(text).providers[0].provider, 'openai');
+  assert.equal(JSON.parse(text).providers[0].provider, 'deepseek');
 });
 
 test('only built-in extraction cases are exposed without expected answers', async t => {

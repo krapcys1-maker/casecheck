@@ -13,9 +13,11 @@ import { extractClaimFacts, planClaimExtraction } from '../ai/hybrid.mjs';
 import { documentSources, documentReview, isOCRSource, sourceProblem, claimSourceProblem, hasSourceReviewBlockers } from './document-review.mjs';
 import { Portal, clientFileVisible } from './portal.mjs';
 import { FirmTemplates, fillFirmTemplate } from './firm-templates.mjs';
+import { Activity } from './activity.mjs';
+import { converse, validateConversation } from '../ai/conversation.mjs';
 
 export class Application {
-  constructor({ env = process.env, stateDir, now, extract = extractFacts, ocr = ocrDocument, reader = readDocument, limit = 20 }) {
+  constructor({ env = process.env, stateDir, now, extract = extractFacts, conversation = converse, ocr = ocrDocument, reader = readDocument, limit = 20 }) {
     mkdirSync(stateDir, { recursive: true, mode: 0o700 });
     this.lockPath = resolve(stateDir, 'app.lock');
     try { writeFileSync(this.lockPath, String(process.pid), { flag: 'wx', mode: 0o600 }); }
@@ -29,6 +31,8 @@ export class Application {
     }
     this.env = env; this.store = new Store(stateDir, { now, limit }); this.extract = extract; this.ocr = ocr; this.reader = reader;
     this.portal = new Portal(this.store); this.firmTemplates = new FirmTemplates(this.store);
+    this.activity = new Activity(this.store);
+    this.conversation = conversation;
     this.busy = false;
     // Saved results need explicit recovery; an interrupted request never calls AI again automatically.
     for (const row of this.store.db.prepare('SELECT tenant,state FROM cases').all()) {
@@ -50,7 +54,7 @@ export class Application {
     requireValue(input.accepted === true && ['openai', 'anthropic', 'deepseek'].includes(input.provider), 'CONSENT_REQUIRED');
     providerConfig(input.provider, this.env);
     return this.store.update(actor, id, input.revision, 'ai_consent', state => {
-      state.consent = { provider: input.provider, notice_version: 'external-api-v1', at: this.store.now().toISOString(), actor: actor.id };
+      state.consent = { provider: input.provider, notice_version: 'external-api-v2', at: this.store.now().toISOString(), actor: actor.id };
     });
   }
   message(actor, id, input) {
@@ -188,7 +192,10 @@ export class Application {
     const result = payload.result, task = payload.task;
     if (!failure) {
       try {
-        if (job.kind === 'ocr') {
+        if (job.kind === 'conversation') {
+          validateConversation(result.output, task);
+          validateFieldTypes(current, result.output.facts, 'intake');
+        } else if (job.kind === 'ocr') {
           const document = current.documents.find(d => d.id === job.document_id);
           requireValue(document && document.sha256 === task.sha256, 'SAVED_RESULT_INVALID', 409);
           validateOCRPages(result.pages, document);
@@ -204,10 +211,20 @@ export class Application {
       saved.finished_at = payload.finished_at; saved.result_sha256 = sha256; delete saved.error;
       if (recovered) { saved.recovered_at = this.store.now().toISOString(); saved.recovered_by = actor.id; }
       if (result) Object.assign(saved, result.metadata);
-      if (failure) { saved.status = 'failed'; saved.error = failure; Object.assign(saved, payload.failure_details); return; }
+      if (failure) {
+        saved.status = 'failed'; saved.error = failure; Object.assign(saved, payload.failure_details);
+        if (job.kind === 'conversation') s.messages.push({ id: uid(), role: 'assistant', kind: 'service_notice', job_id: job.id,
+          text: 'Twoja wiadomość została zapisana, ale asystent nie uzyskał poprawnej odpowiedzi. Pracownik może sprawdzić zapis w Historii. Nie wysłano kolejnej płatnej próby.', at: payload.finished_at });
+        return;
+      }
       if (stale) { saved.status = 'discarded'; saved.error = 'STALE_CASE_VERSION'; return; }
       saved.status = 'completed';
-      if (job.kind === 'ocr') {
+      if (job.kind === 'conversation') {
+        putFacts(s, result.output.facts, { replaceKnownWithUnknown: true });
+        saved.warnings = result.output.warnings;
+        s.messages.push({ id: uid(), role: 'assistant', kind: 'conversation', job_id: job.id,
+          text: result.output.reply, next_field: result.output.next_field, at: payload.finished_at });
+      } else if (job.kind === 'ocr') {
         const document = s.documents.find(d => d.id === job.document_id); document.status = 'ocr_review';
         // Keep original image/text sources and add the transcription for human review.
         for (const page of result.pages) {
@@ -263,6 +280,43 @@ export class Application {
     }
     return this.botReply(actor, id, state.revision, warning);
   }
+  async assistantMessage(actor, id, input) {
+    const before = this.store.get(actor, id);
+    requireValue(before.revision === input.revision, 'VERSION_CONFLICT', 409);
+    requireValue(before.consent?.notice_version === 'external-api-v2', 'CONVERSATION_CONSENT_REQUIRED', 403);
+    const provider = before.consent.provider;
+    this.checkAI(actor, before, provider);
+    requireValue(this.store.budget().remaining > 0, 'DAILY_LIMIT', 429);
+    requireValue(before.messages.length <= 397, 'MESSAGE_LIMIT', 413);
+    const state = this.message(actor, id, { revision: input.revision, text: input.text, request_handoff: input.request_handoff });
+    if (state.handoff) return this.botReply(actor, id, state.revision);
+    const last = state.messages.at(-1), source = state.sources.find(s => s.id === last.source_id);
+    const visible = s => s?.kind === 'message' || s?.kind === 'registry' || s?.document_id && clientFileVisible(state.documents?.find(d => d.id === s.document_id));
+    const known = Object.values(currentFacts(state)).filter(f => f.review !== 'rejected' && !f.source_invalidated &&
+      !sourceProblem(state, f.source_id) && visible(state.sources.find(s => s.id === f.source_id)));
+    const history = []; let historySize = 0;
+    for (const { role, text, next_field } of state.messages.slice(-13, -1).reverse()) {
+      if (historySize + text.length > 24000) break;
+      history.unshift({ role, text, ...(next_field ? { next_field } : {}) }); historySize += text.length;
+    }
+    const task = { track: state.track, sources: [{ id: source.id, kind: source.kind, text: source.text }],
+      allowed_fields: fieldSet(state).map(({ key, label, type, question }) => ({ key, label, type, question })),
+      known_facts: known.map(({ field, type, text_value, boolean_value, minor_units, currency, as_of, precision }) =>
+        ({ field, type, text_value: text_value?.slice(0, 1000) ?? null, text_truncated: (text_value?.length || 0) > 1000,
+          boolean_value, minor_units, currency, as_of, precision })),
+      deferred_fields: known.filter(f => f.type === 'unknown' && f.quote).map(f => f.field),
+      history };
+    requireValue(JSON.stringify(task).length <= 80000, 'SOURCE_LIMIT', 413);
+    const job = { id: uid(), kind: 'conversation', provider, status: 'running', source_ids: [source.id],
+      input_sha256: digest(JSON.stringify(task)), data_revision: state.data_revision, started_at: this.store.now().toISOString() };
+    const started = this.store.update(actor, id, state.revision, 'ai_started', s => { s.jobs.push(job); }, { invalidate: false, reserveAI: true });
+    this.busy = true; let result, failure;
+    try { result = await this.conversation({ provider, task, env: this.env }); validateConversation(result.output, task); }
+    catch (error) { failure = /^[A-Z_]{3,60}$/.test(error.code || '') ? error.code : 'AI_FAILED'; }
+    finally { this.busy = false; }
+    return this.captureJobResult(actor, id, job, started, { task, failure,
+      result: failure ? null : { output: result.output, metadata: result.metadata || {} } });
+  }
   async upload(actor, id, revision, buffer, name) {
     const current = this.store.get(actor, id); requireValue(current.revision === revision, 'VERSION_CONFLICT', 409);
     requireValue((current.documents || []).length < 40, 'FILE_COUNT_LIMIT', 413);
@@ -290,9 +344,9 @@ export class Application {
     requireValue(actor.role !== 'client' || document && clientFileVisible(document), 'NOT_FOUND', 404);
     requireValue(document && document.status === 'ocr_required', 'OCR_NOT_REQUIRED');
     requireValue(['pdf', 'png', 'jpeg'].includes(document.kind) && document.size <= 3 * 1024 * 1024 && document.pages <= 5, 'OCR_FILE_LIMIT', 413);
-    this.checkAI(actor, state, 'openai');
+    this.checkAI(actor, state, 'deepseek');
     const task = { document_id: document.id, sha256: document.sha256, pages: document.pages, kind: document.kind };
-    const job = { id: uid(), kind: 'ocr', provider: 'openai', status: 'running', document_id: document.id,
+    const job = { id: uid(), kind: 'ocr', provider: 'deepseek', status: 'running', document_id: document.id,
       input_sha256: digest(JSON.stringify(task)), data_revision: state.data_revision, started_at: this.store.now().toISOString() };
     const started = this.store.update(actor, id, state.revision, 'ocr_started', s => { s.jobs.push(job); }, { invalidate: false, reserveAI: true });
     this.busy = true;

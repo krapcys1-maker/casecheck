@@ -23,7 +23,7 @@ const extract = async ({ requested_fields, sources }) => ({ model: 'mock', outpu
 async function fixture(t, { pages = 1, ...options } = {}) {
   const directory = mkdtempSync(resolve(tmpdir(), 'casecheck-page-review-'));
   const server = await createAppServer({ stateDir: directory, secure: false,
-    env: { CASECHECK_ADMIN_PASSWORD: password, OPENAI_API_KEY: 'test-key-not-live' }, extract,
+    env: { CASECHECK_ADMIN_PASSWORD: password, DEEPSEEK_API_KEY: 'test-key-not-live' }, extract,
     reader: async () => ({ pages: Array.from({ length: pages }, (_, i) => ({ page: i + 1, text: '' })) }),
     ocr: async () => ({ model: 'mock', pages: Array.from({ length: pages }, (_, i) => ({ page: i + 1, text: i ? 'Druga strona dokumentu.' : text })) }), ...options });
   await new Promise(r => server.listen(0, '127.0.0.1', r));
@@ -32,7 +32,7 @@ async function fixture(t, { pages = 1, ...options } = {}) {
   const lawyerAccount = await app.store.addUser(actor, { name: 'Prawnik Testowy', email: 'page-lawyer@example.invalid', role: 'lawyer', password });
   const lawyerLogin = await app.store.login(lawyerAccount.email, password), lawyer = lawyerLogin.user;
   let state = app.create(actor, { title: 'Test przeglądu skanu', track: 'consumer', synthetic: true });
-  state = app.consent(actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = app.consent(actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = await app.upload(actor, state.id, state.revision, readFileSync('tests/full-fixtures/documents/S11-D01-scan.pdf'), 'skan.pdf');
   state = await app.runOCR(actor, state.id, { revision: state.revision, document_id: state.documents[0].id });
   const request = async (action, input, token = lawyerLogin.token, caseId = state.id) => {

@@ -14,7 +14,7 @@ import { reviewPackage } from '../src/app/review-package.mjs';
 import { digest } from '../src/app/store.mjs';
 
 const password = 'test-only-password-that-is-long-enough';
-const env = { CASECHECK_ADMIN_PASSWORD: password, OPENAI_API_KEY: 'test-key-not-live', CASECHECK_PUBLIC_ORIGIN: 'https://casecheck.example.invalid' };
+const env = { CASECHECK_ADMIN_PASSWORD: password, DEEPSEEK_API_KEY: 'test-key-not-live', CASECHECK_PUBLIC_ORIGIN: 'https://casecheck.example.invalid' };
 const unknown = field => ({ field, type: 'unknown', text_value: null, boolean_value: null, minor_units: null,
   currency: null, as_of: null, precision: 'unknown', source_id: null, quote: null });
 const textFact = (field, value, source) => ({ ...unknown(field), type: 'text', text_value: value, precision: 'exact', source_id: source.id, quote: source.text });
@@ -46,7 +46,7 @@ test('a mistyped extra claim field is quarantined while valid address survives a
       questions: [], warnings: [] }, model: 'mock-domain-type-error' };
   } });
   let state = f.app.create(f.actor, { title: 'Typy dodatkowych pól', track: 'consumer', synthetic: true });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = await f.app.upload(f.actor, state.id, state.revision, Buffer.from('Wierzyciel: Firma. Adres: ul. Testowa 1. Kwestionuję całość.'), 'wezwanie.txt');
   state = f.app.store.update(f.actor, state.id, state.revision, 'fixture_creditor', s => {
     s.claims.push({ id: uid(), document_id: s.documents[0].id, source_ids: [s.sources[0].id], review: 'confirmed',
@@ -114,7 +114,7 @@ test('administrative changes during extraction preserve a valid result and the n
   const f = await fixture(t, { extract: args => { signal(); return new Promise(r => finish = () => r(mock(args))); } });
   let state = f.app.create(f.actor, { title: 'AI i zadanie', track: 'consumer', synthetic: true });
   state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Osoba Testowa' });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   const pending = f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] });
   await ready; const latest = f.app.store.get(f.actor, state.id);
   f.app.task(f.actor, state.id, { revision: latest.revision, title: 'Telefon', kind: 'administrative' });
@@ -128,7 +128,7 @@ test('failed extraction preserves approved drafts and their data revision', asyn
   const lawyer = { ...f.actor, role: 'lawyer' };
   let state = f.app.create(f.actor, { title: 'Awaria bez nowych danych', track: 'consumer', synthetic: true });
   state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Nie wiem' });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = f.app.draft(lawyer, state.id, { revision: state.revision, template: 'case_card' });
   state = f.app.approveDraft(lawyer, state.id, { revision: state.revision, draft_id: state.drafts[0].id });
   const version = state.data_revision;
@@ -141,7 +141,7 @@ test('partial claim extraction preserves manual evidence and correction history'
   const f = await fixture(t);
   let state = f.app.create(f.actor, { title: 'Pochodzenie korekty', track: 'consumer', synthetic: true });
   state = await f.app.upload(f.actor, state.id, state.revision, Buffer.from('Osoba Testowa. Dokument fikcyjny do sprawdzenia pochodzenia danych.'), 'test.txt');
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   const source_ids = state.sources.filter(s => s.document_id).map(s => s.id);
   state = await f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'claim', source_ids, fields: ['creditor_name'] });
   state = f.app.correctClaim(f.actor, state.id, { revision: state.revision, claim_id: state.claims.at(-1).id,
@@ -157,7 +157,7 @@ test('a failed job-start transaction neither spends budget nor locks subsequent 
   const f = await fixture(t);
   let state = f.app.create(f.actor, { title: 'Awaria zapisu', track: 'consumer', synthetic: true });
   state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Osoba Testowa' });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   f.app.store.db.exec("CREATE TRIGGER test_write_failure BEFORE UPDATE ON cases BEGIN SELECT RAISE(ABORT, 'simulated write failure'); END;");
   await assert.rejects(f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] }));
   assert.equal(f.app.store.budget().used, 0); assert.equal(f.app.busy, false);
@@ -172,7 +172,7 @@ test('OCR accepts concurrent administrative work and keeps the image for review'
   const f = await fixture(t, { ocr: () => { signal(); return new Promise(r => finish = () => r({ pages: [{ page: 1, text: 'Tekst testowy OCR' }], model: 'mock' })); } });
   let state = f.app.create(f.actor, { title: 'OCR i zadanie', track: 'consumer', synthetic: true });
   state = await f.app.upload(f.actor, state.id, state.revision, readFileSync('tests/full-fixtures/documents/S11-D01-scan.pdf'), 'skan.pdf');
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   const pending = f.app.runOCR(f.actor, state.id, { revision: state.revision, document_id: state.documents[0].id });
   await ready; const latest = f.app.store.get(f.actor, state.id);
   f.app.task(f.actor, state.id, { revision: latest.revision, title: 'Porównać skan', kind: 'administrative' });
@@ -194,7 +194,7 @@ test('source capacity after paid OCR records one failed job and preserves approv
   const f = await fixture(t, { ocr: async () => ({ pages: [{ page: 1, text: 'Tekst OCR' }], model: 'mock' }) });
   let state = f.app.create(f.actor, { title: 'Limit po OCR', track: 'consumer', synthetic: true });
   state = await f.app.upload(f.actor, state.id, state.revision, readFileSync('tests/full-fixtures/documents/S11-D01-scan.pdf'), 'skan.pdf');
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = f.app.store.update(f.actor, state.id, state.revision, 'test_sources', s => { while (s.sources.length < 240) addSource(s, { text: 'Test' }); });
   const version = state.data_revision;
   state = await f.app.runOCR(f.actor, state.id, { revision: state.revision, document_id: state.documents[0].id });
@@ -241,7 +241,7 @@ test('approval of an earlier knowledge bundle cannot authorise a changed questio
   const f = await fixture(t); const lawyer = { ...f.actor, role: 'lawyer', name: 'Prawnik Testowy' };
   let state = f.app.create(f.actor, { title: 'Zmiana pytań', track: 'consumer', synthetic: false });
   state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Fikcyjny tekst do testu blokady' });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   f.app.store.approveKnowledge(lawyer, { ...knowledge, intake: { ...knowledge.intake, version: 'previous-version' } });
   assert.equal(f.app.store.knowledge(lawyer, knowledge).approval_stale, true);
   await assert.rejects(f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] }), { code: 'KNOWLEDGE_REVIEW_REQUIRED' });
@@ -287,7 +287,7 @@ test('staff cannot approve facts, drafts or legal deadlines; disabling removes s
 test('chat persists, extracts a cited fact, asks missing question and resumes after reopening', async t => {
   const f = await fixture(t);
   let state = f.app.create(f.actor, { title: 'Wywiad', track: 'consumer', synthetic: true });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = await f.app.chat(f.actor, state.id, { revision: state.revision, text: 'Nazywam się Osoba Testowa.', field: 'client_name', analyze: true });
   assert.equal(state.messages.length, 2); assert.equal(state.facts.find(f => f.current && f.field === 'client_name').text_value, 'Osoba Testowa');
   assert.match(state.messages.at(-1).text, /adres/);
@@ -297,7 +297,7 @@ test('chat persists, extracts a cited fact, asks missing question and resumes af
 test('failed API leaves the message and job, and consumes only one reservation', async t => {
   const f = await fixture(t, { extract: async () => { throw Object.assign(new Error(), { code: 'API_TIMEOUT' }); } });
   let state = f.app.create(f.actor, { title: 'Błąd', track: 'consumer', synthetic: true });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = await f.app.chat(f.actor, state.id, { revision: state.revision, text: 'Odpowiedź Testowa', field: 'client_name', analyze: true });
   assert.equal(state.messages[0].text, 'Odpowiedź Testowa'); assert.equal(state.jobs[0].status, 'failed');
   assert.match(state.messages[1].text, /ponownego odczytu/); assert.equal(f.app.store.budget().used, 1);
@@ -306,7 +306,7 @@ test('late AI cannot overwrite a correction and revision conflicts reject edits'
   let finish, started; const ready = new Promise(r => started = r);
   const f = await fixture(t, { extract: args => { started(); return new Promise(r => finish = () => r(mock(args))); } });
   let state = f.app.create(f.actor, { title: 'Wyścig', track: 'consumer', synthetic: true });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Stara odpowiedź' });
   const pending = f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] });
   await ready;
@@ -324,7 +324,7 @@ test('repeating extraction of one document keeps one active claim and normalizes
     questions: [], warnings: [] }, model: 'mock', usage: {} }) });
   let state = f.app.create(f.actor, { title: 'Powtórny odczyt', track: 'consumer', synthetic: true });
   state = await f.app.upload(f.actor, state.id, state.revision, Buffer.from('Informacja o zabezpieczeniu: brak danych. Materiał testowy.'), 'test.txt');
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   const input = { kind: 'claim', source_ids: state.sources.map(s => s.id) };
   state = await f.app.analyze(f.actor, state.id, { revision: state.revision, ...input });
   state = await f.app.analyze(f.actor, state.id, { revision: state.revision, ...input });
@@ -360,7 +360,7 @@ test('upload, OCR source pages and budget work without reading scan oracle text'
   let state = f.app.create(f.actor, { title: 'Skan', track: 'consumer', synthetic: true });
   state = await f.app.upload(f.actor, state.id, state.revision, readFileSync('tests/full-fixtures/documents/S11-D01-scan.pdf'), 'skan.pdf');
   assert.equal(state.documents[0].status, 'ocr_required'); assert.equal(state.sources[0].text, '');
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   state = await f.app.runOCR(f.actor, state.id, { revision: state.revision, document_id: state.documents[0].id });
   assert.equal(state.sources.length, 2); assert.equal(state.sources[1].read_method, 'ai_ocr_requires_image_review'); assert.equal(f.app.store.budget().used, 1);
 });
@@ -416,8 +416,8 @@ test('real cases require knowledge approval, consent and bounded budgets persist
   const f = await fixture(t, { env: { ...env, CASECHECK_DAILY_REQUEST_LIMIT: '1' } });
   let state = f.app.create(f.actor, { title: 'Nie test', track: 'consumer', synthetic: false });
   state = f.app.message(f.actor, state.id, { revision: state.revision, text: 'Fikcyjna wiadomość do testu blokady' });
-  await assert.rejects(f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'], provider: 'openai' }), { code: 'CONSENT_REQUIRED' });
-  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  await assert.rejects(f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'], provider: 'deepseek' }), { code: 'CONSENT_REQUIRED' });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'deepseek' });
   await assert.rejects(f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'intake', fields: ['client_name'] }), { code: 'KNOWLEDGE_REVIEW_REQUIRED' });
   f.app.store.reserve(); assert.throws(() => f.app.store.reserve(), { code: 'DAILY_LIMIT' });
   const reopened = new Store(f.directory, { limit: 1 }); assert.equal(reopened.budget().remaining, 0); reopened.close();
@@ -521,7 +521,7 @@ for (const scenario of scenarios) test('HTTP workflow: ' + scenario.name, async 
   const login = await f.app.store.login(account.email, password);
   let r = await f.request('/cases', { title: scenario.name, track: 'consumer', synthetic: true }, login.token), state = r.body;
   const post = async (action, input) => { const result = await f.request('/cases/' + state.id + '/' + action, { revision: state.revision, ...input }, login.token); assert.equal(result.status, 200, result.body.error); state = result.body; return state; };
-  await post('consent', { accepted: true, provider: 'openai' });
+  await post('consent', { accepted: true, provider: 'deepseek' });
   if (scenario.declared) {
     await post('messages', { text: 'Deklaruję 120000 PLN, saldo 2026-09-30.', analyze: false });
     await post('analyze', { kind: 'intake', fields: ['declared_total'], source_ids: [state.sources.find(s => s.kind === 'message').id] });

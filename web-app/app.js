@@ -1,5 +1,8 @@
 import { openDocumentReview } from './document-review.js';
 import { portalPanel, responseForm, templateManager, templateEditor, parseTemplateText } from './workspace.js';
+import { trackFormEdits, captureForms, restoreForms } from './form-state.js';
+import { conversationPanel } from './conversation.js';
+trackFormEdits(document);
 const base = new URL('.', location.href).pathname.replace(/\/$/, '');
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -7,7 +10,8 @@ const labels = { intake: 'Wywiad', review: 'Przegląd', documents: 'Dokumenty', 
   rejected: 'Odrzucone', draft: 'Projekt', approved: 'Zatwierdzone', stale: 'Nieaktualne', read: 'Tekst odczytany', ocr_required: 'Wymaga OCR',
   ocr_review: 'OCR do sprawdzenia', ocr_verified: 'Strony OCR sprawdzone', read_failed: 'Błąd odczytu', reading: 'Odczytywanie', running: 'Odczytywanie', interrupted: 'Odczyt przerwany', completed: 'Wykonano', failed: 'Błąd', discarded: 'Wynik starej wersji',
   possible_duplicate: 'Możliwy drugi dokument tego samego długu', amount_requires_review: 'Kwota lub data wymaga przeglądu', components_mismatch: 'Składniki nie zgadzają się z sumą', disputed: 'Roszczenie sporne' };
-const errors = { LOGIN_FAILED: 'Nieprawidłowy adres konta lub hasło.', UNAUTHORIZED: 'Zaloguj się ponownie lub otwórz aktualny link do sprawy.',
+const errors = { PROVIDER_DISABLED: 'Dozwolony jest wyłącznie DeepSeek V4.1 Flash.', MODEL_DISABLED: 'Dozwolony jest wyłącznie model deepseek-flash.', AI_COST_LIMIT: 'Wykorzystano przyznany budżet API. Zapisane dane pozostają dostępne.', LOGIN_FAILED: 'Nieprawidłowy adres konta lub hasło.', UNAUTHORIZED: 'Zaloguj się ponownie lub otwórz aktualny link do sprawy.',
+  CONVERSATION_CONSENT_REQUIRED: 'Przed rozmową wybierz dostawcę i zaakceptuj przekazanie wiadomości oraz kontekstu do API.',
   REGISTRY_UNAVAILABLE: 'Nie udało się połączyć z rejestrem publicznym. Dane sprawy nie zostały zmienione. Spróbuj później.',
   REGISTRY_NOT_FOUND: 'Rejestr nie zwrócił podmiotu dla tego numeru. Sprawdź numer oraz wybrany rejestr.',
   REGISTRY_QUERY_REJECTED: 'Rejestr odrzucił zapytanie. Sprawdź numer, wybrany rejestr i datę. Nie zapisano danych.',
@@ -25,7 +29,7 @@ const errors = { LOGIN_FAILED: 'Nieprawidłowy adres konta lub hasło.', UNAUTHO
   UNKNOWN_TEMPLATE_FIELD: 'Wzór zawiera nieznane pole. Skorzystaj z listy dostępnych pól.', INVALID_TEMPLATE_SYNTAX: 'Sprawdź nawiasy pól we wzorze: {{nazwa_pola}}.',
   RELEASE_UNAVAILABLE: 'To udostępnienie nie jest już aktualne. Odśwież sprawę.', DRAFT_NOT_APPROVED: 'Najpierw zatwierdź aktualną wersję pisma.',
   RESPONSE_REQUIRED: 'Wpisz odpowiedź lub wybierz przynajmniej jeden załącznik.', CLIENT_REQUESTS_OPEN: 'Najpierw zakończ otwarte prośby do klienta.',
-  VERSION_CONFLICT: 'Sprawa zmieniła się w trakcie pracy. Odświeżam jej aktualną wersję.', DAILY_LIMIT: 'Wykorzystano dzisiejszy limit wywołań AI.',
+  VERSION_CONFLICT: 'Sprawa zmieniła się w trakcie pracy. Wpisane dane pozostają w formularzu. Odśwież sprawę, sprawdź zmiany i ponownie wybierz zapis.', DAILY_LIMIT: 'Wykorzystano dzisiejszy limit wywołań AI.',
   REQUEST_IN_PROGRESS: 'Trwa inny odczyt AI. Spróbuj po jego zakończeniu.', CONSENT_REQUIRED: 'Najpierw zaakceptuj przekazanie danych do wybranego dostawcy.',
   RESULT_SAVED_RECOVERY_REQUIRED: 'Zapis odczytu oczekuje na odzyskanie. Otwórz Historię i odzyskaj go bez kolejnego wywołania API.',
   SAVED_RESULT_NOT_FOUND: 'Brak zapisanego wyniku tego odczytu. Sprawdź aktualną historię sprawy.',
@@ -41,7 +45,8 @@ const claimLabels = { creditor_name: 'Wierzyciel', creditor_address: 'Adres wier
   original_creditor: 'Poprzedni wierzyciel', principal_amount: 'Kapitał', interest_amount: 'Odsetki', costs_amount: 'Koszty', total_amount: 'Łączna kwota',
   balance_date: 'Data salda', due_date: 'Termin zapłaty', security_description: 'Zabezpieczenie', security_creation_date: 'Data ustanowienia zabezpieczenia',
   disputed: 'Czy roszczenie jest sporne', disputed_scope: 'Zakres sporu', assignment_date: 'Data cesji' };
-let token = '', user = null, config = null, cases = [], team = [], selected = null, tab = 'overview', locked = false;
+let token = '', user = null, config = null, cases = [], team = [], selected = null, tab = 'chat', locked = false;
+let activity = null, activityTimer = null, activityPending = false;
 const isClient = () => user?.role === 'client';
 const isLawyer = () => user?.role === 'lawyer';
 const button = (title, action, value = '', kind = 'secondary') => `<button type="button" class="${kind}" data-action="${action}" data-value="${escape(value)}">${escape(title)}</button>`;
@@ -92,22 +97,57 @@ function renderList() {
 }
 async function refreshConfig() {
   config = await api('/config');
-  if (config.budget) $('#budget').textContent = `AI dziś: ${config.budget.used}/${config.budget.limit}`;
+  if (config.budget) $('#budget').textContent = config.spend ? `Budżet API: ${config.spend.accounted_usd.toFixed(4)} / ${config.spend.limit_usd.toFixed(2)} USD · ${config.budget.used} wywołań dziś` : `AI dziś: ${config.budget.used}/${config.budget.limit ?? 'bez limitu liczby'}`;
 }
-async function openCase(id) { selected = await api('/cases/' + id); render(); }
-async function refresh() {
+async function openCase(id) { selected = await api('/cases/' + id); render(); renderActivity(); }
+async function refresh({ preserveInput = false } = {}) {
   await refreshConfig();
-  if (isClient()) { selected = await api('/cases/' + user.case_id); render(); return; }
-  cases = (await api('/cases')).cases;
-  team = (await api('/team')).team;
-  if (selected) selected = await api('/cases/' + selected.id);
-  renderList(); render();
+  let freshCase = selected;
+  if (isClient()) freshCase = await api('/cases/' + user.case_id);
+  else {
+    cases = (await api('/cases')).cases; team = (await api('/team')).team;
+    if (selected) freshCase = await api('/cases/' + selected.id);
+  }
+  const forms = preserveInput ? captureForms(document) : [];
+  selected = freshCase;
+  if (!isClient()) renderList();
+  render(); restoreForms(document, forms); renderActivity();
+}
+function renderActivity() {
+  if (!user) return;
+  $('#notifications-button').hidden = false;
+  $('#notifications-button').textContent = `Powiadomienia${activity?.unread ? ' (' + activity.unread + ')' : ''}`;
+  if (activity) {
+    $('#notification-items').innerHTML = activity.items.map(n => `<article class="notification-item ${n.read ? '' : 'unread'}"><div><strong>${escape(n.title)}</strong><p class="small">${escape(n.case_title)} · ${escape(n.at.slice(0, 16).replace('T', ' '))} UTC</p></div><div class="row">${button('Otwórz sprawę', 'notification-open', n.id)}${n.read ? '<span class="small">Przeczytane</span>' : button('Oznacz jako przeczytane', 'notification-read', n.id, 'quiet')}</div></article>`).join('') || '<p class="small">Nie ma nowych powiadomień.</p>';
+    $('#notification-scope').textContent = `Powiadomienia wewnątrz aplikacji. Sprawdzane co 10 sekund, gdy karta jest widoczna. Przypomnienia o wpisanych datach zadań pojawiają się dzień wcześniej i codziennie do zakończenia. Daty są liczone w UTC.${activity.truncated ? ' Pokazano 50 pozycji; po oznaczeniu ich jako przeczytane pojawią się kolejne.' : ''}`;
+  }
+  const remote = activity?.cases.find(c => c.id === selected?.id);
+  $('#live-update').hidden = !remote || remote.revision <= selected.revision;
+}
+async function pollActivity() {
+  if (!token || !user || activityPending || document.hidden || locked) return;
+  const sessionToken = token;
+  activityPending = true;
+  try {
+    const next = await api('/activity');
+    if (sessionToken !== token) return;
+    activity = next; renderActivity();
+    $('#activity-connection').textContent = '';
+  } catch (error) {
+    if (sessionToken === token) $('#activity-connection').textContent = error.code === 'UNAUTHORIZED' ? 'Sesja wygasła — zaloguj się ponownie. Wpisana treść pozostaje w formularzu.' : 'Brak połączenia z powiadomieniami. Ponowimy sprawdzenie.';
+    if (error.code === 'UNAUTHORIZED') { clearInterval(activityTimer); activityTimer = null; }
+  } finally { activityPending = false; }
+}
+async function refreshKeepingInput() {
+  // Dialogs hold a particular draft/source revision. Refresh their underlying state only after closing them.
+  if ($('#modal').open && !$('#request-answer-form') && !$('#request-reopen-form')) { notice('Zamknij okno po skopiowaniu lub zapisaniu treści, a następnie odśwież sprawę. Dane otwartego formularza nie zostały zmienione.'); return; }
+  await refresh({ preserveInput: true }); notice('Dane odświeżone. Zachowano wpisy w formularzach. Sprawdź zmiany przed wysłaniem.');
 }
 function welcomePanel() {
   const examples = [['S01', 'Rozbieżność salda', 'Deklaracja klienta i trzy dokumenty. Przejdź od różnicy kwot do źródeł i zadań.'],
     ['S02', 'Cesja i drugi dokument', 'Dwie informacje o tej samej umowie. Właściwy wierzyciel i saldo wymagają przeglądu.'],
     ['S04', 'Roszczenie sporne', 'Oddziel odczyt dokumentu od stanowiska klienta. Zachowaj zakres sporu.']];
-  return `<div class="card welcome"><p class="eyebrow">OD ŹRÓDŁA DO PRZEGLĄDU</p><h2>Uporządkowana sprawa.<br>Świadoma decyzja.</h2><p>Otwórz sprawę, porównaj odczyt z dokumentem i zobacz, co wymaga uzupełnienia. Panel pokazuje rzeczywisty stan zapisanych danych.</p><div class="demo-cards">${examples.map(([code, title, text]) => { const c = cases.find(c => c.synthetic && c.title.startsWith(code + ' ')); return `<article><span class="eyebrow">${code} / FIKCYJNE DANE</span><h3>${title}</h3><p class="small">${text}</p>${c ? button('Otwórz scenariusz', 'open-case', c.id) : '<p class="small">Administrator może wczytać materiały testowe.</p>'}</article>`; }).join('')}</div><p class="small">Import materiałów testowych dodaje źródła. Wyniki AI pojawiają się po osobnym odczycie; przegląd testowy pozostaje wyraźnie oznaczony.</p></div>`;
+  return `<div class="card welcome"><p class="eyebrow">OD ŹRÓDŁA DO PRZEGLĄDU</p><h2>Zacznij od rozmowy.</h2>${button('Rozpocznij nową rozmowę z asystentem', 'start-assistant')}<p class="small">Asystent jest też dostępny w każdej sprawie w zakładce Asystent AI.</p><p>Otwórz sprawę, porównaj odczyt z dokumentem i zobacz, co wymaga uzupełnienia. Panel pokazuje rzeczywisty stan zapisanych danych.</p><div class="demo-cards">${examples.map(([code, title, text]) => { const c = cases.find(c => c.synthetic && c.title.startsWith(code + ' ')); return `<article><span class="eyebrow">${code} / FIKCYJNE DANE</span><h3>${title}</h3><p class="small">${text}</p>${c ? button('Otwórz scenariusz', 'open-case', c.id) : '<p class="small">Administrator może wczytać materiały testowe.</p>'}</article>`; }).join('')}</div><p class="small">Import materiałów testowych dodaje źródła. Wyniki AI pojawiają się po osobnym odczycie; przegląd testowy pozostaje wyraźnie oznaczony.</p></div>`;
 }
 function overviewPanel() {
   const s = selected.review_summary, checks = selected.controls;
@@ -134,17 +174,19 @@ async function enter() {
   $('#logout').hidden = false; $('#workspace').hidden = isClient(); $('#client-workspace').hidden = !isClient();
   $('#seed').hidden = user.role !== 'admin'; $('#settings-button').hidden = !['admin', 'lawyer'].includes(user.role);
   await refresh();
+  clearInterval(activityTimer); activityTimer = setInterval(pollActivity, 10000);
+  setTimeout(pollActivity, 0);
 }
 function consentPanel() {
   return `<div class="privacy"><p>${escape(config.notice)}</p><label for="provider">Dostawca odczytu AI</label><select id="provider">${config.providers.map(p => `<option value="${p.provider}" ${(selected.consent?.provider || 'deepseek') === p.provider ? 'selected' : ''}>${p.provider} · ${escape(p.model)}</option>`).join('')}</select><p class="small">${selected.consent ? 'Przekazanie danych zaakceptowano: ' + escape(selected.consent.provider) : 'Przed pierwszym odczytem potwierdź zakres przekazania danych.'}</p>${button('Akceptuję przekazanie wybranych danych', 'consent')}</div>`;
 }
 function chatPanel() {
-  const fields = config.knowledge.intake.fields.filter(f => f.tracks.includes(selected.track));
-  const missing = selected.missing || selected.controls.missing_fields;
-  return `<div class="panels"><div class="card"><h3>Rozmowa</h3>${!isClient() ? `<form id="staff-reply-form"><label for="staff-reply">Wiadomość kancelarii do klienta</label><textarea id="staff-reply" required maxlength="12000"></textarea><button>Wyślij do portalu klienta</button></form><p class="small">Ta wiadomość nie zmienia danych wywiadu ani zatwierdzonych pism.</p>` : ''}<div class="chat-log">${selected.messages.map(m => `<div class="message ${m.role}"><small>${m.role === 'user' ? 'Klient / informacja' : m.role === 'staff' ? 'Kancelaria · ' + escape(m.author) : 'CaseCheck'}</small>${escape(m.text)}</div>`).join('')}</div><form id="message-form"><h3>${isClient() ? 'Twoje informacje do sprawy' : 'Zapisz informację otrzymaną od klienta'}</h3><label for="answer-field">Informacja, którą podajesz lub poprawiasz</label><select id="answer-field">${fields.map(f => `<option value="${f.key}" ${missing[0]?.key === f.key ? 'selected' : ''}>${escape(f.label)}</option>`).join('')}</select><label for="answer">Twoja odpowiedź</label><textarea id="answer" placeholder="Opisz sytuację własnymi słowami…" required maxlength="12000"></textarea><label><input id="use-ai" type="checkbox" ${selected.consent ? 'checked' : ''}> Odczytaj tę odpowiedź przez wybrane API</label><button type="submit">Zapisz i kontynuuj</button></form></div><div><div class="card"><p class="eyebrow">NASTĘPNE PYTANIE</p><h3>${escape(selected.next_question)}</h3><p class="small">Możesz poprawić wcześniejszą odpowiedź, wybierając odpowiednie pole. Nieznana informacja pozostanie do uzupełnienia.</p>${button('Proszę o kontakt z człowiekiem', 'handoff')}</div>${consentPanel()}</div></div>`;
+  return conversationPanel({ state: selected, fields: config.knowledge.intake.fields.filter(f => f.tracks.includes(selected.track)),
+    client: isClient(), escape, button, valueOf, consentPanel });
 }
+
 function docsPanel() {
-  return `<div class="panels"><div class="card"><h3>Załączniki</h3><form id="upload-form"><label for="file">PDF, skan PNG/JPEG lub tekst</label><input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" required><p class="small">Do 8 MB i 20 stron. OCR: do 3 MB i 5 stron, przekazanie całego pliku do OpenAI po osobnym uruchomieniu.</p><button type="submit">Dodaj dokument</button></form>${(selected.documents || []).map(d => `<div class="document"><p>${escape(d.name)} ${badge(d.status, d.status.includes('required') || d.status.includes('failed'))}</p><p class="small">${d.pages} stron · ${(d.size / 1024).toFixed(1)} KB${!isClient() ? d.client_visible === false ? ' · tylko kancelaria' : ' · widoczny dla klienta' : ''}</p><div class="row">${button('Pobierz oryginał', 'download-file', d.id)}${isLawyer() && d.uploaded_by_role !== 'client' ? button(d.client_visible === false ? 'Udostępnij klientowi' : 'Ukryj przed klientem', 'file-visibility', d.id) : ''}${!isClient() ? button('Porównaj z oryginałem', 'document-text', d.id) : ''}${d.status === 'ocr_required' ? button('Uruchom OCR OpenAI', 'ocr', d.id) : ''}${!isClient() && ['read', 'ocr_review', 'ocr_verified'].includes(d.status) ? button('Odczytaj roszczenie', 'analyze-claim', d.id) : ''}</div>${d.error ? `<p class="small">${escape(d.error)}</p>` : ''}</div>`).join('')}</div><div class="card"><p class="eyebrow">PRZEGLĄD PLIKÓW</p><h3>Oryginał pozostaje źródłem</h3><p class="small">Odczyt wskazuje stronę i fragment. Wynik OCR wymaga porównania z obrazem. Pismo wierzyciela nie potwierdza automatycznie uznania długu przez klienta.</p>${consentPanel()}</div></div>`;
+  return `<div class="panels"><div class="card"><h3>Załączniki</h3><form id="upload-form"><label for="file">PDF, skan PNG/JPEG lub tekst</label><input id="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" required><p class="small">Do 8 MB i 20 stron. OCR: do 3 MB i 5 stron, przekazanie obrazów wszystkich stron do DeepSeek po osobnym uruchomieniu.</p><button type="submit">Dodaj dokument</button></form>${(selected.documents || []).map(d => `<div class="document"><p>${escape(d.name)} ${badge(d.status, d.status.includes('required') || d.status.includes('failed'))}</p><p class="small">${d.pages} stron · ${(d.size / 1024).toFixed(1)} KB${!isClient() ? d.client_visible === false ? ' · tylko kancelaria' : ' · widoczny dla klienta' : ''}</p><div class="row">${button('Pobierz oryginał', 'download-file', d.id)}${isLawyer() && d.uploaded_by_role !== 'client' ? button(d.client_visible === false ? 'Udostępnij klientowi' : 'Ukryj przed klientem', 'file-visibility', d.id) : ''}${!isClient() ? button('Porównaj z oryginałem', 'document-text', d.id) : ''}${d.status === 'ocr_required' ? button('Uruchom OCR DeepSeek', 'ocr', d.id) : ''}${!isClient() && ['read', 'ocr_review', 'ocr_verified'].includes(d.status) ? button('Odczytaj roszczenie', 'analyze-claim', d.id) : ''}</div>${d.error ? `<p class="small">${escape(d.error)}</p>` : ''}</div>`).join('')}</div><div class="card"><p class="eyebrow">PRZEGLĄD PLIKÓW</p><h3>Oryginał pozostaje źródłem</h3><p class="small">Odczyt wskazuje stronę i fragment. Wynik OCR wymaga porównania z obrazem. Pismo wierzyciela nie potwierdza automatycznie uznania długu przez klienta.</p>${consentPanel()}</div></div>`;
 }
 function factsPanel() {
   const fields = config.knowledge.intake.fields.filter(f => f.tracks.includes(selected.track));
@@ -176,7 +218,7 @@ function registryPanel() {
 function render() {
   if (!config) return;
   if (!selected) { if (!isClient()) $('#case-view').innerHTML = welcomePanel(); return; }
-  const tabs = isClient() ? [['portal', 'Moja sprawa'], ['chat', 'Rozmowa'], ['docs', 'Załączniki']] : [['overview', 'Podsumowanie'], ['chat', 'Rozmowa'], ['docs', 'Załączniki'], ['facts', 'Dane'], ['claims', 'Zobowiązania'], ['drafts', 'Projekty pism'], ['portal', 'Współpraca z klientem'], ['tasks', 'Zadania'], ['history', 'Historia']];
+  const tabs = isClient() ? [['chat', 'Asystent AI'], ['portal', 'Moja sprawa'], ['docs', 'Załączniki']] : [['overview', 'Podsumowanie'], ['chat', 'Asystent AI'], ['docs', 'Załączniki'], ['facts', 'Dane'], ['claims', 'Zobowiązania'], ['drafts', 'Projekty pism'], ['portal', 'Współpraca z klientem'], ['tasks', 'Zadania'], ['history', 'Historia']];
   if (!isClient() && selected.track === 'company') tabs.splice(6, 0, ['registry', 'Rejestry']);
   if (!tabs.some(([key]) => key === tab)) tab = isClient() ? 'portal' : 'chat';
   const target = isClient() ? $('#client-view') : $('#case-view');
@@ -187,9 +229,10 @@ function render() {
 async function mutate(action, input) {
   selected = await api(`/cases/${selected.id}/${action}`, { revision: selected.revision, ...input });
   await refreshConfig(); if (!isClient()) cases = (await api('/cases')).cases; render();
-  if (['analyze', 'ocr', 'recover-job'].includes(action)) {
+  if (['analyze', 'ocr', 'recover-job', 'assistant-message'].includes(action)) {
     const job = action === 'recover-job' ? selected.jobs.find(j => j.id === input.job_id) : selected.jobs?.at(-1);
     if (job?.status === 'failed') notice(`Odczyt nie powiódł się (${job.error}). Poprzednie dane zachowano. Sprawdź Historię; nie uruchamiamy ponownej płatnej próby automatycznie.`);
+    else if (job?.status === 'discarded') notice('W trakcie odpowiedzi zmieniono dane sprawy. Wynik dotyczył wcześniejszej wersji i nie został zastosowany. Wiadomość jest zapisana; odśwież dane przed dalszą rozmową.');
     else if (job?.field_abstentions?.length) notice(`Odczyt zapisano. ${job.field_abstentions.length} pól ma wadliwy wynik i pozostaje do ręcznego sprawdzenia; szczegóły w Historii.`);
     else if (job?.semantic_flags?.length) notice('Odczyt zapisano z zastrzeżeniami. Niepewne wartości pozostawiono do sprawdzenia; przeczytaj ostrzeżenia w Historii.');
   }
@@ -199,7 +242,11 @@ async function run(fn) {
   const buttons = [...document.querySelectorAll('button')].map(b => [b, b.disabled]);
   buttons.forEach(([b]) => b.disabled = true);
   try { await fn(); }
-  catch (e) { notice(e.message || 'Nie udało się wykonać działania.'); if (['VERSION_CONFLICT', 'RESULT_SAVED_RECOVERY_REQUIRED'].includes(e.code)) await refresh().catch(() => {}); }
+  catch (e) {
+    notice(e.message || 'Nie udało się wykonać działania.');
+    if (e.code === 'VERSION_CONFLICT' && ($('#request-answer-form') || $('#request-reopen-form'))) $('#modal-notice')?.insertAdjacentHTML('beforeend', '<br>' + button('Odśwież dane i zachowaj odpowiedź', 'refresh'));
+    if (e.code === 'RESULT_SAVED_RECOVERY_REQUIRED' && !$('#modal').open) await refresh().catch(() => {});
+  }
   finally { locked = false; buttons.forEach(([b, disabled]) => { if (b.isConnected) b.disabled = disabled; }); }
 }
 function sourceModal(id) {
@@ -228,7 +275,12 @@ document.addEventListener('click', event => {
   const target = event.target.closest('[data-action]'); if (!target) return;
   run(async () => {
     const action = target.dataset.action, value = target.dataset.value;
-    if (action === 'refresh') await refresh();
+    if (action === 'refresh') await refreshKeepingInput();
+    else if (action === 'start-assistant') showNewConversation();
+    else if (action === 'notifications-toggle') { $('#notifications-panel').hidden = !$('#notifications-panel').hidden; if (!$('#notifications-panel').hidden) { activity = await api('/activity'); renderActivity(); } }
+    else if (action === 'notification-read') { activity = await api('/activity/read', { ids: [value] }); renderActivity(); }
+    else if (action === 'notifications-read-all') { const ids = activity?.items.filter(n => !n.read).map(n => n.id) || []; if (ids.length) { activity = await api('/activity/read', { ids }); renderActivity(); } }
+    else if (action === 'notification-open') { if (captureForms(document).length || $('#modal').open) { notice('Masz wpisaną odpowiedź. Dokończ jej zapis przed przejściem do powiadomienia.'); return; } const n = activity?.items.find(n => n.id === value); if (n) { tab = n.tab; if (selected?.id === n.case_id) await refreshKeepingInput(); else await openCase(n.case_id); activity = await api('/activity/read', { ids: [value] }); renderActivity(); $('#notifications-panel').hidden = true; } }
     else if (action === 'firm-templates') modal('Wzory kancelarii', templateManager(config.firm_templates || [], isLawyer(), escape, button));
     else if (action === 'template-edit') modal('Edycja wzoru kancelarii', templateEditor(config.firm_templates.find(t => t.id === value), config.template_fields, escape));
     else if (action === 'template-view') { const t = config.firm_templates.find(t => t.id === value); modal(t.title, t.sections.map(s => '<h3>' + escape(s.heading) + '</h3><div class="article">' + escape(s.text) + '</div>').join('')); }
@@ -243,7 +295,7 @@ document.addEventListener('click', event => {
     else if (action === 'download-release') await download('/cases/' + selected.id + '/client-pdf/' + value, 'casecheck-sprawdzone-pismo.pdf');
     else if (action === 'download-docx') await download('/cases/' + selected.id + '/docx/' + value, 'casecheck-projekt.docx');
     else if (action === 'tab') { tab = value; render(); }
-    else if (action === 'open-case') { tab = 'overview'; await openCase(value); }
+    else if (action === 'open-case') { tab = 'chat'; await openCase(value); }
     else if (action === 'consent') await mutate('consent', { accepted: true, provider: $('#provider').value });
     else if (action === 'handoff') await mutate('messages', { text: 'Proszę o kontakt z człowiekiem — prawnikiem.', analyze: false, request_handoff: true });
     else if (action === 'recover-job') await mutate('recover-job', { job_id: value });
@@ -255,7 +307,7 @@ document.addEventListener('click', event => {
         onSave: async (action, input) => { await mutate(action, input); return selected; } });
     } else if (action === 'ocr') {
       const doc = selected.documents.find(d => d.id === value);
-      modal('Odczyt skanu', `<p>Cały plik ${escape(doc.name)} zostanie przekazany do OpenAI. Odczyt zużyje jedno wywołanie z dziennego limitu. Wynik wymaga porównania z obrazem.</p>${button('Uruchom odczyt tego pliku', 'confirm-ocr', value)}`);
+      modal('Odczyt skanu', `<p>Cały plik ${escape(doc.name)} zostanie przekazany do DeepSeek. Odczyt zużyje budżet API. Wynik wymaga porównania z obrazem.</p>${button('Uruchom odczyt tego pliku', 'confirm-ocr', value)}`);
     } else if (action === 'confirm-ocr') { $('#modal').close(); await mutate('ocr', { document_id: value }); }
     else if (action === 'analyze-claim') {
       const ids = activeDocumentSourceIds(value);
@@ -291,7 +343,7 @@ document.addEventListener('click', event => {
     else if (action === 'export') await download(`/cases/${selected.id}/export`, 'casecheck-sprawa.json');
     else if (action === 'client-link') {
       const link = await api(`/cases/${selected.id}/link`, {}); const address = `${location.origin}${base}/#client=${link.token}&case=${selected.id}`;
-      modal('Link do wywiadu klienta', `<p class="small">Ważny 7 dni, do ${escape(link.expires)}. Daje dostęp do tej jednej sprawy. Przekaż go właściwej osobie.</p><p class="links-list"><a href="${escape(address)}" rel="noreferrer">${escape(address)}</a></p>`);
+      modal('Link do wywiadu klienta', `<p class="small">Ważny 7 dni, do ${escape(link.expires)}. Daje dostęp do tej jednej sprawy. Przekaż go właściwej osobie.</p><p class="links-list"><a href="${escape(address)}" target="_blank" rel="noopener noreferrer">${escape(address)}</a></p>`);
     } else if (action === 'revoke-links') { await api(`/cases/${selected.id}/revoke-links`, {}); notice('Dotychczasowe linki klienta zostały odwołane.'); }
     else if (action === 'approve-knowledge') { await api('/knowledge/approve', {}); await refreshConfig(); await showSettings(); }
     else if (action === 'disable-user') { await api('/users/disable', { user_id: value }); team = (await api('/team')).team; await showSettings(); }
@@ -310,6 +362,11 @@ document.addEventListener('submit', event => {
     if (form.id === 'login-form') { const login = await api('/login', { email: $('#email').value, password: $('#password').value }); token = login.token; user = login.user; $('#password').value = ''; await enter(); }
     else if (form.id === 'new-case-form') { selected = await api('/cases', { title: $('#case-title').value, track: $('#case-track').value, synthetic: $('#synthetic').checked }); $('#modal').close(); tab = 'chat'; await refresh(); }
     else if (form.id === 'staff-reply-form') await mutate('staff-reply', { text: $('#staff-reply').value });
+    else if (form.id === 'assistant-form') {
+      const input = $('#assistant-input'); input.readOnly = true; $('#assistant-progress').hidden = false;
+      try { await mutate('assistant-message', { text: input.value }); }
+      finally { if (input.isConnected) { input.readOnly = false; $('#assistant-progress').hidden = true; } }
+    }
     else if (form.id === 'client-request-form') await mutate('client-request', { title: $('#request-title').value, description: $('#request-description').value, target_date: $('#request-date').value || null });
     else if (form.id === 'request-answer-form') { const input = { request_id: form.dataset.request, text: $('#request-answer').value, document_ids: [...form.querySelectorAll('[name="response-document"]:checked')].map(i => i.value) }; await mutate('request-response', input); $('#modal').close(); }
     else if (form.id === 'request-reopen-form') { await mutate('request-review', { request_id: form.dataset.request, status: 'open', note: $('#request-note').value }); $('#modal').close(); }
@@ -348,7 +405,10 @@ $('#search').addEventListener('input', renderList);
 $('#case-filter').addEventListener('change', renderList);
 $('#demo-guide').addEventListener('click', () => modal('Demo w 8 minut', `<p class="small">Samodzielny projekt portfolio. Scenariusze korzystają wyłącznie z fikcyjnych danych.</p><ol class="demo-guide"><li><strong>Problem / 1 minuta.</strong> Zbieranie informacji z rozmowy i kilku dokumentów utrudnia przekazanie sprawy kolejnej osobie.</li><li><strong>S01 / 3 minuty.</strong> Otwórz podsumowanie. Pokaż różnicę 10 tys. zł, zobowiązanie i jego źródło. Przejdź do zadań oraz aktualnych projektów pism.</li><li><strong>S02 i S04 / 2 minuty.</strong> Pokaż drugi dokument tej samej umowy oraz spór. Przed pokazem sprawdź, czy odczyty są zapisane. Import źródeł nie uruchamia AI.</li><li><strong>Kontrola / 1 minuta.</strong> Pokaż wcześniejsze wersje oraz rolę prawnika. Uzupełnienie danych wymaga nowego przeglądu projektu.</li><li><strong>Dalszy pilotaż / 1 minuta.</strong> Uzgodnij metryki: czas przygotowania i przeglądu, błędy kwot i odsetek, poprawność źródeł oraz odsetek ręcznych korekt.</li></ol><p class="small">Pełny opis projektu, architektura, testy i scenariusz prezentacji są w publicznym repozytorium.</p><a href="https://github.com/krapcys1-maker/casecheck" target="_blank" rel="noopener noreferrer">Otwórz dokumentację projektu →</a>`));
 $('#close-modal').addEventListener('click', () => $('#modal').close());
-$('#new-case').addEventListener('click', () => modal('Nowa sprawa', '<form id="new-case-form"><label for="case-title">Nazwa sprawy</label><input id="case-title" required maxlength="150"><label for="case-track">Ścieżka</label><select id="case-track"><option value="consumer">Konsumencka</option><option value="company">Firmowa</option></select><label><input type="checkbox" id="synthetic" checked> Wszystkie dane są fikcyjne</label><button>Rozpocznij wywiad</button></form>'));
+function showNewConversation() {
+  modal('Nowa rozmowa z asystentem', '<form id="new-case-form"><label for="case-title">Nazwa rozmowy lub sprawy</label><input id="case-title" required maxlength="150" placeholder="Np. rozmowa testowa"><label for="case-track">Kogo dotyczy rozmowa?</label><select id="case-track"><option value="consumer">Osoba fizyczna</option><option value="company">Firma</option></select><label><input type="checkbox" id="synthetic" checked> Wszystkie dane są fikcyjne</label><button>Otwórz asystenta</button></form>');
+}
+$('#new-case').addEventListener('click', showNewConversation);
 $('#seed').addEventListener('click', () => run(async () => { const result = await api('/seed', {}); await refresh(); notice(`Wczytano ${result.imported} spraw testowych. Dane nie są wynikami AI — odczyt uruchamiasz osobno.`); }));
 $('#settings-button').addEventListener('click', () => run(showSettings));
 $('#logout').addEventListener('click', () => run(async () => { if (!isClient()) await api('/logout', {}); token = ''; user = null; location.reload(); }));

@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { fetchAI } from './spend.mjs';
 import { anchorEvidence } from './evidence.mjs';
 import { completeUnusedNulls, isolateInvalidFacts } from './normalization.mjs';
 
@@ -272,6 +273,11 @@ export function reconcileMoney(declared, amounts) {
 
 export function providerConfig(provider, env = process.env) {
   if (!Object.hasOwn(KEY_NAMES, provider)) throw new ExtractionError('UNKNOWN_PROVIDER');
+  // Owner policy: possessing another API key never authorizes using that provider.
+  if (provider !== 'deepseek') throw new ExtractionError('PROVIDER_DISABLED', { provider });
+  if (env.DEEPSEEK_MODEL?.trim() && env.DEEPSEEK_MODEL.trim() !== 'deepseek-flash') {
+    throw new ExtractionError('MODEL_DISABLED', { provider });
+  }
   const key = env[KEY_NAMES[provider]]?.trim();
   if (!key) throw new ExtractionError('MISSING_API_KEY', { provider });
   const model = env[`${provider.toUpperCase()}_MODEL`]?.trim() || DEFAULT_MODELS[provider];
@@ -345,11 +351,12 @@ export async function extractFacts({ provider, sources, requested_fields, env = 
   const started = performance.now();
   let response;
   try {
-    response = await fetchImpl(request.url, {
+    response = await fetchAI(request.url, {
       method: 'POST', headers: request.headers, body: JSON.stringify(request.body),
       signal: AbortSignal.timeout(timeoutMs), redirect: 'error',
-    });
+    }, env, fetchImpl);
   } catch (error) {
+    if (['AI_COST_LIMIT', 'AI_BUDGET_CONFIG', 'AI_REQUEST_LIMIT'].includes(error?.code)) throw error;
     const code = ['TimeoutError', 'AbortError'].includes(error?.name) ? 'API_TIMEOUT' : 'NETWORK_ERROR';
     throw new ExtractionError(code, { provider });
   }

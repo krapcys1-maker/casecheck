@@ -15,7 +15,7 @@ const textFact = (field, value) => ({ ...unknown(field), type: 'text', text_valu
 const actor = { id: 'test-lawyer', tenant: 'test', role: 'lawyer', name: 'Test lawyer' };
 function fixture(t, extract) {
   const parent = resolve(tmpdir()), directory = mkdtempSync(resolve(parent, 'casecheck-consistency-'));
-  const app = new Application({ stateDir: directory, env: { OPENAI_API_KEY: 'not-a-real-key' }, ...(extract ? { extract } : {}) });
+  const app = new Application({ stateDir: directory, env: { DEEPSEEK_API_KEY: 'not-a-real-key' }, ...(extract ? { extract } : {}) });
   t.after(() => { app.close(); assert.ok(directory.startsWith(parent + sep)); rmSync(directory, { recursive: true, force: true }); });
   return { app, state: app.create(actor, { title: 'Correction test', track: 'consumer', synthetic: true }) };
 }
@@ -55,7 +55,7 @@ test('a partial AI creditor change cannot silently retain the previous creditor 
   let calls = 0;
   const f = fixture(t, async ({ sources }) => { calls++; return { output: { facts: [{ ...textFact('creditor_name', 'Fundusz Beta'), source_id: sources[0].id, quote: sources[0].text }], questions: [], warnings: [] }, model: 'controlled-response' }; });
   let s = await claimFixture(f.app, f.state);
-  s = f.app.consent(actor, s.id, { revision: s.revision, provider: 'openai', accepted: true });
+  s = f.app.consent(actor, s.id, { revision: s.revision, provider: 'deepseek', accepted: true });
   s = await f.app.analyze(actor, s.id, { revision: s.revision, kind: 'claim', fields: ['creditor_name'], source_ids: [s.sources[0].id] });
   const claim = s.claims.find(c => !c.merged_into);
   assert.equal(claim.facts.find(f => f.field === 'creditor_address').type, 'unknown');

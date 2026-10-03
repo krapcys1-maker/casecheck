@@ -1,0 +1,19 @@
+export function conversationPanel({ state, fields, client, escape: e, button: b, valueOf, consentPanel }) {
+  const ready = state.consent?.provider === 'deepseek' && state.consent?.notice_version === 'external-api-v2';
+  const facts = state.conversation_facts || [];
+  const known = facts.filter(f => f.type !== 'unknown');
+  const intro = state.track === 'company'
+    ? 'Dzień dobry. Pomogę zebrać informacje o sytuacji firmy dla kancelarii. Opisz własnymi słowami, czym zajmuje się firma i z jakimi trudnościami się mierzy.'
+    : 'Dzień dobry. Pomogę uporządkować informacje o Twojej sytuacji dla kancelarii. Opisz własnymi słowami, z jakimi długami lub trudnościami się mierzysz. Możesz też zacząć od pytania.';
+  return `<div class="assistant-layout"><section class="card assistant-chat"><div class="assistant-heading"><div><p class="eyebrow">ASYSTENT CASECHECK</p><h3>${state.track === 'company' ? 'Rozmowa o sytuacji firmy' : 'Rozmowa o Twojej sytuacji'}</h3></div><span class="badge">${ready ? 'API: ' + e(state.consent.provider) : 'DeepSeek V4.1 Flash'}</span></div>
+    <p class="small">Zbieramy informacje do przeglądu przez prawnika. W pilotażu używaj danych fikcyjnych.</p>
+    <div class="chat-log" aria-label="Historia rozmowy"><div class="message assistant"><small>Asystent CaseCheck · powitanie</small>${e(intro)}</div>${state.messages.map(m => `<div class="message ${e(m.role)}"><small>${m.role === 'user' ? 'Ty / informacja od klienta' : m.role === 'staff' ? 'Kancelaria · ' + e(m.author) : m.kind === 'service_notice' ? 'Komunikat systemu' : 'Asystent CaseCheck'}</small>${e(m.text)}</div>`).join('')}</div>
+    ${!ready ? `<div class="assistant-consent">${consentPanel()}</div>` : ''}
+    <form id="assistant-form"><label for="assistant-input">Napisz wiadomość do asystenta</label><textarea id="assistant-input" placeholder="Opisz sytuację albo zadaj pytanie…" rows="3" required maxlength="12000" ${ready ? '' : 'disabled'}></textarea><div class="row"><button type="submit" ${ready ? '' : 'disabled'}>Wyślij do asystenta</button>${b('Dodaj dokumenty', 'tab', 'docs')}${b('Proszę o kontakt z człowiekiem', 'handoff', '', 'quiet')}</div><p id="assistant-progress" class="small" role="status" hidden>Asystent przygotowuje odpowiedź…</p></form>
+    ${ready ? `<details class="assistant-settings"><summary>Ustawienia przekazywania danych do AI</summary>${consentPanel()}</details>` : ''}
+    ${!client ? `<details class="assistant-settings"><summary>Odpowiedz jako pracownik kancelarii</summary><form id="staff-reply-form"><label for="staff-reply">Wiadomość kancelarii do klienta</label><textarea id="staff-reply" required maxlength="12000"></textarea><button>Wyślij do portalu klienta</button></form><p class="small">Wiadomość jest widoczna dla klienta. Nie staje się automatycznie ustaleniem ani odpowiedzią AI.</p></details>` : ''}
+    </section><aside class="card assistant-facts"><p class="eyebrow">ZAPIS W SPRAWIE</p><h3>Ustalenia z rozmowy</h3><p class="small">${known.length} z ${fields.length} obszarów zawiera dane. Licznik nie oznacza gotowości wniosku.</p>
+    ${facts.map(f => `<article class="intake-fact"><strong>${e(fields.find(p => p.key === f.field)?.label || f.field)}</strong><p>${e(valueOf(f))}</p><span class="badge ${f.review === 'confirmed' ? '' : 'warn'}">${f.review === 'confirmed' ? 'Odczyt po przeglądzie' : 'Do przeglądu'}</span>${f.quote ? `<details><summary>Fragment źródła</summary><p class="quote">${e(f.quote)}</p></details>` : ''}</article>`).join('') || '<p class="small">Po odpowiedzi asystenta pojawią się tu odczytane informacje i fragmenty, z których pochodzą.</p>'}
+    <details><summary>Obszary do uzupełnienia</summary><ul>${fields.filter(f => !known.some(k => k.field === f.key)).map(f => `<li>${e(f.label)}</li>`).join('') || '<li>Sprawdź dane i dokumenty z osobą prowadzącą sprawę.</li>'}</ul></details>
+    ${!client ? b('Otwórz przegląd danych', 'tab', 'facts') : ''}</aside></div>`;
+}

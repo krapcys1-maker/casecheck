@@ -217,7 +217,8 @@ export class Store {
   budget() {
     const day = this.now().toISOString().slice(0, 10);
     const used = this.db.prepare('SELECT count FROM budget WHERE day=?').get(day)?.count || 0;
-    return { day, used, limit: this.limit, remaining: Math.max(0, this.limit - used) };
+    return { day, used, limit: Number.isFinite(this.limit) ? this.limit : null,
+      remaining: Number.isFinite(this.limit) ? Math.max(0, this.limit - used) : Number.MAX_SAFE_INTEGER };
   }
   reserve({ inTransaction = false } = {}) {
     const reserve = () => {

@@ -2,7 +2,7 @@
 
 Istniejący Node.js 22.18+, git, systemd użytkownika, reverse proxy nginx i wybrana domena HTTPS. Może to być własna domena panelu albo tymczasowo ścieżka `/casecheck/` na istniejącej stronie. Brak npm nie wymaga apt: można użyć npm CLI z oficjalnego pakietu rejestru w prywatnym katalogu użytkownika. Zależności instaluj przez `npm ci` z lockfile; pakiety platformowe muszą odpowiadać VPS.
 
-Checkout `~/casecheck`. Stan `~/casecheck-app-state` z prawami 700, poza repo. Konfiguracja `~/casecheck-app.env` z prawami 600 zawiera wyłącznie klucze wybranych dostawców i ustawienia aplikacji. Nie przenoś SMTP ani tokenu GitHub.
+Checkout `~/casecheck`. Stan `~/casecheck-app-state` z prawami 700, poza repo. Konfiguracja `~/casecheck-app.env` z prawami 600 zawiera wyłącznie klucz DEEPSEEK_API_KEY i ustawienia aplikacji. Nie przenoś SMTP ani tokenu GitHub.
 
 `CASECHECK_ADMIN_EMAIL` i `CASECHECK_ADMIN_PASSWORD` tworzą pierwsze konto na pustej bazie. Zmiana tych pól nie zmienia hasła istniejącego konta. Pozostałe pola: `CASECHECK_APP_PORT=8861`, `CASECHECK_APP_BASE_PATH=/casecheck`, `CASECHECK_APP_STATE_DIR=/home/web/casecheck-app-state`, `CASECHECK_PUBLIC_ORIGIN=https://wybrana-domena`, `CASECHECK_DAILY_REQUEST_LIMIT=20`.
 
@@ -48,3 +48,9 @@ Kopie mogą zawierać sprawę usuniętą później z aktywnej bazy. Ustal okres 
 Kopia, `git pull --ff-only`, `npm ci`, `npm test`, restart tylko `casecheck-app`. Sprawdź health, logowanie, kartotekę i wcześniejsze aplikacje. Migracje tworzą nowe tabele bez kasowania danych. Wycofanie kodu do poprzedniego commita; zmiana modelu danych wymaga dobrania zgodnej, sprawdzonej kopii.
 
 Pilotaż nie ma automatycznej wysyłki poczty, składania pism ani procesowego kalkulatora terminów. Logi usługi zawierają bezpieczne komunikaty techniczne.
+
+## Polityka API i budżet
+
+Jedyny model: deepseek-flash (DeepSeek V4.1 Flash). Inni dostawcy i inne modele są blokowani przed połączeniem, także w OCR i runnerach CLI. Historyczne odpowiedzi zachowują czytelność.
+
+Ustaw CASECHECK_AI_USD_LIMIT (0–10 USD) i absolutny CASECHECK_AI_BUDGET_PATH poza checkoutem. Wszystkie procesy z jednego przydziału muszą wskazywać ten sam plik SQLite. Domyślny brak budżetu blokuje rzeczywiste wywołania. CASECHECK_DAILY_REQUEST_LIMIT=0 wyłącza limit liczby w pełnej aplikacji przy dodatnim limicie USD. Limit USD jest łączny, nie dzienny. Kopia bazy nie stanowi nowego budżetu. Na kilku hostach podziel jeden przydział lub użyj jednej usługi. Koszt jest ostrożnym szacunkiem według stawek 3.10.2026. Nie usuwaj bazy kosztów przy wdrożeniu.

@@ -13,7 +13,8 @@ import { documentReview } from './app/document-review.mjs';
 import { renderDraftDocx } from './app/docx.mjs';
 import { templateFields } from './app/firm-templates.mjs';
 import { clientFileVisible, releaseAvailable } from './app/portal.mjs';
-import { KEY_NAMES, providerConfig } from './ai/extraction.mjs';
+import { KEY_NAMES, providerConfig, ExtractionError } from './ai/extraction.mjs';
+import { Spend } from './ai/spend.mjs';
 
 export function readBody(request, max = 512 * 1024, json = true) {
   if (json) requireValue(/^application\/json(?:;|$)/i.test(request.headers['content-type'] || ''), 'JSON_REQUIRED', 415);
@@ -39,10 +40,10 @@ export function readBody(request, max = 512 * 1024, json = true) {
 }
 
 export async function createAppServer({ env = process.env, stateDir = env.CASECHECK_APP_STATE_DIR || resolve(root, 'data/local/app'),
-  now, extract, ocr, reader, secure = true } = {}) {
+  now, extract, conversation, ocr, reader, secure = true } = {}) {
   const limit = Number(env.CASECHECK_DAILY_REQUEST_LIMIT || 20);
-  requireValue(Number.isInteger(limit) && limit >= 1 && limit <= 100, 'INVALID_CONFIG');
-  const app = new Application({ env, stateDir, now, extract, ocr, reader, limit });
+  requireValue(Number.isInteger(limit) && limit >= 0 && limit <= 100 && (limit !== 0 || Number(env.CASECHECK_AI_USD_LIMIT) > 0), 'INVALID_CONFIG');
+  const app = new Application({ env, stateDir, now, extract, conversation, ocr, reader, limit: limit === 0 ? Infinity : limit });
   const caseResponse = (state, actor) => publicCase(actor.role === 'client' ? state : {
     ...state, recoverable_jobs: app.store.pendingJobResults(actor, state.id),
     document_reviews: (state.documents || []).map(d => documentReview(state, d)).filter(Boolean) }, actor);
@@ -54,6 +55,8 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
   const assets = new Map([['/', ['index.html', 'text/html; charset=utf-8']], ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
     ['/document-review.js', ['document-review.js', 'text/javascript; charset=utf-8']],
     ['/workspace.js', ['workspace.js', 'text/javascript; charset=utf-8']],
+    ['/form-state.js', ['form-state.js', 'text/javascript; charset=utf-8']],
+    ['/conversation.js', ['conversation.js', 'text/javascript; charset=utf-8']],
     ['/style.css', ['style.css', 'text/css; charset=utf-8']]].map(([path, [name, type]]) => [path, { body: readFileSync(resolve(root, 'web-app', name)), type }]));
   for (const name of ['pdf.mjs', 'pdf.worker.mjs']) assets.set('/' + name, {
     body: readFileSync(resolve(root, 'node_modules/pdfjs-dist/build', name)), type: 'text/javascript; charset=utf-8' });
@@ -88,13 +91,18 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
       requireValue(auth.startsWith('Bearer ') && auth.length <= 300, 'UNAUTHORIZED', 401);
       const token = auth.slice(7), actor = app.store.auth(token), staff = actor.role !== 'client';
       if (path === '/api/me' && request.method === 'GET') { send(200, { user: actor }); return; }
+      if (path === '/api/activity' && request.method === 'GET') { send(200, app.activity.feed(actor)); return; }
+      if (path === '/api/activity/read' && request.method === 'POST') { send(200, app.activity.markRead(actor, await readBody(request, 8192))); return; }
       if (path === '/api/logout' && request.method === 'POST') { app.store.logout(token); send(200, { ok: true }); return; }
       if (path === '/api/config' && request.method === 'GET') {
         const providers = Object.keys(KEY_NAMES).flatMap(provider => { try { return [{ provider, model: providerConfig(provider, env).model }]; } catch { return []; } });
+        let spend = null;
+        if (staff && env.CASECHECK_AI_USD_LIMIT !== undefined) { const ledger = new Spend(env); try { spend = ledger.state(); } finally { ledger.close(); } }
         send(200, { providers, budget: staff ? app.store.budget() : null, busy: app.busy,
+          spend,
           knowledge: staff ? app.store.knowledge(actor, knowledge) : { intake: knowledge.intake },
           ...(staff ? { firm_templates: app.firmTemplates.list(actor), template_fields: templateFields } : {}),
-          notice: 'Wybrane wiadomości i fragmenty dokumentów są przekazywane do wskazanego zewnętrznego API. Odczyt skanów przekazuje cały wskazany plik do OpenAI. Klucze pozostają na serwerze. Wersja testowa używa danych fikcyjnych.',
+          notice: 'Asystent przekazuje do DeepSeek V4.1 Flash Twoją wiadomość, do 12 poprzednich wiadomości tej rozmowy oraz zapisane, widoczne dla klienta ustalenia. Odczyt dokumentu przekazuje wybrane fragmenty, a OCR obrazy wszystkich stron wskazanego pliku do DeepSeek. Klucze pozostają na serwerze. W pilotażu używaj danych fikcyjnych.',
           app_mode: 'pilot', secure }); return;
       }
       if (path === '/api/users') {
@@ -160,6 +168,7 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
       const input = await readBody(request);
       const actions = {
         consent: () => app.consent(actor, id, input), messages: () => app.chat(actor, id, input),
+        'assistant-message': () => app.assistantMessage(actor, id, input),
         'staff-reply': () => app.portal.reply(actor, id, input),
         'client-request': () => app.portal.request(actor, id, input),
         'request-response': () => app.portal.respond(actor, id, input),
@@ -187,7 +196,8 @@ export async function createAppServer({ env = process.env, stateDir = env.CASECH
       send(200, caseResponse(await actions[action](), actor));
     } catch (error) {
       if (response.writableEnded || response.destroyed) return;
-      send(error instanceof AppError ? error.status : 500, { error: error instanceof AppError ? error.code : 'SERVER_ERROR' });
+      send(error instanceof AppError ? error.status : error instanceof ExtractionError ? 400 : 500,
+        { error: error instanceof AppError || error instanceof ExtractionError ? error.code : 'SERVER_ERROR' });
     }
   });
   server.maxConnections = 32; server.keepAliveTimeout = 5000; server.app = app;
