@@ -12,3 +12,5 @@ Tekst i sześć tabel w PPTX pozostają edytowalne. Zrzuty aplikacji są obrazam
 Źródło prezentacji: [build-presentation.mjs](../../scripts/build-presentation.mjs). Builder wymaga dołączonego runtime Presentations oraz zmiennych `RUNTIME_NODE_MODULES`, `PRESENTATIONS_SKILL_DIR`, `RUNTIME_PYTHON`. Nie wymaga kluczy API. Dla kolejnego wydania ustaw nowy `DECK_FILENAME`, ponieważ finalizator chroni istniejące pliki. PDF tworzy [render-presentation-pdf.py](../../scripts/render-presentation-pdf.py) z lokalnych renderów, używając ReportLab i Pillow.
 
 ![Okładka prezentacji](okladka.png)
+
+Aktualizacja po przygotowaniu slajdów: najnowszy kod został już wdrożony na VPS. Informacja slajdu o oczekiwaniu na wdrożenie jest historyczna; [bieżący odbiór](../../docs/RECZNY-ODBIOR-VPS.md) opisuje aktualizację oraz nadal oczekujące przeniesienie domeny.

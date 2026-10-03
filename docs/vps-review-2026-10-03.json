@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-03",
+  "deployed_commit": "0c7c247ff82b6df91b2ab1efa0b049b44699833d",
+  "runtime": "Node.js 22.22.1",
+  "automated_tests": { "passed": 121, "failed": 0, "location": "isolated release on the same VPS" },
+  "restored_copy": { "schema_version": 3, "existing_records_preserved": true, "new_model_calls_disabled": true },
+  "live_deployment": {
+    "url": "https://astrologiapoludzku.com/casecheck/",
+    "service_active": true,
+    "cases": 18,
+    "attachment_hashes_verified": 46,
+    "website_routes_unchanged": 10,
+    "existing_records_preserved": true,
+    "budget_preserved": true,
+    "login": true,
+    "pdf": true,
+    "review_package_hash": true,
+    "anonymous_status": 401,
+    "foreign_origin_status": 403,
+    "env_path_status": 404
+  },
+  "manual_review": {
+    "performed_by": "AI agent using browser UI; synthetic cases",
+    "copy": ["login", "S01 discrepancy", "read legacy letter", "download DOCX and read contents", "download PDF and visually inspect its single page", "create client request", "open scoped client portal", "share approved PDF", "acknowledge reading", "reply with an existing attachment", "stale release removed from download", "accept client response", "render original beside extracted text", "create and approve firm template", "generate and read draft from firm template"],
+    "live": ["HTTPS login", "S02 possible duplicate exclusion", "S04 disputed claim"],
+    "new_upload_retested": false,
+    "new_model_calls": 0,
+    "new_ocr_calls": 0,
+    "new_application_defects_observed": 0
+  },
+  "domain_migration": {
+    "target": "https://inproduction.dev/casecheck/",
+    "status": "awaiting administrator activation",
+    "observed_http_status": 404
+  },
+  "competitor_parity": "not demonstrated; narrower feature scope and no comparative product access"
+}

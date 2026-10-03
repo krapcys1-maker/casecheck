@@ -1,6 +1,6 @@
 # CaseCheck i LegalFlow — porównanie z 3 października 2026
 
-CaseCheck ma działający lokalnie obieg dokumentów z kontrolą źródeł. LegalFlow ma szerszy deklarowany zakres obsługi kancelarii. Nie mamy dostępu do ich panelu, kodu, umów z dostawcami ani wyników badań. Nie można zatem uczciwie stwierdzić, że nasz system jest lepszy we wszystkim, dokładniejszy lub bezpieczniejszy.
+CaseCheck ma wdrożony na VPS obieg dokumentów z kontrolą źródeł. LegalFlow ma szerszy deklarowany zakres obsługi kancelarii. Nie mamy dostępu do ich panelu, kodu, umów z dostawcami ani wyników badań. Nie można zatem uczciwie stwierdzić, że nasz system jest lepszy we wszystkim, dokładniejszy lub bezpieczniejszy.
 
 ## Co robi ich produkt, a co nasz
 
@@ -52,3 +52,7 @@ Nie budujemy fikcyjnych przycisków „integracja” bez połączenia z docelowy
 „Zbudowałem moduł przyjęcia i kontroli dokumentów: cytaty, przegląd OCR, kontrola wierzyciela po cesji, wersjonowane wzory i portal klienta. Mogę pokazać znalezione błędy rzeczywistych odpowiedzi API oraz ich obsługę. Proponuję małe zlecenie: dopasowanie tego modułu do jednego procesu i eksport potwierdzonych danych do Waszego systemu, z ustalonym pomiarem jakości.”
 
 Taki zakres można wycenić i odebrać. Deklaracja zastąpienia całego LegalFlow nie byłaby poparta obecnym stanem projektu.
+
+## Ponowny odbiór po wdrożeniu
+
+[Ręczny odbiór VPS](RECZNY-ODBIOR-VPS.md) z 3.10.2026 potwierdził na kopii istniejącej bazy obieg prośby i odpowiedzi klienta, wydanie oraz wycofanie pisma, eksporty i własny wzór. Po publikacji sprawdzono też S02 i S04 w publicznym panelu. Nie dowodzi to równoważności z całym LegalFlow. Otwarte karty wymagają odświeżenia po zmianie przez drugą osobę; brak automatycznych powiadomień pozostaje istotną luką.

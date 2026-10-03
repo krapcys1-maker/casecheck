@@ -48,13 +48,15 @@ Gotowa [prezentacja 22 slajdy](../output/presentation/README.md) opisuje działa
 
 ## Wdrożenie i następny etap
 
-Dokumentacja zawiera istniejący [panel HTTPS](https://astrologiapoludzku.com/casecheck/) i wcześniejsze dowody wdrożenia. Najnowsze zmiany zweryfikowano lokalnie oraz w GitHub Actions na Node 22 i 24. Na VPS nie wdrażano tych zmian. Nie publikowano danych dostępu i nie zmieniano prywatnego stanu działającego serwera.
+Najnowszą wersję aplikacji wdrożono na VPS w commicie `0c7c247`: działa istniejący [panel HTTPS](https://astrologiapoludzku.com/casecheck/). [Ręczny odbiór aktualizacji](RECZNY-ODBIOR-VPS.md) obejmuje kopię bazy, migrację schematu, portal klienta, własny wzór, podgląd źródła oraz PDF/Word. Na VPS przeszło 121/121 testów. Po wdrożeniu zachowano 18 spraw, 46 plików, konta, historię i budżet. Dziesięć adresów obu stron zachowało te same odpowiedzi i hashe. Nie wykonywano nowych wywołań modeli.
+
+Adres `https://inproduction.dev/casecheck/` jest przygotowany, ale jeszcze nieaktywny (404). [Migracja domeny](../deploy/PRZENIESIENIE-INPRODUCTION.md) wymaga komendy administratora, ponieważ konto `web` nie może zapisywać konfiguracji tej domeny. Dane dostępu pozostają prywatne.
 
 Kolejność dalszej pracy:
 
-1. Przed aktualizacją VPS wykonać prywatną kopię, sprawdzić odtworzenie i nową funkcję na fikcyjnej sprawie. Kod oraz materiały są publikowane na GitHubie, zakres CI jest jawny.
+1. Uruchomić przygotowane przeniesienie domeny przez administratora, a potem sprawdzić logowanie, pliki, portal i zachowanie strony portfolio pod nowym adresem. Kod i bieżące wyniki są publikowane na GitHubie.
 2. Uzgodnić z kancelarią jeden proces i osobny zestaw dokumentów do oceny. Zmierzyć błędy, czas ręcznego przeglądu, czas poprawek i koszt API.
 3. Wykonać niezależny przegląd pytań/wzorów, przygotować dostęp z MFA/SSO oraz zasady danych i kopii przed przyjęciem rzeczywistych spraw.
 4. Rozwinąć jeden przydatny adapter do CRM/obiegu kancelarii na istniejącym pakiecie JSON, po uzgodnieniu odbiorcy i formatu.
 
-Brakuje m.in. pełnego KRZ/CEIDG/BIR, integracji CRM/KSeF, podpisu, audio, automatycznej wysyłki oraz niezależnego pomiaru skuteczności na rzeczywistych aktach. Eksport DOCX, własne wzory i przegląd OCR per strona działają lokalnie. Import dowolnego pliku Word jako wzoru nie jest obsługiwany. Te granice są opisane w [audycie](AUDYT.md).
+Brakuje m.in. pełnego KRZ/CEIDG/BIR, integracji CRM/KSeF, podpisu, audio, automatycznej wysyłki oraz niezależnego pomiaru skuteczności na rzeczywistych aktach. Eksport DOCX, własne wzory i przegląd OCR per strona są teraz również w kodzie wdrożonym na VPS. Import dowolnego pliku Word jako wzoru nie jest obsługiwany. Te granice są opisane w [audycie](AUDYT.md).
