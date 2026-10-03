@@ -1,0 +1,6 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Wierzyciel: Fikcyjny Wierzyciel Brzoza
+Umowa: TEST/121/2026
+Saldo całkowite na 12.09.2026: 12 345,67 PLN.
+
+Historia: pierwszym wierzycielem był Bank Fikcyjny Początek. Bezpośrednio przed obecną cesją wierzycielem był Fikcyjny Fundusz Wschód; ten podmiot przeniósł wierzytelność na Fikcyjny Wierzyciel Brzoza.

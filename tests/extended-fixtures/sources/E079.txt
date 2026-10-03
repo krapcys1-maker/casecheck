@@ -1,0 +1,5 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Wierzyciel	Fikcyjny Wierzyciel Klon
+Umowa	TEST/79/2026
+Data salda	2026-09-15
+Saldo całkowite	876 543,21 PLN

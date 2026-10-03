@@ -1,0 +1,276 @@
+{
+  "schema": "casecheck-manual-portal-review-v1",
+  "date": "2026-10-03",
+  "environment": "local Windows / Node 24.13.0",
+  "scope": {
+    "synthetic_only": true,
+    "reviewer": "AI agent acting through test lawyer/client roles",
+    "independent_legal_review": false,
+    "detailed_cases": [
+      "S01",
+      "S02",
+      "S04"
+    ],
+    "copied_cases": 6,
+    "not_full_200_case_acceptance": true,
+    "deployed_to_vps": false,
+    "new_ci_verified": false
+  },
+  "manual_ui_observations": [
+    "Read S01 total 110000 PLN from 50000 + 40000 + 20000, same balance date 2026-09-30.",
+    "Created, approved and edited a firm template; read preserved v1-v3 in UI and approved v4.",
+    "Client answered a request twice with existing and newly uploaded attachments; team reopened and accepted it.",
+    "Client reply invalidated previous shared PDF; editing template v3 invalidated the next release.",
+    "Manual declared total correction preserved 120000 PLN as approximate; exact difference no longer displayed.",
+    "Read final draft and all 11 separate source evidence items.",
+    "Staff file was private, explicitly shared, then hidden; observed each client view.",
+    "Final current release available; two previous releases unavailable; read acknowledgement saved as case revision 29.",
+    "S04 custom draft could not be approved with missing required client fields.",
+    "Read S04 disputed 19000 PLN and unknown security; read extra fields against source.",
+    "Read S02 assignment and detected old creditor address incorrectly attributed to current creditor; manually corrected before approval."
+  ],
+  "fresh_api": {
+    "count": 3,
+    "baseline_reservations": 17,
+    "final_budget": {
+      "day": "2026-10-03",
+      "used": 20,
+      "limit": 20,
+      "remaining": 0
+    },
+    "automatic_retry": false,
+    "calls": [
+      {
+        "case": "S04",
+        "provider": "anthropic",
+        "outcome": "failed",
+        "error": "INVALID_FIELD_TYPE",
+        "raw_response_preserved": false
+      },
+      {
+        "case": "S04",
+        "provider": "anthropic",
+        "model": "claude-haiku-4-5-20251001",
+        "prompt": "casecheck-extract-v0.7",
+        "outcome": "completed",
+        "four_extra_fields_manually_read": true
+      },
+      {
+        "case": "S02",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "prompt": "casecheck-extract-v0.7",
+        "outcome": "completed_with_semantic_error",
+        "error": "Address belongs to previous creditor",
+        "manually_corrected_before_review": true
+      }
+    ],
+    "new_live_api_after_address_guard": false
+  },
+  "recorded_response_replay": [
+    {
+      "case": "S02",
+      "fresh_api_calls": 0,
+      "source_sha256": "39b8b32e4f0b3aa008bba6a5627ef89c2b8c9237a9c6cae8feec3b5e32975a2a",
+      "input_output_sha256": "11881b2b79c69fc7fa34b3f77473ec1b7d473709685d7c5ae579b1b76aaf9516",
+      "before_address": {
+        "field": "creditor_address",
+        "type": "text",
+        "text_value": "ul. Dokumentowa 20, 00-000 Miasto Testowe",
+        "boolean_value": null,
+        "minor_units": null,
+        "currency": null,
+        "as_of": null,
+        "precision": "exact",
+        "source_id": "981d030b-b438-4135-99a0-b402b7fbf9ed",
+        "quote": "Adres: ul. Dokumentowa 20, 00-000 Miasto Testowe."
+      },
+      "after_address": {
+        "field": "creditor_address",
+        "type": "unknown",
+        "text_value": null,
+        "boolean_value": null,
+        "minor_units": null,
+        "currency": null,
+        "as_of": null,
+        "precision": "unknown",
+        "source_id": "981d030b-b438-4135-99a0-b402b7fbf9ed",
+        "quote": "Adres: ul. Dokumentowa 20, 00-000 Miasto Testowe."
+      }
+    },
+    {
+      "case": "S04",
+      "fresh_api_calls": 0,
+      "source_sha256": "7e1275e45dcb9d4466d0f37357cbb23cec34a9c52ee140e3ec7f32aabe9155f7",
+      "input_output_sha256": "fce9fb7d01db3b3982664901ee73a604de123a1db90e6a106cbfdaad78aa498e",
+      "before_address": {
+        "field": "creditor_address",
+        "type": "text",
+        "text_value": "ul. Dokumentowa 20, 00-000 Miasto Testowe",
+        "boolean_value": null,
+        "minor_units": null,
+        "currency": null,
+        "as_of": null,
+        "precision": "exact",
+        "source_id": "789a7c1c-074f-4118-aa81-551e445697a8",
+        "quote": "Adres: ul. Dokumentowa 20, 00-000 Miasto\nTestowe."
+      },
+      "after_address": {
+        "field": "creditor_address",
+        "type": "text",
+        "text_value": "ul. Dokumentowa 20, 00-000 Miasto Testowe",
+        "boolean_value": null,
+        "minor_units": null,
+        "currency": null,
+        "as_of": null,
+        "precision": "exact",
+        "source_id": "789a7c1c-074f-4118-aa81-551e445697a8",
+        "quote": "Adres: ul. Dokumentowa 20, 00-000 Miasto\nTestowe."
+      }
+    }
+  ],
+  "final_draft": {
+    "template_revision": 4,
+    "data_revision": 9,
+    "content_hash": "47f114689e320bf5aeb050b0f7aa1dd0af47adbf5f3de29bea9218911b557467",
+    "field_evidence_count": 11,
+    "approved_by": "TEST — ręczny przegląd przez agenta",
+    "release_count": 3,
+    "available_release_count": 1
+  },
+  "manual_http": [
+    {
+      "label": "current_release",
+      "expected": 200,
+      "observed": 200,
+      "pass": true
+    },
+    {
+      "label": "outdated_release",
+      "expected": 409,
+      "observed": 409,
+      "pass": true
+    },
+    {
+      "label": "private_file",
+      "expected": 404,
+      "observed": 404,
+      "pass": true
+    },
+    {
+      "label": "other_case",
+      "expected": 404,
+      "observed": 404,
+      "pass": true
+    },
+    {
+      "label": "client_word_denied",
+      "expected": 403,
+      "observed": 403,
+      "pass": true
+    },
+    {
+      "label": "client_export_denied",
+      "expected": 403,
+      "observed": 403,
+      "pass": true
+    }
+  ],
+  "exports": {
+    "word_downloaded_via_ui": true,
+    "pdf_downloaded_via_client_ui": true,
+    "pdf_pages": 1,
+    "docx_rendered_pages": 2,
+    "all_final_rendered_pages_viewed": true,
+    "renderer": "LibreOffice via bundled render_docx.py; Poppler for PDF",
+    "full_draft_read_in_ui": true,
+    "orphan_metadata_page_fixed": true,
+    "microsoft_word_matrix_tested": false
+  },
+  "backup": {
+    "case_revision": 28,
+    "created": {
+      "files": 12
+    },
+    "verified": {
+      "ok": true,
+      "files": 12
+    },
+    "restored": {
+      "case_count": 6,
+      "state_exact_match": true,
+      "template_revision": 4,
+      "history_versions": [
+        4,
+        3,
+        2,
+        1
+      ],
+      "current_release_http": 200,
+      "request_status": "accepted",
+      "budget": {
+        "day": "2026-10-03",
+        "used": 20,
+        "limit": 20,
+        "remaining": 0
+      },
+      "uploaded_files": 12,
+      "no_new_api": true
+    }
+  },
+  "supplementary_checks": {
+    "local_tests_passed": 114,
+    "local_tests_failed": 0,
+    "npm_audit_reported_vulnerabilities": 0,
+    "git_diff_check": "passed"
+  },
+  "artifacts": [
+    {
+      "path": "reports/local/portal-qa/s01-final.docx",
+      "sha256": "12ee37b41998e45767e800b32decf9343c7b98e036e8327c00805fed4f91954b"
+    },
+    {
+      "path": "reports/local/portal-qa/s01-final.pdf",
+      "sha256": "0a0321308a00d03ee37040e10317dd74a0bf111c96593ea61fa2b9ec7d3aa729"
+    },
+    {
+      "path": "reports/local/portal-qa/s01-final-state.json",
+      "sha256": "54dca356d5f65beed7b63b6d5fd56715214e0f02d5da946dfa0deb7486d83d55"
+    },
+    {
+      "path": "reports/local/portal-qa/address-replay.json",
+      "sha256": "3137ed0ad6ab22bbb00147140c12ffb1d560d77299b857654c0b5165c9cee896"
+    },
+    {
+      "path": "reports/local/portal-qa/final-verification.json",
+      "sha256": "3cc4f3c8c414fa4415a6ed16f31f5026a279ba1ee9f647ff582a908342747f22"
+    },
+    {
+      "path": "reports/local/portal-qa/test-run-final.log",
+      "sha256": "f60ef68c8bccb57ce009902daec58fac146f56f00b707e3b132e2b1b41259d30"
+    },
+    {
+      "path": "docs/images/portal-klienta-test.png",
+      "sha256": "ed0fa2799212e9845fad4353f92f42a0ac63cea08e589d89c08a651a9953511e"
+    },
+    {
+      "path": "reports/local/portal-qa/final-balanced-word/page-1.png",
+      "sha256": "b0439cf295d9de5f5769a54a108336ff69ad35d6e9a1aca03f6066eee31ef0e7"
+    },
+    {
+      "path": "reports/local/portal-qa/final-balanced-word/page-2.png",
+      "sha256": "47a7eaee6aabd593c797522a3caedf7d12c5c45c499be1cc3585f9f2150fb0b3"
+    },
+    {
+      "path": "reports/local/portal-qa/approved-pdf-1.png",
+      "sha256": "cc11236126d596a22c2ece2a0369c8898f19f5c534c71994687a7814ba7cbaa4"
+    }
+  ],
+  "limitations": [
+    "No access to competitor implementation or comparative benchmark.",
+    "No independent lawyer sign-off.",
+    "No new end-to-end run of all 200 historical texts.",
+    "Address guard supports explicit text patterns; other layouts may need manual completion.",
+    "No CRM/KSeF/e-sign/audio integration or deployment in this stage."
+  ]
+}

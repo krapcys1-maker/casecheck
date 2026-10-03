@@ -1,0 +1,657 @@
+{
+  "schema": "casecheck-public-http-acceptance-v1",
+  "generated_at": "2026-10-03T07:59:26.964Z",
+  "synthetic": true,
+  "scope": "Local HTTP application, real external API, source PDFs and image-only scan PDFs. Test accounts simulate staff/lawyer review. No independent legal assessment.",
+  "environment": {
+    "node": "v24.13.0",
+    "platform": "win32",
+    "local_automated_tests": {
+      "passed": 98,
+      "failed": 0,
+      "api_calls": 0
+    },
+    "latest_ci_verified": false,
+    "latest_vps_deployed": false
+  },
+  "code_sha256": {
+    "scripts/acceptance.mjs": "d09b58768590329adfd82e783f946933ff2668794f85ce40575467f7ff0c3289",
+    "src/app/application.mjs": "2bb0043e2901a97e230fd7606b94187b7a0379c663ab3b788ac12df3b7ae004d",
+    "src/app/store.mjs": "7ff0a32fe0058558f5b096c4e971bbd6b9e485cb730b213094e68d64b0b742e5",
+    "src/app/files.mjs": "b766460ae4a2e0e9bda3b2e814b67346b94efca3a43dc2aeac69f37d438df6b4",
+    "src/ai/extraction.mjs": "22139b9f08d290391a36edb4c9009b6f47ff77b7e8aabbf0edca1cc72a6070a7",
+    "src/ai/semantics.mjs": "2c0ed53f640b4149c9a912ec8dd674524f83f345409b83503485fc7ff586bf82",
+    "src/ai/hybrid.mjs": "e83c69dafd768583a869e4143a74eccb402edfbc8acddf5178088a82cbe6fca8",
+    "tests/job-recovery.test.mjs": "b04ccda4d7e1ed10b22e41201f7a1685bbd00d87229bcc7d833223a3344839ab",
+    "tests/semantics.test.mjs": "93e813d11a0f916d8e5a096f4614bce0df01736a18e8a8a25926f7f8af000192"
+  },
+  "real_api_calls": 17,
+  "providers": [
+    {
+      "provider": "deepseek",
+      "calls": 9,
+      "models": [
+        "deepseek-flash"
+      ]
+    },
+    {
+      "provider": "anthropic",
+      "calls": 2,
+      "models": [
+        "claude-haiku-4-5-20251001"
+      ]
+    },
+    {
+      "provider": "openai",
+      "calls": 6,
+      "models": [
+        "gpt-4.1-mini-2025-04-14"
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "started_at": "2026-10-03T07:44:57.112Z",
+      "finished_at": "2026-10-03T07:46:11.543Z",
+      "new_calls": 15,
+      "passed_cases": 5,
+      "failed_cases": [
+        {
+          "code": "S04",
+          "error": {
+            "code": "ERR_ASSERTION",
+            "message": "No invented lack of security\n\n'text' !== 'unknown'\n",
+            "expected": "unknown",
+            "actual": "text"
+          }
+        }
+      ],
+      "backup_restored": false
+    },
+    {
+      "started_at": "2026-10-03T07:49:08.578Z",
+      "finished_at": "2026-10-03T07:49:16.818Z",
+      "new_calls": 1,
+      "passed_cases": 6,
+      "failed_cases": [],
+      "backup_restored": false
+    },
+    {
+      "started_at": "2026-10-03T07:50:32.250Z",
+      "finished_at": "2026-10-03T07:50:33.700Z",
+      "new_calls": 0,
+      "passed_cases": 6,
+      "failed_cases": [],
+      "backup_restored": true
+    },
+    {
+      "started_at": "2026-10-03T07:57:03.729Z",
+      "finished_at": "2026-10-03T07:57:09.701Z",
+      "new_calls": 1,
+      "passed_cases": 6,
+      "failed_cases": [],
+      "backup_restored": true
+    }
+  ],
+  "defects_fixed": [
+    {
+      "case": "S04",
+      "field": "security_description",
+      "observed_value": "brak",
+      "cited_source": "Informacja o zabezpieczeniu: brak danych.",
+      "corrected_type": "unknown",
+      "rule": "NO_SECURITY_INFORMATION",
+      "rules_version": "claim-rules-v2",
+      "verified_on_fresh_paid_response": true,
+      "regression_tests_added": 2
+    }
+  ],
+  "cases": [
+    {
+      "code": "S01",
+      "passed": true,
+      "checks": [
+        "Conversation persists and financial intake matches source",
+        "S01-D01.pdf: original hash, parsed evidence and expected claim fields",
+        "S01-D02.pdf: original hash, parsed evidence and expected claim fields",
+        "S01-D03.pdf: original hash, parsed evidence and expected claim fields",
+        "Manual correction preserves previous value and evidence",
+        "120000 PLN declared, 110000 PLN in documents: difference 10000 PLN",
+        "Reviewed JSON export and client/staff permissions",
+        "Assigned tasks, blocked premature close, task completion and closing"
+      ],
+      "jobs": [
+        {
+          "kind": "intake",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2177,
+            "completion_tokens": 652,
+            "total_tokens": 2829,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 385
+          },
+          "elapsed_ms": 2486,
+          "llm_called": true
+        },
+        {
+          "kind": "intake",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2173,
+            "completion_tokens": 300,
+            "total_tokens": 2473,
+            "prompt_tokens_details": {
+              "cached_tokens": 1920
+            },
+            "prompt_cache_hit_tokens": 1920,
+            "prompt_cache_miss_tokens": 253
+          },
+          "elapsed_ms": 1830,
+          "llm_called": true
+        },
+        {
+          "kind": "claim",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2440,
+            "completion_tokens": 1394,
+            "total_tokens": 3834,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 648
+          },
+          "elapsed_ms": 4108,
+          "llm_called": true
+        },
+        {
+          "kind": "claim",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2433,
+            "completion_tokens": 998,
+            "total_tokens": 3431,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 641
+          },
+          "elapsed_ms": 3191,
+          "llm_called": true
+        },
+        {
+          "kind": "claim",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2454,
+            "completion_tokens": 1434,
+            "total_tokens": 3888,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 662
+          },
+          "elapsed_ms": 4449,
+          "llm_called": true
+        }
+      ]
+    },
+    {
+      "code": "S02",
+      "passed": true,
+      "checks": [
+        "S02-D01.pdf: original hash, parsed evidence and expected claim fields",
+        "S02-D02.pdf: original hash, parsed evidence and expected claim fields",
+        "Assignment retains both sources, one active claim and one balance",
+        "Reviewed JSON export and client/staff permissions"
+      ],
+      "jobs": [
+        {
+          "kind": "claim",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2440,
+            "completion_tokens": 1394,
+            "total_tokens": 3834,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 648
+          },
+          "elapsed_ms": 4402,
+          "llm_called": true
+        },
+        {
+          "kind": "claim",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2439,
+            "completion_tokens": 1416,
+            "total_tokens": 3855,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 647
+          },
+          "elapsed_ms": 4030,
+          "llm_called": true
+        }
+      ]
+    },
+    {
+      "code": "S04",
+      "passed": true,
+      "checks": [
+        "Actual paid response recovered after failed final write without another API call",
+        "S04-D01.pdf: original hash, parsed evidence and expected claim fields",
+        "Reviewed JSON export and client/staff permissions"
+      ],
+      "jobs": [
+        {
+          "kind": "claim",
+          "provider": "anthropic",
+          "status": "completed",
+          "model": "claude-haiku-4-5-20251001",
+          "usage": {
+            "input_tokens": 3005,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 1109,
+            "service_tier": "standard",
+            "inference_geo": "not_available"
+          },
+          "elapsed_ms": 6731,
+          "recovered_at": "2026-10-03T07:45:30.802Z",
+          "llm_called": true
+        },
+        {
+          "kind": "claim",
+          "provider": "anthropic",
+          "status": "completed",
+          "model": "claude-haiku-4-5-20251001",
+          "usage": {
+            "input_tokens": 3005,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 0
+            },
+            "output_tokens": 1134,
+            "service_tier": "standard",
+            "inference_geo": "not_available"
+          },
+          "elapsed_ms": 6818,
+          "recovered_at": "2026-10-03T07:49:16.572Z",
+          "llm_called": true
+        }
+      ]
+    },
+    {
+      "code": "S11",
+      "passed": true,
+      "checks": [
+        "S11-D01-scan.pdf: original hash, parsed evidence and expected claim fields",
+        "Reviewed JSON export and client/staff permissions"
+      ],
+      "jobs": [
+        {
+          "kind": "ocr",
+          "provider": "openai",
+          "status": "completed",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "usage": {
+            "input_tokens": 1405,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 438,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 1843
+          }
+        },
+        {
+          "kind": "claim",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2451,
+            "completion_tokens": 1387,
+            "total_tokens": 3838,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 659
+          },
+          "elapsed_ms": 4472,
+          "llm_called": true
+        }
+      ]
+    },
+    {
+      "code": "S12",
+      "passed": true,
+      "checks": [
+        "S12-D01-scan.pdf: original hash, parsed evidence and expected claim fields",
+        "Reviewed JSON export and client/staff permissions"
+      ],
+      "jobs": [
+        {
+          "kind": "ocr",
+          "provider": "openai",
+          "status": "completed",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "usage": {
+            "input_tokens": 1405,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 422,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 1827
+          }
+        },
+        {
+          "kind": "claim",
+          "provider": "deepseek",
+          "status": "completed",
+          "model": "deepseek-flash",
+          "usage": {
+            "prompt_tokens": 2435,
+            "completion_tokens": 1290,
+            "total_tokens": 3725,
+            "prompt_tokens_details": {
+              "cached_tokens": 1792
+            },
+            "prompt_cache_hit_tokens": 1792,
+            "prompt_cache_miss_tokens": 643
+          },
+          "elapsed_ms": 4314,
+          "llm_called": true
+        }
+      ]
+    },
+    {
+      "code": "S18",
+      "passed": true,
+      "checks": [
+        "Conversation persists and financial intake matches source",
+        "S18-D01.pdf: original hash, parsed evidence and expected claim fields",
+        "S18-D02.pdf: original hash, parsed evidence and expected claim fields",
+        "Reviewed JSON export and client/staff permissions",
+        "Company follow-up: four plan fields extracted with evidence from two client messages"
+      ],
+      "jobs": [
+        {
+          "kind": "intake",
+          "provider": "openai",
+          "status": "completed",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "usage": {
+            "input_tokens": 1845,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 546,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 2391
+          },
+          "elapsed_ms": 4349,
+          "llm_called": true
+        },
+        {
+          "kind": "claim",
+          "provider": "openai",
+          "status": "completed",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "usage": {
+            "input_tokens": 2092,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 952,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 3044
+          },
+          "elapsed_ms": 7257,
+          "llm_called": true
+        },
+        {
+          "kind": "claim",
+          "provider": "openai",
+          "status": "completed",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "usage": {
+            "input_tokens": 2094,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 945,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 3039
+          },
+          "elapsed_ms": 8468,
+          "llm_called": true
+        },
+        {
+          "kind": "intake",
+          "provider": "openai",
+          "status": "completed",
+          "model": "gpt-4.1-mini-2025-04-14",
+          "usage": {
+            "input_tokens": 1976,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 506,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 2482
+          },
+          "elapsed_ms": 4483,
+          "llm_called": true
+        }
+      ]
+    }
+  ],
+  "checks": [
+    "HTTP login for administrator, staff and lawyer",
+    "Private backup contains verified database and original files",
+    "Restored separate application: lawyer login, six cases, revisions, every attachment hash and persistent budget"
+  ],
+  "pdfs": [
+    {
+      "case": "S01",
+      "template": "case_card",
+      "pages": 2,
+      "sha256": "27c01657fb993af9e6a7353754b50672f797a8be84b23379550d78def5c1e6ed",
+      "text_verified": true,
+      "visual_review": {
+        "performed": true,
+        "method": "Agent inspection of every page rendered with Poppler at 100 dpi; no clipping, overlaps or missing glyphs observed",
+        "image_sha256": [
+          "6bbbac9875b15eff32528d800f553f59e3925031fc28a5b8b1c4205ec79c1027",
+          "75cd26244f945cf5b334c01d2a296997f8bc7112fa1ab1dae2433c2b29cfdffb"
+        ]
+      }
+    },
+    {
+      "case": "S01",
+      "template": "creditor_list",
+      "pages": 1,
+      "sha256": "2ead344bce08e4eca5d78266a5136d12b8d55c42e14597125e85d54beb9b5f4c",
+      "text_verified": true,
+      "visual_review": {
+        "performed": true,
+        "method": "Agent inspection of every page rendered with Poppler at 100 dpi; no clipping, overlaps or missing glyphs observed",
+        "image_sha256": [
+          "abf1b71eeda7fbcea53dcb0eda31fab8840303758957ff04ccf7bacca3dcc3af"
+        ]
+      }
+    },
+    {
+      "case": "S01",
+      "template": "missing_documents",
+      "pages": 1,
+      "sha256": "9d7398ca65f1ab4159fa23a59d21077ffb4f347b012ecc01223cd0b633789aa7",
+      "text_verified": true,
+      "visual_review": {
+        "performed": true,
+        "method": "Agent inspection of every page rendered with Poppler at 100 dpi; no clipping, overlaps or missing glyphs observed",
+        "image_sha256": [
+          "fe44a36a34c4afaf1d61e6159983af1cbe5e406c8f6ca31bb3002111727d640f"
+        ]
+      }
+    },
+    {
+      "case": "S01",
+      "template": "claim_clarification",
+      "pages": 1,
+      "sha256": "c42261b05002a3f382be232a6b85ac09cd030d44c2eac5c4f7eac69b12b556e0",
+      "text_verified": true,
+      "visual_review": {
+        "performed": true,
+        "method": "Agent inspection of every page rendered with Poppler at 100 dpi; no clipping, overlaps or missing glyphs observed",
+        "image_sha256": [
+          "5cdbfe2bad510e2136437be500b04215c967763cb73f52126e9cd3b9a3f59745"
+        ]
+      }
+    },
+    {
+      "case": "S18",
+      "template": "preliminary_plan",
+      "pages": 1,
+      "sha256": "aa99ebb54077509bbea0b3df19f674c31908b27970785bafedac0cb603157239",
+      "text_verified": true,
+      "visual_review": {
+        "performed": true,
+        "method": "Agent inspection of every page rendered with Poppler at 100 dpi; no clipping, overlaps or missing glyphs observed",
+        "image_sha256": [
+          "87c82fcc729f7d493dbc4475e2077b00429f7b918ab9def21f16cebc4452adec"
+        ]
+      }
+    }
+  ],
+  "source_documents": [
+    {
+      "case": "S01",
+      "name": "S01-D01.pdf",
+      "sha256": "25b2ea9daeb13cd1288230c555ae98d4b6e631d2a3298f7633ba8be3b0c21f6b",
+      "status": "read"
+    },
+    {
+      "case": "S01",
+      "name": "S01-D02.pdf",
+      "sha256": "8d05221a0d4de7146133807501d779e23e92a83eb51a5824c08a46b6c14d5d2b",
+      "status": "read"
+    },
+    {
+      "case": "S01",
+      "name": "S01-D03.pdf",
+      "sha256": "5b5c6c6f6d0199d78a0285c85d64d839cd854053a2118a113bc74a40ccae7c1f",
+      "status": "read"
+    },
+    {
+      "case": "S02",
+      "name": "S02-D01.pdf",
+      "sha256": "0926be845a56dde883d361b6e4dd1e7acdc212fe336e81354fb281daba6822d3",
+      "status": "read"
+    },
+    {
+      "case": "S02",
+      "name": "S02-D02.pdf",
+      "sha256": "4be6482bfd3ddef8e28ae279ecd0e4ba6e1194f8a76aa3edd07eb00f03b2bb2c",
+      "status": "read"
+    },
+    {
+      "case": "S04",
+      "name": "S04-D01.pdf",
+      "sha256": "507faaa684a08cc7c92f29343230821771788db2e24d710117e21a67ccf95731",
+      "status": "read"
+    },
+    {
+      "case": "S11",
+      "name": "S11-D01-scan.pdf",
+      "sha256": "dc64ff95111c5eb8674f77533c93e5170ed36449c9001ea1bb05577882993910",
+      "status": "ocr_review"
+    },
+    {
+      "case": "S12",
+      "name": "S12-D01-scan.pdf",
+      "sha256": "46fc47a7faf2c937e8389a518e114b23ea87403e81c939d25041321a7efbb48f",
+      "status": "ocr_review"
+    },
+    {
+      "case": "S18",
+      "name": "S18-D01.pdf",
+      "sha256": "f36c7e27bcfc52305df0d6c091b5b12dfd7fbe4d638e65e804f8b511c7e3afc2",
+      "status": "read"
+    },
+    {
+      "case": "S18",
+      "name": "S18-D02.pdf",
+      "sha256": "55833f6acdc891399a6e04efe8fe51e8730dc6faf03dcb509a15e965687ca73a",
+      "status": "read"
+    }
+  ],
+  "final_daily_budget": {
+    "day": "2026-10-03",
+    "used": 17,
+    "limit": 20,
+    "remaining": 3
+  },
+  "limitations": [
+    "Six synthetic workflows and ten source documents; not 200 manually reviewed documents.",
+    "The 200-document result is a separate automatic replay of recorded responses on a development corpus.",
+    "S12 verifies that its unreadable amount remains unknown, not that every field on unreadable scans is correct.",
+    "Provider costs were not reconciled against invoices.",
+    "Current changes have not been verified on the public VPS or in new CI."
+  ],
+  "passed": true
+}

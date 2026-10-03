@@ -1,0 +1,6 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Wierzyciel: Fikcyjny Wierzyciel Cedr
+Umowa: TEST/22/2026
+Saldo całkowite na 2026-09-13: 99,99 PLN.
+
+Cesja wierzytelności: poprzednim wierzycielem był Fikcyjny Fundusz Zachód. Aktualnym wierzycielem jest Fikcyjny Wierzyciel Cedr.

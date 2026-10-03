@@ -14,27 +14,35 @@ Zaloguj się kontem początkowym skonfigurowanym w prywatnym pliku środowiska. 
 2. „Rozmowa”: wybierz obszar, wpisz odpowiedź i zdecyduj, czy uruchomić odczyt AI. Zapis bez AI zachowuje treść i kolejne pytanie; sam nie wyciąga wartości do kartoteki.
 3. Wybierz dostawcę i zaakceptuj przekazanie wybranych danych, jeśli chcesz uruchomić AI. Wywołania zliczane są na dzień UTC. Zmiana dostawcy wymaga właściwej zgody dla sprawy.
 4. „Załączniki”: dodaj PDF, tekst lub obraz. Odczyt tekstu jest lokalny. Pusty skan otrzyma status wymagający OCR. Osobny przycisk OCR wyświetla zakres przekazania całego pliku do OpenAI.
-5. „Odczytaj roszczenie AI”: przejrzyj wysyłane fragmenty i uruchom ekstrakcję. „Dane” pozwala wybrać do pięciu pól z wiadomości na jeden odczyt.
+5. „Odczytaj roszczenie”: sprawdź plan pól lokalnych i pól przekazywanych do API, przejrzyj fragmenty i uruchom ekstrakcję. „Dane” pozwala wybrać do pięciu pól z wiadomości na jeden odczyt.
 
 ## Przegląd przez zespół
 
 Podsumowanie pokazuje uzupełnione pola, stan przeglądu, roszczenia, aktualne projekty i następne kroki. To liczniki techniczne, bez oceny prawnej gotowości sprawy. Filtry kartoteki pozwalają znaleźć odczyty do przeglądu, otwarte zadania i ścieżkę firmy/konsumenta.
 
-W „Dane” sprawdź cytat i „Źródło”. „Uzupełnij / popraw” zapisuje nową wartość z własnym uzasadnieniem. Prawnik potwierdza odczyt albo odrzuca wartość. Dane nieznane i odrzucone nadal wymagają uzupełnienia.
+W „Dane” sprawdź cytat i „Źródło”. „Uzupełnij / popraw” zapisuje nową wartość z własnym uzasadnieniem. Aby wycofać błędny odczyt bez nowej wartości, zaznacz „Wartość nieznana — wycofaj poprzedni odczyt” i podaj uzasadnienie. Przy kwocie zaznacz przybliżenie, jeżeli jest szacunkiem. Prawnik potwierdza odczyt albo odrzuca wartość. Dane nieznane i odrzucone nadal wymagają uzupełnienia. Ostrzeżenia odczytu są widoczne po operacji i w Historii. Zawsze sprawdź, czy cytowany adres dotyczy właściwego wierzyciela, szczególnie po cesji.
 
-W „Zobowiązania” sprawdź wierzyciela, numer umowy, walutę, saldo i datę oraz stanowisko klienta. Pismo wierzyciela nie dowodzi automatycznie braku sporu. Kwoty sumują się osobno dla każdej waluty i daty. Przy zgodnych numerach umów wybierz „Sprawdź i powiąż”, wskaż właściwy dokument i uzasadnij decyzję. Pozostałe źródła pozostają zachowane, a wybrana pozycja wraca do przeglądu.
+W „Zobowiązania” sprawdź wierzyciela, numer umowy, walutę, saldo i datę oraz stanowisko klienta. Zmiana wierzyciela wycofuje jego poprzedni adres, zmiana stanowiska o sporze wycofuje opis sporu, a zmiana zabezpieczenia wycofuje jego datę. Powiązane wartości trzeba ustalić ponownie. Pismo wierzyciela nie dowodzi automatycznie braku sporu. Kwoty sumują się osobno dla każdej waluty i daty. Przy zgodnych numerach umów wybierz „Sprawdź i powiąż”, wskaż właściwy dokument i uzasadnij decyzję. Pozostałe źródła pozostają zachowane, a wybrana pozycja wraca do przeglądu.
 
 ## Projekty i zadania
 
 Wybierz jeden z dostępnych wzorów. Prośba o wyjaśnienie roszczenia powstaje przy konkretnej pozycji wierzyciela; korzysta z jego zapisanego adresu, jeśli jest znany. Innych wierzycieli nie umieszcza się w tej prośbie.
 
-„Przeczytaj” pokazuje zawartość. Edycja zapisuje nową wersję stanu sprawy i cofa przegląd pisma. Prawnik może zatwierdzić projekt po przeglądzie znanych danych i powiązaniu duplikatów. Brakujące informacje pozostają oznaczone. Aktualne pisma wyświetlają się na górze; „Poprzednie wersje” zawiera nieaktualne projekty. Pobierany PDF pokazuje charakter danych i stan projektu.
+„Przeczytaj” pokazuje zawartość. Edycja zapisuje nową wersję stanu sprawy i cofa przegląd pisma. Puste sekcje są odrzucane bez utraty formularza. Ręcznie zmieniony tekst ma osobne ostrzeżenie; źródła danych sprzed edycji nie potwierdzają automatycznie dopisanej treści. Prawnik może zatwierdzić projekt po przeglądzie znanych danych i powiązaniu duplikatów. Brakujące informacje pozostają oznaczone. Aktualne pisma wyświetlają się na górze; „Poprzednie wersje” zawiera nieaktualne projekty. Pobierany PDF pokazuje charakter danych i stan projektu.
 
-Zadanie przypisz do aktywnej osoby z listy. Termin administracyjny służy organizacji pracy. Termin prawny wymaga roli prawnika, podanej podstawy i potwierdzonego początku biegu; aplikacja nie oblicza go automatycznie. Zamknięcie sprawy wymaga prawnika oraz zakończenia otwartych zadań.
+„Wzory kancelarii” otwierają edytor własnych wzorów. Sekcje rozpoczynaj od `##`, a pola wybieraj z listy, np. `{{client_name}}`, `{{claims.list}}`, `{{totals}}`. Pracownik może zapisać wzór, prawnik zatwierdza konkretną wersję. Zmiana wzoru wymaga ponownego zatwierdzenia i nowego przeglądu zależnych pism. Historia przechowuje poprzednie wersje. Własny wzór korzysta z potwierdzonych informacji; brak wymaganego pola blokuje zatwierdzenie projektu. Jawne pytania o braki mogą być treścią zatwierdzonej prośby o uzupełnienie.
+
+„Pobierz Word” zapisuje edytowalną kopię. Zmiana pliku poza CaseCheck nie jest objęta wcześniejszym zatwierdzeniem. „Udostępnij klientowi” udostępnia wyłącznie aktualny, zatwierdzony PDF. Żaden eksport ani potwierdzenie przeczytania nie stanowi podpisu elektronicznego.
+
+Zadanie przypisz do aktywnej osoby z listy. Termin administracyjny służy organizacji pracy. Termin prawny wymaga roli prawnika, podanej podstawy i potwierdzonego początku biegu; aplikacja nie oblicza go automatycznie. Zamknięcie sprawy wymaga prawnika, zakończenia otwartych zadań i przyjęcia wszystkich próśb do klienta.
 
 ## Klient i rejestry
 
-„Link dla klienta” tworzy dostęp na siedem dni do jednej sprawy. Przekaż go właściwej osobie. „Odwołaj linki” unieważnia wcześniejsze linki tej sprawy. Klient widzi rozmowę i własne załączniki, bez wewnętrznego przeglądu i zadań zespołu.
+„Link dla klienta” tworzy dostęp na siedem dni do jednej sprawy. Przekaż go właściwej osobie. „Odwołaj linki” unieważnia wcześniejsze linki tej sprawy. W „Moja sprawa” klient odpowiada na prośby, dołącza wybrane załączniki, pobiera udostępnione PDF-y i potwierdza zapoznanie się. Nie ma dostępu do wewnętrznych faktów, pism i zadań.
+
+W „Współpraca z klientem” zespół tworzy prośby z organizacyjną datą odpowiedzi, przyjmuje odpowiedź albo ponownie otwiera prośbę z wyjaśnieniem. Nowa odpowiedź klienta wycofuje zatwierdzenia wcześniejszych pism; samo przyjęcie odpowiedzi ich nie przywraca. „Wiadomość kancelarii” w Rozmowie jest odróżniona od informacji klienta i nie zasila jego wywiadu.
+
+Nowy plik przesłany przez zespół jest widoczny tylko kancelarii, dopóki prawnik go nie udostępni. Plik przesłany przez klienta pozostaje dostępny klientowi. Starsze pliki bez znacznika widoczności zachowują wcześniejszą widoczność; przy aktualizacji należy je przejrzeć. Pobranie prywatnego pliku blokuje również serwer.
 
 W ścieżce firmy „Rejestry” umożliwiają pobranie aktualnego odpisu KRS lub sprawdzenie wykazu VAT na podany dzień. Rejestr pomaga sprawdzić tożsamość podmiotu, nie ustala całej listy długów. Fikcyjne sprawy korzystają z testowego VAT MF.
 
@@ -44,8 +52,9 @@ W ścieżce firmy „Rejestry” umożliwiają pobranie aktualnego odpisu KRS lu
 |---|---|
 | Limit dzienny AI | Pracuj nad zadaniami i przeglądem istniejących wyników. Kolejna doba UTC otwiera budżet. |
 | Sprawa zmieniła się w trakcie pracy | Panel odświeża aktualną wersję. Porównaj dane i wprowadź zmianę ponownie. |
+| Zapis odczytu czeka na odzyskanie | Zespół otwiera „Historia” → „Odzyskaj zapisany wynik”. Bez nowego API; wynik starszej wersji zostanie odrzucony. |
 | Błąd odczytu | Wiadomość/plik pozostają zapisane. Sprawdź status i ponów jawnie, jeśli potrzeba; błąd mógł zużyć budżet. |
-| Odczyt OCR do sprawdzenia | Porównaj transkrypcję z oryginalnym obrazem. |
+| Odczyt OCR do sprawdzenia | W Załącznikach wybierz „Porównaj z oryginałem”. Sprawdź każdą stronę, zapisz korekty z uzasadnieniem i potwierdź zgodność kontem prawnika. Zależne fakty sprawdza się osobno. [Instrukcja](PRZEGLAD-OCR.md). |
 | Nieaktualny projekt | Przejrzyj zmienione dane i utwórz projekt na aktualnej wersji. |
 | Rola prawnika wymagana | Przekaż czynność osobie z odpowiednią rolą. |
 

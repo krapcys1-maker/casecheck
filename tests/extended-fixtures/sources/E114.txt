@@ -1,0 +1,6 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Wierzyciel: Fikcyjny Wierzyciel Klon
+Umowa: TEST/114/2026
+Saldo całkowite na 2026-09-15: 876 543,21 PLN.
+
+Rozważano cesję na Fikcyjny Fundusz Południe, jednak do cesji nie doszło. Wierzyciel się nie zmienił.

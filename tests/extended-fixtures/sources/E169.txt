@@ -1,0 +1,4 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Wierzyciel: Fikcyjny Wierzyciel Klon
+Umowa: TEST/169/2026
+Saldo na 2026-09-15: 1000 PLN oraz 200 EUR. Dwie odrębne części walutowe, bez przeliczenia.

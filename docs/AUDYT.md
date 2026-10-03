@@ -4,6 +4,8 @@ Projekt ma działający obieg od zgłoszenia do przeglądu i projektu PDF. Najwi
 
 Zakres: oba serwery, aplikacja HTTP, role i sesje, SQLite, wersje, upload i parser, OCR, adaptery rejestrów, kontrakt AI, interfejs, wzory, fixtures, kopie, CI i konfiguracja wdrożenia. To audyt kodu i testy funkcjonalne, bez niezależnego pentestu, certyfikacji RODO lub opinii prawnej.
 
+Aktualizacja lokalna: **119/119 testów**. [Najnowsze ręczne powtórzenia](RECZNE-TESTY-KOREKT.md) potwierdzają naprawy wycofywania wartości, zależności danych i pustych pism. Sprawdzono restart, komunikaty oraz oba eksporty. Najnowszy [ręczny przegląd portalu i własnych wzorów](RECZNY-PRZEGLAD-PORTALU.md) obejmuje Word/PDF, wersjonowanie, odpowiedzi klienta, kontrolę pobrania i kopię 12 plików. Trzy nowe wywołania wykryły błąd typu i adres starego wierzyciela przypisany nowemu. Błąd adresu obsługuje zachowawczy filtr potwierdzony na zapisanych odpowiedziach; brak nowego API po filtrze. Wcześniejszy [przegląd OCR](PRZEGLAD-OCR.md), [ponowienie sześciu scenariuszy](ocr-review-2026-10-03.json) i [porównanie E001–E200](RECZNY-PRZEGLAD-200.md) zachowują swoje zakresy. Brak nowego wdrożenia VPS/CI.
+
 ## Naprawione problemy
 
 Pierwsze siedem regresji odtworzono na wcześniejszym kodzie: **7/7 testów nie przeszło**. Po zmianach przechodzą. Dalsze testy sprawdzają granice transakcji, źródeł, zatwierdzeń i nowego eksportu.
@@ -20,6 +22,12 @@ Pierwsze siedem regresji odtworzono na wcześniejszym kodzie: **7/7 testów nie 
 | Awaria zapisu startu zadania mogła zużyć rezerwację i zablokować AI | Rezerwacja i start w jednej transakcji; blokada dopiero po udanym zapisie | Wymuszony błąd SQLite: 0 wydanych rezerwacji, kolejne AI działa |
 | Limit źródeł zostawiał upload/OCR jako działające | Jawny zapis niepowodzenia przed dodaniem stron | Granica 240 źródeł: brak częściowego zapisu i brak wiszącego zadania |
 | Zatwierdzenie starej bazy wiedzy mogło autoryzować nowy zestaw pytań i pism | Sprawdzanie hasha aktualnego pakietu | Zmieniony pakiet wymaga nowej akceptacji, bez płatnego wywołania |
+| Awaria końcowego zapisu po odpowiedzi AI/OCR mogła zgubić wynik | Osobna transakcja zapisu wyniku, jawne odzyskanie; zastosowanie i usunięcie zapisu są atomowe | 11 testów, w tym nagłe zakończenie procesu i restart, rollback audytu/usunięcia, brak drugiego API, ochrona korekt i uprawnień; lokalnie |
+| Rzeczywista odpowiedź Anthropic zmieniła „brak danych” o zabezpieczeniu na „brak” zabezpieczenia | Filtr zamienia taką interpretację na `unknown`, zachowując cytat; `claim-rules-v2` | Dwa testy regresji i nowe wywołanie Anthropic, w którym filtr usunął ten sam błąd; S04 w raporcie odbioru |
+
+| Ręczne „nieznane” pozostawiało poprzednią potwierdzoną wartość | Jawne wycofanie ma pierwszeństwo przed starą wartością, historia zostaje | Kontrola UI i regresja, dawny adres nie trafia do eksportu |
+| Zmiana wierzyciela pozostawiała adres starego podmiotu | Unieważnienie zależnego adresu, zakresu sporu i daty zabezpieczenia | Ręczna kontrola trzech zmian oraz częściowa odpowiedź adaptera |
+| Można było zatwierdzić pusty dokument | Walidacja edycji, zatwierdzenia i dostępności historycznych wydań | HTTP 400, niezmieniony cały stan, błąd widoczny w zachowanym formularzu |
 
 ## Jakość odczytu — znalezione ograniczenie
 
@@ -33,7 +41,7 @@ Dodane zabezpieczenia:
 - Poprzedni wierzyciel wymaga kontekstu poprzednika lub przelewu. To filtr częstego błędu, nie potwierdzenie następstwa prawnego.
 - Nazwy mogą mieć ujednolicone odstępy; źródła i cytaty pozostają oryginalne. Odczyty nadal czekają na człowieka.
 
-Te poprawki przeszły testy bez API, w tym zakaz naprawiania innej kwoty i niejednoznacznego cytatu. **Końcowej wersji nie zmierzono ponownie w pełnej próbie API**: wykorzystano 9/9 rezerwacji osobnego runnera na dzień UTC, wliczając dwie wcześniejsze próby diagnostyczne. Raport nie przypisuje późniejszym poprawkom niezmierzonej skuteczności. Limit aplikacji na VPS jest odrębny: 20/dzień.
+Te poprawki przeszły testy bez API, w tym zakaz naprawiania innej kwoty i niejednoznacznego cytatu. **Tej siedmiodokumentowej próby nie powtórzono w całości po poprawkach**: wykorzystano 9/9 rezerwacji osobnego runnera na dzień UTC, wliczając dwie wcześniejsze próby diagnostyczne. Późniejszy [odbiór sześciu scenariuszy przez HTTP](acceptance-2026-10-03.json) to osobna próba z nowymi wywołaniami, OCR i naprawą kolejnego błędu, a nie zamiana wyników wcześniejszego raportu. Limit aplikacji na VPS jest odrębny: 20/dzień.
 
 ## Nowy element do pokazania
 
@@ -54,17 +62,18 @@ Odtworzenie czterech wcześniej przyjętych odpowiedzi z zapisanej bazy, **bez n
 | P1 | Duplikaty opierają się na równych numerach umów | Kandydaci uwzględniają podmioty i cesję, różne faktury o tym samym numerze, aliasy; zawsze decyzja człowieka |
 | P1 | Jedno AI naraz, pełne JSON-y spraw i kopie każdej wersji | Paginacja, znormalizowane metadane, kolejka i idempotencja; pomiar na 100/1000 spraw, bez zgadywania wydajności |
 | P1 | Brak pomiaru rzeczywistej oszczędności i kosztu pieniężnego | Zmierzyć ręczny i wspomagany przegląd tych samych dokumentów, medianę/p95, czas poprawek i koszt tokenów; limit liczby wywołań nie jest limitem rachunku |
-| P1 | Przy udanym wywołaniu, ale awarii końcowego zapisu, możliwa utrata wyniku | Trwałe zapisanie odpowiedzi przed zastosowaniem i odzyskiwanie bez powtórnego wywołania; test crash/restart |
-| P1 | OCR wymaga porównania z obrazem; 5 stron/3 MB | Zatwierdzanie transkrypcji per strona, rozbieżności cyfr, mieszane PDF-y i wiele stron; osobne miary OCR i ekstrakcji |
+| P1 | Przegląd OCR per strona już działa lokalnie; nadal 5 stron/3 MB | Pomiar na mieszanych PDF-ach i trudnych wielostronicowych skanach; osobne miary OCR i ekstrakcji |
 | P1 | Wspólny limit logowania może utrudnić dostęp innym kontom | Limity per źródło/konto w zaufanym reverse proxy, alerty; test blokady bez ujawniania istnienia konta |
-| P2 | Wzory są stałe i nie obejmują pełnego cyklu postępowania | Import zatwierdzonych wzorów kancelarii, DOCX i mapa wymaganych pól; wersje i test aktualizacji |
+| P2 | Własne wzory i DOCX już działają lokalnie; brak importu Word i pełnego cyklu postępowania | Dopasowanie zatwierdzonych wzorów z kancelarią; zachowanie formatowania importu i mapowanie pól po określeniu formatu |
 | P2 | KRS/VAT są osobnymi sprawdzeniami; brak wdrożonych CRM/SharePoint/KRZ/podpisu | Pierwszy adapter do uzgodnionego systemu na pakiecie v1; kontrakt, odbiorca, ponowienia i audyt transmisji |
 
 `npm audit --omit=dev` w dniu audytu: **0 zgłoszonych podatności** w zainstalowanych zależnościach. Nie oznacza to braku nieznanych luk. Dla produkcji potrzebne są również testy obciążenia, przegląd konfiguracji dostawców i niezależny test bezpieczeństwa.
 
 ## Jak to teraz sprawdzać
 
-Weryfikacja kodu: **70/70 lokalnie, w CI na Node 22 i 24 oraz na VPS**. [Potwierdzony CI](https://github.com/krapcys1-maker/casecheck/actions/runs/37096789137), [metadane weryfikacji](audit-verification-2026-10-03.json). Publiczny test potwierdził pakiet S01: 6 pól po przeglądzie, 3 roszczenia, 9 braków i 3 aktualne zatwierdzenia. Oryginalny plik zachował hash, PDF działa, strona główna i formularz kontaktowy pozostały sprawne.
+Bieżąca weryfikacja lokalna: **119/119** testów bez API, Node 24.13.0. [Najnowszy ręczny obieg](RECZNY-PRZEGLAD-PORTALU.md) i trzy dodatkowe wywołania opisano oddzielnie. Wcześniej **6/6 scenariuszy przez HTTP z rzeczywistymi dostawcami, 17 wywołań**, 10 dokumentów, kontrola pięciu PDF-ów i odtworzenie kopii. [Raport odbioru](acceptance-2026-10-03.json) zachowuje także pierwszy nieudany wynik S04 i potwierdzenie naprawy. Odtworzenie [200 syntetycznych dokumentów](extended-evaluation-2026-10-03.json) nie jest niezależnym pomiarem realnych spraw; reguły rozwijano na tym materiale. [Status i następne kroki](STATUS-PROJEKTU.md), [odzyskiwanie](ODZYSKIWANIE-WYNIKOW.md). Wdrożenie nowych zmian i nowe CI nie zostały potwierdzone w tej kontynuacji.
+
+Wcześniejsza weryfikacja kodu: **70/70 lokalnie, w CI na Node 22 i 24 oraz na VPS**. [Potwierdzony CI](https://github.com/krapcys1-maker/casecheck/actions/runs/37096789137), [metadane weryfikacji](audit-verification-2026-10-03.json). Publiczny test potwierdził pakiet S01: 6 pól po przeglądzie, 3 roszczenia, 9 braków i 3 aktualne zatwierdzenia. Oryginalny plik zachował hash, PDF działa, strona główna i formularz kontaktowy pozostały sprawne.
 
 1. `npm ci && npm test` — regresje, izolacja, role, race conditions, pliki, kopie, eksport, cytaty i semantyczne filtry; bez API.
 2. `npm run ai:bench` — plan 7 syntetycznych dokumentów, bez wywołań. `node scripts/quality-bench.mjs --run` — płatna próba, maksymalnie 9 prób/dzień UTC w osobnej trwałej bazie, bez automatycznego ponowienia.

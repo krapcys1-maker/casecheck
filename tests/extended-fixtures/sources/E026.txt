@@ -1,0 +1,6 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Nadawca: Kancelaria Testowa Omega, pełnomocnik. Nie jest wierzycielem.
+
+Wierzyciel: Fikcyjny Wierzyciel Brzoza
+Umowa: TEST/26/2026
+Saldo całkowite na 12.09.2026: 12 345,67 PLN.

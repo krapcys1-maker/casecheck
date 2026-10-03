@@ -37,6 +37,31 @@ async function fixture(t, options = {}) {
   return { server, app: server.app, directory, request, token: login.body.token, actor: login.body.user, url };
 }
 
+test('a mistyped extra claim field is quarantined while valid address survives and the paid call is not retried', async t => {
+  let calls = 0;
+  const f = await fixture(t, { extract: async ({ sources }) => {
+    calls++;
+    return { output: { facts: [textFact('creditor_address', 'ul. Testowa 1', sources[0]),
+      { ...unknown('disputed_scope'), type: 'boolean', boolean_value: true, precision: 'exact', source_id: sources[0].id, quote: sources[0].text }],
+      questions: [], warnings: [] }, model: 'mock-domain-type-error' };
+  } });
+  let state = f.app.create(f.actor, { title: 'Typy dodatkowych pól', track: 'consumer', synthetic: true });
+  state = f.app.consent(f.actor, state.id, { revision: state.revision, accepted: true, provider: 'openai' });
+  state = await f.app.upload(f.actor, state.id, state.revision, Buffer.from('Wierzyciel: Firma. Adres: ul. Testowa 1. Kwestionuję całość.'), 'wezwanie.txt');
+  state = f.app.store.update(f.actor, state.id, state.revision, 'fixture_creditor', s => {
+    s.claims.push({ id: uid(), document_id: s.documents[0].id, source_ids: [s.sources[0].id], review: 'confirmed',
+      facts: [textFact('creditor_name', 'Firma', s.sources[0])], merged_into: null });
+  });
+  state = await f.app.analyze(f.actor, state.id, { revision: state.revision, kind: 'claim', fields: ['creditor_address', 'disputed_scope'], source_ids: state.sources.map(s => s.id) });
+  const claim = state.claims.at(-1), job = state.jobs.at(-1);
+  assert.equal(job.status, 'completed'); assert.equal(claim.review, 'pending');
+  const address = claim.facts.find(v => v.field === 'creditor_address'), scope = claim.facts.find(v => v.field === 'disputed_scope');
+  assert.equal(address.text_value, 'ul. Testowa 1'); assert.equal(scope.type, 'unknown');
+  assert.equal(scope.boolean_value, null); assert.equal(scope.quote, state.sources[0].text);
+  assert.equal(job.field_abstentions[0].code, 'INVALID_FIELD_TYPE'); assert.equal(job.field_abstentions[0].returned_type, 'boolean');
+  assert.equal(calls, 1); assert.equal(f.app.store.budget().used, 1);
+});
+
 test('handoff button and Polish inflections create one open contact task', async t => {
   const f = await fixture(t);
   let state = f.app.create(f.actor, { title: 'Przejęcie rozmowy', track: 'consumer', synthetic: true });

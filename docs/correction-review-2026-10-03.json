@@ -1,0 +1,94 @@
+{
+  "schema": "casecheck-correction-review-v1",
+  "date": "2026-10-03",
+  "synthetic_only": true,
+  "external_api_calls_this_stage": 0,
+  "portal_budget": {
+    "day": "2026-10-03",
+    "used": 20,
+    "limit": 20,
+    "remaining": 0
+  },
+  "review_method": "Agent manually operated the actual local UI, read the result and both exported pages. Fictional fixture values were seeded, not extracted by a new AI call.",
+  "reproduced_before_fix": [
+    "Manual unknown kept old confirmed value",
+    "Creditor change retained previous creditor address in generated letter",
+    "Empty document could be approved"
+  ],
+  "manual_ui_verified": [
+    "Manual unknown retires client address",
+    "Creditor change invalidates creditor address",
+    "Dispute change invalidates dispute scope",
+    "Security change invalidates security date",
+    "Claim returns to review and leaves totals until confirmed",
+    "Draft recipient has new name and explicit missing address",
+    "Whitespace edit rejected with visible error and preserved form",
+    "Manual-edit disclosure visible",
+    "Corrected state survives server restart",
+    "Approved PDF and DOCX preserve correction and do not reuse old addresses"
+  ],
+  "http_verified": {
+    "invalid_empty_edit_status": 400,
+    "error": "INVALID_DRAFT_CONTENT",
+    "entire_case_unchanged": true,
+    "revision": 16,
+    "data_revision": 13
+  },
+  "regression_suite": {
+    "passed": 119,
+    "failed": 0,
+    "new_cases": 5,
+    "initial_four_cases_failed_before_fix": 4,
+    "paid_api": false
+  },
+  "acceptance_replay": {
+    "passed": true,
+    "cases": [
+      "S01",
+      "S02",
+      "S04",
+      "S11",
+      "S12",
+      "S18"
+    ],
+    "new_api_disabled": true,
+    "budget_before": {
+      "day": "2026-10-03",
+      "used": 17,
+      "limit": 20,
+      "remaining": 3
+    },
+    "budget_after": {
+      "day": "2026-10-03",
+      "used": 17,
+      "limit": 20,
+      "remaining": 3
+    },
+    "note": "Separate historical 17-call state. Its unused budget was not used to bypass the 20-call portal limit."
+  },
+  "exports": [
+    {
+      "name": "pismo.pdf",
+      "bytes": 15472,
+      "sha256": "81f052622320ee081e5f639a7d0686d1c999715e19f682f88945e1f1c59a49ec",
+      "pages": 1,
+      "manually_read_and_rendered": true
+    },
+    {
+      "name": "pismo.docx",
+      "bytes": 11523,
+      "sha256": "9b48b35aa70f3a7d28c219fdc9d231d4b6c7fef75ee9ae874b030f14a8de4337",
+      "pages": 1,
+      "manually_read_and_rendered": true
+    }
+  ],
+  "screenshots": [
+    "images/korekty-zaleznosci-test.png",
+    "images/puste-pismo-blokada-test.png"
+  ],
+  "limitations": [
+    "No new live AI calls after these changes",
+    "No independent legal review",
+    "Current changes not deployed to VPS"
+  ]
+}

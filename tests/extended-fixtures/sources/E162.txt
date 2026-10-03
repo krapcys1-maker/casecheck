@@ -1,0 +1,3 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Wierzyciel: Fikcyjny Wierzyciel Cedr
+Stan na 2026-09-13. Umowa A/TEST: saldo 1000 PLN. Umowa B/TEST: saldo 2000 PLN. Obie niezależne umowy należą do tej samej osoby. Nie wskazano umowy do odczytu.

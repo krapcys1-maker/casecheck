@@ -1,0 +1,4 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Dłużnik: Firma Testowa Odbiorca. Sprzedawca i wierzyciel: Fikcyjny Wierzyciel Klon
+Identyfikator umowy: TEST/104/2026
+Potwierdzenie rozrachunków według stanu z 2026-09-15. Całość pozostałej należności: 876 543,21 zł.

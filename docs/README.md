@@ -4,6 +4,8 @@ Zacznij od [portfolio](PORTFOLIO.md) i [trzystronicowego PDF](../output/pdf/case
 
 | Potrzeba | Dokument |
 |---|---|
+| Zobaczyć ostatnie naprawy i ręczne dowody | [Korekty i eksporty](RECZNE-TESTY-KOREKT.md), [stan projektu](STATUS-PROJEKTU.md) |
+| Porównać z ofertą LegalFlow | [Zakres i kierunki poprawy](POROWNANIE-LEGALFLOW.md) |
 | Pokazać projekt podczas rozmowy | [Demo w 8 minut](DEMO.md) |
 | Przygotować rozmowę z Szymonem Bazanem | [Booster: research, pytania i pokaz](ROZMOWA-BOOSTER.md) |
 | Sprawdzić słabe punkty i naprawy | [Audyt i kolejność rozwoju](AUDYT.md) |

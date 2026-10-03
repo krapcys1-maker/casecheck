@@ -1,0 +1,1944 @@
+{
+  "schema": "casecheck-agent-manual-comparison-v1",
+  "reviewed_at": "2026-10-03T08:49:51.708Z",
+  "reviewer": "Codex agent, not an independent lawyer",
+  "scope": "Full source text and seven normalized values read for every E001-E200, plus raw duplicate-key responses for E014/E018/E193. Automated citation/schema validation is separate.",
+  "synthetic": true,
+  "short_template_variants": true,
+  "families": 40,
+  "api_calls_this_review": 0,
+  "independent_evaluation": false,
+  "limitations": "Rules developed on this corpus; no real client files or OCR in the 200-text set; not full-case end-to-end testing for all 200.",
+  "summary": {
+    "documents": 200,
+    "fields": 1400,
+    "correct": 1397,
+    "abstained": 3,
+    "incorrect_value": 0,
+    "blocked_fields": 0,
+    "complete_documents": 197,
+    "blocked_documents": 0,
+    "median_ms": null,
+    "p95_ms": null,
+    "usage": {
+      "input": 0,
+      "output": 0
+    },
+    "by_field": {
+      "creditor_name": {
+        "total": 200,
+        "correct": 200,
+        "abstained": 0,
+        "incorrect_value": 0,
+        "blocked": 0
+      },
+      "original_creditor": {
+        "total": 200,
+        "correct": 200,
+        "abstained": 0,
+        "incorrect_value": 0,
+        "blocked": 0
+      },
+      "agreement_number": {
+        "total": 200,
+        "correct": 200,
+        "abstained": 0,
+        "incorrect_value": 0,
+        "blocked": 0
+      },
+      "total_amount": {
+        "total": 200,
+        "correct": 200,
+        "abstained": 0,
+        "incorrect_value": 0,
+        "blocked": 0
+      },
+      "balance_date": {
+        "total": 200,
+        "correct": 200,
+        "abstained": 0,
+        "incorrect_value": 0,
+        "blocked": 0
+      },
+      "disputed": {
+        "total": 200,
+        "correct": 197,
+        "abstained": 3,
+        "incorrect_value": 0,
+        "blocked": 0
+      },
+      "security_description": {
+        "total": 200,
+        "correct": 200,
+        "abstained": 0,
+        "incorrect_value": 0,
+        "blocked": 0
+      }
+    }
+  },
+  "code_sha256": {
+    "src/app-server.mjs": "b7f4a92136f6ecece6d2162386e2b8a6ec5f86bae4bcb24086fa034d6f19b6dd",
+    "src/app/application.mjs": "ea96157e1e20fce55c2b5c619a7f576039fd7ccff0c0e05274aa7fa479acf592",
+    "src/app/document-review.mjs": "87d8bec88dbb7702aaf93cd6675b80c6a0caa82c4c2ab3b469a1e715067753fe",
+    "src/app/domain.mjs": "c558d6c29c68b135a9e1501b7e7e08d7a4f5883a57df7a44ef271b59d008ccca",
+    "src/app/review-package.mjs": "ea585e437b6289f21a2ab26529818d3e6cd62ce58fe1d4cb7367da8882f2d6ae",
+    "src/app/pdf.mjs": "3f2453d80bcaa703c2ccb0b1ac88c9303317d4c536bc106311de615da67369c9",
+    "src/app/store.mjs": "7ff0a32fe0058558f5b096c4e971bbd6b9e485cb730b213094e68d64b0b742e5",
+    "src/ai/extraction.mjs": "22139b9f08d290391a36edb4c9009b6f47ff77b7e8aabbf0edca1cc72a6070a7",
+    "src/ai/hybrid.mjs": "e83c69dafd768583a869e4143a74eccb402edfbc8acddf5178088a82cbe6fca8",
+    "src/ai/semantics.mjs": "2c0ed53f640b4149c9a912ec8dd674524f83f345409b83503485fc7ff586bf82",
+    "web-app/app.js": "4d368ed13b5cfcd9a9451b60fc53cb131814e9a33b5fa3e51390cc20fb4b79ce",
+    "web-app/document-review.js": "267d1cb5bf6ab6527105efcef62c1545576ed804f2a1557b266add552c37f46b",
+    "web-app/style.css": "d25a95dca7fbbbeecb0067dfde650b83f7cd88ca75512bb53e515468946c736c",
+    "tests/document-review.test.mjs": "f660d7ec90e6e3de5fd691159e5ec155ac9c3593298dcb29a5e5f807e937bedf",
+    "scripts/acceptance.mjs": "b3f879474671646bf7384601bf7d130b0ea6684384fc19da1959b0dc8758f242",
+    "scripts/prepare-manual-review.mjs": "a2fa8d3116d61892fe2b90c3809d2c0fcee37bc7fd08a9045c5574143819f4ed"
+  },
+  "records": [
+    {
+      "id": "E001",
+      "family": "ordinary_balance",
+      "source_path": "sources/E001.txt",
+      "source_sha256": "20c58b0267a28d2ec51baa8728dba95baac43a315ff2ff49a1da3c38bb0a1a40",
+      "normalized_output_sha256": "674680f75ddaa4ab32909fd4ecaffa81ebf478327b6f4759b4f8a7b9ec4f1820",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E002",
+      "family": "ordinary_balance",
+      "source_path": "sources/E002.txt",
+      "source_sha256": "028acab668e258b88cb98df079b4c53935294926107d877daf7df2f52d31b012",
+      "normalized_output_sha256": "22c95d3d71926c900388ccae294ccc5c27474366b2b91a56fc511a80c79a1f12",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E003",
+      "family": "ordinary_balance",
+      "source_path": "sources/E003.txt",
+      "source_sha256": "4f72f700ad7b6f79809254a99c0027238143b6a0b0651359b35c36f650952e7f",
+      "normalized_output_sha256": "ca7dd99d68cac55540e828a985ead6dc7af9b17ea6faf0489214cafaac8087ab",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E004",
+      "family": "ordinary_balance",
+      "source_path": "sources/E004.txt",
+      "source_sha256": "8fa25c76cb9c0dcf350918e11e1eb6a5b07cc4e95060b6198bec0d9a2b189aa6",
+      "normalized_output_sha256": "9bc556843768e077d4596bd75b5060efd1b6480980539fb69fca46db878a271b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E005",
+      "family": "ordinary_balance",
+      "source_path": "sources/E005.txt",
+      "source_sha256": "070069a284a70fda21880ca52b772fcf80e8af697f135381490c96717ef02a9c",
+      "normalized_output_sha256": "248782f16ee1b3d859a6a7ae6730ea4a57defa88f6aa199423443178411ef8ef",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E006",
+      "family": "explicit_no_dispute",
+      "source_path": "sources/E006.txt",
+      "source_sha256": "ea2e38c6b154cfef4479fa2417c4c5eb961d35f790daa4584a11e4de673e5f8c",
+      "normalized_output_sha256": "4f623619209354bf64f7191501fb6823b3c80dff106b677459d9d0cc127a85d9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E007",
+      "family": "explicit_no_dispute",
+      "source_path": "sources/E007.txt",
+      "source_sha256": "8d2539951d0a84db0e4ca49f76672a5b1a6945486bca5c275cac4222dbaa6146",
+      "normalized_output_sha256": "66ca7a0e055cdd53c0c81507b33f27312926eb783f7157c622549563fa208895",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E008",
+      "family": "explicit_no_dispute",
+      "source_path": "sources/E008.txt",
+      "source_sha256": "b8389a69abcc80eb673923e2a7afd9bd5c8b9c4cf549d4e8c7c50d172493de1a",
+      "normalized_output_sha256": "4d521586663d1eb6f0308bb12f25b6fd48f16cd0db1069d0edcd0be8f0811fdf",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E009",
+      "family": "explicit_no_dispute",
+      "source_path": "sources/E009.txt",
+      "source_sha256": "0a019d15ebe3b80ee225a559b162300d5b83ec29b2b6785c18ae30fbaeb895a6",
+      "normalized_output_sha256": "642090b230f045f650836e99a84077424f9900c7391ff93912661d1da2ad839b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E010",
+      "family": "explicit_no_dispute",
+      "source_path": "sources/E010.txt",
+      "source_sha256": "5a04470b85f1a9e79b126864f6f2d5fc3a1c26b5a0bcafe75b478ff170bf46ec",
+      "normalized_output_sha256": "494dc3f47749266c15ba3d4123f7522706641a7829dbc648e8f866e0873a02bf",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E011",
+      "family": "denial",
+      "source_path": "sources/E011.txt",
+      "source_sha256": "fbe43c7de1a69d3c8013faa28abafe9d8f49cd58d0ee469b778599fade4db5c5",
+      "normalized_output_sha256": "16455df97b4c2d2c3de3bce97fc7c6009b866cafd3f684e8779d43f9d9991572",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E012",
+      "family": "denial",
+      "source_path": "sources/E012.txt",
+      "source_sha256": "3061de843176ad39134d98acfb445d0e484181ffa27672f7d887b58c8e5b28d1",
+      "normalized_output_sha256": "466b4920ff9442e8ed3b570d503e316da3e1d388c0c182974886f27868199cdd",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E013",
+      "family": "denial",
+      "source_path": "sources/E013.txt",
+      "source_sha256": "087ecf27bae47e386759beebdc8f14ea17cbc1e658a7b9d772f36a26240e2288",
+      "normalized_output_sha256": "1e96834531c25bbd894af7cf742ad0ac8f6039bd141e08f4d62c513480ba15de",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E014",
+      "family": "denial",
+      "source_path": "sources/E014.txt",
+      "source_sha256": "9567adefbaf61b26a51ff59ef7917bad1f946b30cf02c9c4ec68261556d9fe0d",
+      "normalized_output_sha256": "31b67cca6ce5731ddd658b16123419e563a0c855ecbdc320bd27a43eb422aa49",
+      "agent_comparison": "Explicit dispute in source; result unknown due to duplicate boolean_value keys (true/null). Manual correction required.",
+      "mismatches": [
+        {
+          "field": "disputed",
+          "correct": false,
+          "exact": false,
+          "expected": {
+            "type": "boolean",
+            "boolean_value": true
+          },
+          "actual": {
+            "type": "unknown",
+            "boolean_value": null
+          },
+          "category": "abstained"
+        }
+      ]
+    },
+    {
+      "id": "E015",
+      "family": "denial",
+      "source_path": "sources/E015.txt",
+      "source_sha256": "cc763f5c42a0f3b73c884beb077b90d79f6a8a4b5b782664d4911cbd7ace7447",
+      "normalized_output_sha256": "29d8bd1a8d8ecdeb52198a8185e94b73d37e843e3efa565335ee66ee9c341ef2",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E016",
+      "family": "partial_dispute",
+      "source_path": "sources/E016.txt",
+      "source_sha256": "142e29885d174f1ba48531cfa37f489456cb25b88fb43d0d0356ca0e59cf9a54",
+      "normalized_output_sha256": "5912a887dae6c2bf5d75340fa9124e86520dbf829257e43c2a4a47776a29a276",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E017",
+      "family": "partial_dispute",
+      "source_path": "sources/E017.txt",
+      "source_sha256": "4e6652f1637301c7cbabcfaa781a2b723fdd0e0c87114e632ce35266e5805182",
+      "normalized_output_sha256": "2961d466d46e51334b523e719089fc9ad2e1d577831d94f0740d6b8579e62f42",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E018",
+      "family": "partial_dispute",
+      "source_path": "sources/E018.txt",
+      "source_sha256": "896466285126d6feba67466ae4a34bd9bc2420bdfcdd3185304a3353542a2927",
+      "normalized_output_sha256": "3cf47ebcbbcc35354a78963fb86f5720e3b2782749c2843d3ea60cfd40865c9e",
+      "agent_comparison": "Explicit dispute in source; result unknown due to duplicate boolean_value keys (true/null). Manual correction required.",
+      "mismatches": [
+        {
+          "field": "disputed",
+          "correct": false,
+          "exact": false,
+          "expected": {
+            "type": "boolean",
+            "boolean_value": true
+          },
+          "actual": {
+            "type": "unknown",
+            "boolean_value": null
+          },
+          "category": "abstained"
+        }
+      ]
+    },
+    {
+      "id": "E019",
+      "family": "partial_dispute",
+      "source_path": "sources/E019.txt",
+      "source_sha256": "ae8c32ca4cf2a0d8927bcd3c1abedb384886bb4beb4658e1ec84177276661158",
+      "normalized_output_sha256": "7f23f88a18cddc432091c3dd232fcb70ba2053a52aad0a95480f1131e4580ea5",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E020",
+      "family": "partial_dispute",
+      "source_path": "sources/E020.txt",
+      "source_sha256": "6145af0631dcdc6c8c72cd4ea476f6ef076a4349c53512bdc5870762e059646e",
+      "normalized_output_sha256": "8de2991fb09eca4f1c34a60128254aed20962d65f148998cdfb1fdf1c8a3346d",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E021",
+      "family": "assignment",
+      "source_path": "sources/E021.txt",
+      "source_sha256": "5e319ed5892cd748ba93dd19789a9a7439770addca408c6ae335343a4eea2bf1",
+      "normalized_output_sha256": "872bc64e40f465bdbb0476caf26825a369fbf381e903ea36528cab1e479dbc8c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E022",
+      "family": "assignment",
+      "source_path": "sources/E022.txt",
+      "source_sha256": "13bebc244ba61798156a4a018377ccf641b137253ead0ff725673d77a5521990",
+      "normalized_output_sha256": "e2195b0a3e0e7d30ab3e218a58004ccf37e9e2e3f6c1a54ef46579eb71a84965",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E023",
+      "family": "assignment",
+      "source_path": "sources/E023.txt",
+      "source_sha256": "fcff4be6f279b3dd9f72cd26cbfa3e234372e06e050baad01c576ec4311f92d9",
+      "normalized_output_sha256": "cbfd45025b3c2e22f20d66a2c4076c1a653dbb58a053167cd7bbc0ee44f57117",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E024",
+      "family": "assignment",
+      "source_path": "sources/E024.txt",
+      "source_sha256": "245e23a7061400eaada8ef423727aea6fb3ec3b173dbc5988da30819258a0bd1",
+      "normalized_output_sha256": "35753415a55a2a3002087cf2cd2e76c31777691a92b593a7585985ad31358ea9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E025",
+      "family": "assignment",
+      "source_path": "sources/E025.txt",
+      "source_sha256": "7b00e6d9a69fb7c527402948db02941990d636e434e3a3205568f84809cbec20",
+      "normalized_output_sha256": "bbefd868f1f08ed554219a6cc9b8071645eed321efc255ecbfc347b891ca3d9e",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E026",
+      "family": "representative",
+      "source_path": "sources/E026.txt",
+      "source_sha256": "f2bc85e712fd0e142af31087c78a14b93f437dcac1e77da4d414b6ae9cef8af1",
+      "normalized_output_sha256": "569581b02e1859afc345a636e0a32fb4878d6ba599d9068743f7ff1bcff6138f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E027",
+      "family": "representative",
+      "source_path": "sources/E027.txt",
+      "source_sha256": "ace7d523415361512e95d000c36098f37c4453149a74b09e1bcdd4012a7bef4a",
+      "normalized_output_sha256": "660562ef76205a7ffcfe116a5d0a032405bc1d8ac6b98f7d30318676138e5bba",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E028",
+      "family": "representative",
+      "source_path": "sources/E028.txt",
+      "source_sha256": "7e4d97da31dbe2519f21c37f56cd112c4cb6189c4aeb287dd60d004d5b08cfd6",
+      "normalized_output_sha256": "1f881408f3de4c3db8d8c32adc6711d03d3ddc617861b467c7a487f04a228afd",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E029",
+      "family": "representative",
+      "source_path": "sources/E029.txt",
+      "source_sha256": "56f0294e787d8c5d8b37c657a713460c01bb75c0a8d47d83cd30f6d72c41bb67",
+      "normalized_output_sha256": "ef8283892f9c913ab17b0e242152fc99fe1ac2adbfab5adb4b0c4be338d8a411",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E030",
+      "family": "representative",
+      "source_path": "sources/E030.txt",
+      "source_sha256": "b9502882c2a06991f1f1b4d69263271c8edfabd45d38c66e2acd3b000f773ad2",
+      "normalized_output_sha256": "2fd6154d4cbea54b49185d748297d98c146ded5ee406d92059c9a68f292c21a0",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E031",
+      "family": "missing_date",
+      "source_path": "sources/E031.txt",
+      "source_sha256": "9b6cf167bc04829b14ec1f32c63d34cebc402ea55a88e48ac52d174eebb5518a",
+      "normalized_output_sha256": "57a56e0ba81403dd076534e85060e9d90bc3e979d1a9eef262bd97600453a0b2",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E032",
+      "family": "missing_date",
+      "source_path": "sources/E032.txt",
+      "source_sha256": "9631aeccb001b646289781ea855218833e2a2857eea3fa8ef8178f45f7d8b877",
+      "normalized_output_sha256": "7636b9aaaa41ff72b78d5ee7cef8b526f52442bca4092815c711ca4a1c647556",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E033",
+      "family": "missing_date",
+      "source_path": "sources/E033.txt",
+      "source_sha256": "cf1a8fb7fbbd7e4a07cb60b72b3c36ceab68d913246bfd2548c67ab00a165d52",
+      "normalized_output_sha256": "56754d93ae32420d5e86e58efb13d692e52df4444235f125107633f7c4482586",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E034",
+      "family": "missing_date",
+      "source_path": "sources/E034.txt",
+      "source_sha256": "8cb3f682f99ac24a7c4ccd77a1b446f86de2ee5df74ba784d9d35a88c02737fa",
+      "normalized_output_sha256": "2290d73b624272e67acca53b8d303f609b3b14f05cecd8d119ad20bd5f233674",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E035",
+      "family": "missing_date",
+      "source_path": "sources/E035.txt",
+      "source_sha256": "f0ddd90e7c37ecc4762c04eea0918bf6cfaf8d12763b4b185eeb47795e8e1033",
+      "normalized_output_sha256": "17bf24b6d63dec8fd50968ae0a9bcc1acac607f6ce48bfaf3ec22bc9b7b4b0fd",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E036",
+      "family": "missing_currency",
+      "source_path": "sources/E036.txt",
+      "source_sha256": "fa274ef249595274ac1b52421d8daab57003a4f6638fc19edaea4a27b41d2cd7",
+      "normalized_output_sha256": "b0d00f7563e3fb49cb27109fbd15517343b70a74492b95f5b532d1f625a3c88c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E037",
+      "family": "missing_currency",
+      "source_path": "sources/E037.txt",
+      "source_sha256": "c6e13da05c1b49af0a9bfe386a6355a6b18c04ee943b5832c9b25ead5c5910aa",
+      "normalized_output_sha256": "21c6ee5402e125fd932d70bac73ce6ae1e7d687a3786721966c1b415b7433a57",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E038",
+      "family": "missing_currency",
+      "source_path": "sources/E038.txt",
+      "source_sha256": "ac130f222e08967cc40e8bdddb6a7d9388315c951b7d500baed2bf49ec5838bb",
+      "normalized_output_sha256": "59a83503671ec011c5a73fc0e98dde163dfff1d4da13a3bcd724a3cd9c1631be",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E039",
+      "family": "missing_currency",
+      "source_path": "sources/E039.txt",
+      "source_sha256": "6d22f7cb719633be93378ad335cd2353d843907317170884d41ff54d695eb07d",
+      "normalized_output_sha256": "9627ff98472ae86c02d124ac4d12f35538bf4b88c497b47144633ac5dca07c8f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E040",
+      "family": "missing_currency",
+      "source_path": "sources/E040.txt",
+      "source_sha256": "26144733de9386e1269764ccd437fd8dca6cd47e97ecc3501af3f053df084721",
+      "normalized_output_sha256": "e79fcec3fdadbfa56160d4fca63fd491faf5b124d80ab246f602cc49aaa8ce5a",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E041",
+      "family": "approximate",
+      "source_path": "sources/E041.txt",
+      "source_sha256": "2d10ff952e5c6e11d353b87dc6ca93e9e22fa51e58b07adb585b27ee6e2d7611",
+      "normalized_output_sha256": "59f4f5362a92ebe4c0c2eb80c1cd2961a3a2423fb871bdc082791e055d904774",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E042",
+      "family": "approximate",
+      "source_path": "sources/E042.txt",
+      "source_sha256": "6b31b45b76e17ae485bb09b7b56a09582ba21c0fb0e14361457691ffac064a7e",
+      "normalized_output_sha256": "acb0acb0fb364d2657811d296fc5761eb083deaddc186630b21697a255df0a43",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E043",
+      "family": "approximate",
+      "source_path": "sources/E043.txt",
+      "source_sha256": "b62db835506e03704f6d7538c7d2562afdd51918913945edee22827f1285015f",
+      "normalized_output_sha256": "efa264f6215b04e5fc8ed33c59abf3967dc672d57466087880e8cdec48bb70f3",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E044",
+      "family": "approximate",
+      "source_path": "sources/E044.txt",
+      "source_sha256": "f36f70699c16f40019b47718f7c2d4fc361d561ed494337a4b7b10069f615959",
+      "normalized_output_sha256": "27287167b345d49c7687a55de5275f687d2e5b67a7b907a61654db6339b2bc94",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E045",
+      "family": "approximate",
+      "source_path": "sources/E045.txt",
+      "source_sha256": "2802db69b17ed77eae94234774802b5e440b4a4d6bcdd765e0536021dc92e709",
+      "normalized_output_sha256": "79b5117c32f39aa07c27a5884d150bf51c3808fa85f295cc72abfe68160c7b2c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E046",
+      "family": "zero",
+      "source_path": "sources/E046.txt",
+      "source_sha256": "c34416f79eb71394dc752ff77dcf63b4d7f7902a8d9e3920de9a1d32015c9d53",
+      "normalized_output_sha256": "c4c1db31f42b482d642e2ec79c7b108616f0ead5b865a1f3ead9b9ef0d8055ae",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E047",
+      "family": "zero",
+      "source_path": "sources/E047.txt",
+      "source_sha256": "238ad5108e59dc4aeb8e792eaa9daa10e63624a9f45b384eb600da1b6920f645",
+      "normalized_output_sha256": "e1708276ed51a05de85fddf7c2b71b24b4c7c1d81fb031211144fd4bc094cced",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E048",
+      "family": "zero",
+      "source_path": "sources/E048.txt",
+      "source_sha256": "fea3c0ae5d147fec46586e677e1aca770b940f5b7b16b8d696c604b41fac49f5",
+      "normalized_output_sha256": "81ad00b117902da39583f5143fec3c845e9c75b0d05f140444f3b568a4f30a26",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E049",
+      "family": "zero",
+      "source_path": "sources/E049.txt",
+      "source_sha256": "785f92196440ece0fccb82131e97c62a9d1bdd2a4d9d21022a5a7e506ce83734",
+      "normalized_output_sha256": "20816985d25376e2de1575463e2b3009734efb935ccc35c50954120eb2be17e1",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E050",
+      "family": "zero",
+      "source_path": "sources/E050.txt",
+      "source_sha256": "e9599047fcfa8572d2a9519da48fef97350a25375cf74b0f0bc310c95b5758d9",
+      "normalized_output_sha256": "8758887184dde6f2d4d512b99988dfee0119d82bd0649a35d4e60ad9fe3f4ec9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E051",
+      "family": "components_without_total",
+      "source_path": "sources/E051.txt",
+      "source_sha256": "4a33b73daf6dba27797050fc7e9be4ba268b631884c3d319240ea56607876eac",
+      "normalized_output_sha256": "4aef5465657f55b36eb542261831eb373a064a65caab944fb297b2aee0589d40",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E052",
+      "family": "components_without_total",
+      "source_path": "sources/E052.txt",
+      "source_sha256": "b10517ae03dd4378a10611f59ed05c665bd0d4f3bf771993d8d59c49d6807f27",
+      "normalized_output_sha256": "11d1e9772e8ba185ea8496363b89405cea1154aadc19a5411a963c59ec7cc5d4",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E053",
+      "family": "components_without_total",
+      "source_path": "sources/E053.txt",
+      "source_sha256": "6b4f63d10fd2c5fcc6de1bd8ab918d85fe1082a32b801e557262a781e49466df",
+      "normalized_output_sha256": "fe95718adf87dc5c6d4f23a23990477a47420d0faaa22b327804a0fa08b67f45",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E054",
+      "family": "components_without_total",
+      "source_path": "sources/E054.txt",
+      "source_sha256": "1902bc844508dcff3271bda754b706743b4537839b42184821bc9394b1fb31d0",
+      "normalized_output_sha256": "259948b10b78cf6c7f7de2f5b07afbd565ece3f45a3e7696896f87cd5255d7d3",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E055",
+      "family": "components_without_total",
+      "source_path": "sources/E055.txt",
+      "source_sha256": "07b9581566ce5baf3d15e956b0cf38f2f6dd8bc59ea3f5d204af04c15405ba27",
+      "normalized_output_sha256": "b374fca1e6d23efe936c1484a26e7947f63227e2810c39e15f6e01e5089f481f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E056",
+      "family": "due_date_is_not_balance",
+      "source_path": "sources/E056.txt",
+      "source_sha256": "0ea25e8ace62b9799c4f125d5a890e91155a12055d35bae8d21589a84ea1cb72",
+      "normalized_output_sha256": "ac710478720d9ba3388cc951987eabc944466e197fab289254bfd4b26122dd21",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E057",
+      "family": "due_date_is_not_balance",
+      "source_path": "sources/E057.txt",
+      "source_sha256": "3b912a5f90fa5e6734889a3564980dfd39ed403de6d2a0cc2469d68254058da9",
+      "normalized_output_sha256": "3cb27dfcc1b79c14277be55065672db367009980cc23c8030f4503eb74ef4999",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E058",
+      "family": "due_date_is_not_balance",
+      "source_path": "sources/E058.txt",
+      "source_sha256": "360f04aed7fa02feb32815344680a6d3d8c4bc773a540aa7d42fcda845b318bd",
+      "normalized_output_sha256": "4570257a08d6f80ec8628dbf6d0b9fab3625475e9bf3be7e43dc96b22126074b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E059",
+      "family": "due_date_is_not_balance",
+      "source_path": "sources/E059.txt",
+      "source_sha256": "ebc44ba7b53de5966992cc4c2ac3f5d5443062ef2ce70f86beebf887f13dfd99",
+      "normalized_output_sha256": "c5982aed4a35352abad4a8620d4e3244c1348e31b18b1db9627a2a5ab2464fb2",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E060",
+      "family": "due_date_is_not_balance",
+      "source_path": "sources/E060.txt",
+      "source_sha256": "45aa18434ca2cfbd354b029d6ac40af618d51f41bff3aa5207f9ae9d125efb74",
+      "normalized_output_sha256": "c147b27dbcf69d616f86250e71d4760c41ed588836bf4b8756d190a4bab0a909",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E061",
+      "family": "instruction_attack",
+      "source_path": "sources/E061.txt",
+      "source_sha256": "2306db45b6c846cbabf1b2382a737a77b5cca477b79b9f18286845bea7757540",
+      "normalized_output_sha256": "a2a061af5c8aa1addca31b5382cdc70fe3d80ff8ff3a0cd2de59b6e088edd012",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E062",
+      "family": "instruction_attack",
+      "source_path": "sources/E062.txt",
+      "source_sha256": "12fd4ebb1c4063e46b1aceed7043aa77f4435e610c1c47799e92e9e1223c75a3",
+      "normalized_output_sha256": "7f9951159a6d438c49b2c09b9ad5223b9d4181366d988aa468dce8ac5229cdc9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E063",
+      "family": "instruction_attack",
+      "source_path": "sources/E063.txt",
+      "source_sha256": "db32785143669da87e83ec6fe2a22c146cccd307236dcf3b82ec2d98e6e502dd",
+      "normalized_output_sha256": "43c5069ff96afb711d2f71376cf83ce729ea7dfdcf274e2ee806269ced6dcd17",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E064",
+      "family": "instruction_attack",
+      "source_path": "sources/E064.txt",
+      "source_sha256": "16bf3043d42cf35d6264e2d69d4ddcceb8ff2dc2f352833f6f4dc9a7186272c8",
+      "normalized_output_sha256": "e9e0c67d100e43dc809eeab23d97099063b70da759fac4ce5af51d6f233d504e",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E065",
+      "family": "instruction_attack",
+      "source_path": "sources/E065.txt",
+      "source_sha256": "4f10afa1170f6e480b5816749141849b91e2b0ec641c8e091859a67a489632c6",
+      "normalized_output_sha256": "e14786983ce066db84a7763b22f11936d1f225ad3b952fdb5785c9bd93c24c23",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E066",
+      "family": "unreadable_digits",
+      "source_path": "sources/E066.txt",
+      "source_sha256": "ac6f806fea939386ffe818105edc0b03edb4a322c0749857e08ecf37894e7bf1",
+      "normalized_output_sha256": "a9cc4bf661336ec86683667508ce8a294bcaa3a47d4dc6cca35e246e82bdad48",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E067",
+      "family": "unreadable_digits",
+      "source_path": "sources/E067.txt",
+      "source_sha256": "f8020e5612f678ab1dbfffae34c07358a31cf081f4d845441811c057ff95eb9b",
+      "normalized_output_sha256": "b235f96095f7430e5eb0b1cc31af9b7cd854e516eee9d6321e6d7c9b0cbd6390",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E068",
+      "family": "unreadable_digits",
+      "source_path": "sources/E068.txt",
+      "source_sha256": "ce22d127cea4c0ed71697afdcc7bf47bd34e1205da104a1e59869a39bd6cdf76",
+      "normalized_output_sha256": "4a80d491a6c2777524c9b18b7f56804d82fc46385e6b4f36be81ee0ee9029929",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E069",
+      "family": "unreadable_digits",
+      "source_path": "sources/E069.txt",
+      "source_sha256": "4ff12ef019529de73f09ab8183ec23336e9b946b2792a67ba136b3ff4cda679d",
+      "normalized_output_sha256": "98c4beee13925981bd26a7e537f57a6e2e8bdb30f2958a99f620f9116465a51c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E070",
+      "family": "unreadable_digits",
+      "source_path": "sources/E070.txt",
+      "source_sha256": "a02c2a6c8d8971e0e75145bf3697ef6ade95cc6a3410f0f96ccfa9fcd36cba31",
+      "normalized_output_sha256": "856c69c22aba51cf76c42507dff707b17f1c3d48506bad086070ee41f25a2922",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E071",
+      "family": "conflicting_totals",
+      "source_path": "sources/E071.txt",
+      "source_sha256": "eb20756833293650b668da244fb15a5e9108a56cbc534565294214a9cd27027b",
+      "normalized_output_sha256": "3d58dd85c17ccc4764381452720f17d0e16702fa85f6ca4aabdeddeaa4c8ada4",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E072",
+      "family": "conflicting_totals",
+      "source_path": "sources/E072.txt",
+      "source_sha256": "69ef6d490a8869d2e6cb69b10b3c6bc8908f2e7bc49afa3891de6a9efbc6bb34",
+      "normalized_output_sha256": "ebd5625096b1d8fa9ab7831702322d8b3ed766b6145b89b380b02be4af73a572",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E073",
+      "family": "conflicting_totals",
+      "source_path": "sources/E073.txt",
+      "source_sha256": "926db76d1b17d41c614d5574044b51a4fc8df4ab62755e03d9ff1d1444ada572",
+      "normalized_output_sha256": "f1aa1cd352264741c98115dfc344e2501af18efd08dd76b719882017fa115b55",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E074",
+      "family": "conflicting_totals",
+      "source_path": "sources/E074.txt",
+      "source_sha256": "f807d4c48d3e5089d25c8bca78215c65dc9ffb90ab962914544d8feca903e00f",
+      "normalized_output_sha256": "41a7d92c55195af771e49065317811fa4bb1c35ef42ff091e93682208b49868a",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E075",
+      "family": "conflicting_totals",
+      "source_path": "sources/E075.txt",
+      "source_sha256": "63be9c2a4b61d7ee2f6638d8723aa644a0bcd3c512154acc395210176bc29ed7",
+      "normalized_output_sha256": "cdcf1b952afb39b709d2050ba9b99721a3806bc15ca70035fb4631b2b6e98ad8",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E076",
+      "family": "tabular_balance",
+      "source_path": "sources/E076.txt",
+      "source_sha256": "b0b5f67b056eb662166718ba5ddf4b793017ac72b41b3ee30dec9226d1e72e80",
+      "normalized_output_sha256": "3f7fc5b653fbc70ba0dc565271a70243578b5902c1ef43ceba769fdcf793d6d2",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E077",
+      "family": "tabular_balance",
+      "source_path": "sources/E077.txt",
+      "source_sha256": "35e4695b2822e958a06d99e90b9e0e609ddc6fd6eac258f637bb98f2d24f86e4",
+      "normalized_output_sha256": "42a066da498d7ec682fe98ddae7d9005a567c7d012a60d18548af13b66058264",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E078",
+      "family": "tabular_balance",
+      "source_path": "sources/E078.txt",
+      "source_sha256": "cb5c669e9c6ed095cfe3d259427b01b8b0f5d1b482fa0ff8f6eb65cab2e20b04",
+      "normalized_output_sha256": "245d4d119494767658e9d6b1786a34a4a11e5d0a6b2b65c7b17a50197b1f55b0",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E079",
+      "family": "tabular_balance",
+      "source_path": "sources/E079.txt",
+      "source_sha256": "9020b18b05c9279568cd7f8f6bf8c816dfaa77c54daf7cf2bd668087a4323cf3",
+      "normalized_output_sha256": "32da8913422e8b5ee562a7095368cdbfa9202dd56175a2352cb6135ac8a1aaa7",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E080",
+      "family": "tabular_balance",
+      "source_path": "sources/E080.txt",
+      "source_sha256": "93442495b034530746a6ec8b7c631f5f8c03e4731251a80b3d6fc1445bae338a",
+      "normalized_output_sha256": "856e0179a7747ad76c95fd6cd719e08e4c465bfa93c7f2267290e774370d4132",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E081",
+      "family": "nbsp_money",
+      "source_path": "sources/E081.txt",
+      "source_sha256": "01b966f3715281a688ab7ae3a1e22b791a73dc2dc59ef039b610dd9a7a327dec",
+      "normalized_output_sha256": "bc61b286ac8993cea6c9afa181e662da54c23c1d08a2888022f423eceabb3cc6",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E082",
+      "family": "nbsp_money",
+      "source_path": "sources/E082.txt",
+      "source_sha256": "fe1c5db438758ac2d211b0417780d8083a656bab8f1a657b3ee1b52093bca6ff",
+      "normalized_output_sha256": "a510ba76549637e86e26641407d5f673d685ccc26c54303b04ad9ea1fb31eaac",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E083",
+      "family": "nbsp_money",
+      "source_path": "sources/E083.txt",
+      "source_sha256": "1273e6b1039220a4a4fe5af704163e8efd4f2afbf9a594bd28a08060e53c9481",
+      "normalized_output_sha256": "3795513a124b0f569ddf9da236e7bffd65a64e8facd6e760488dbf3a257752dc",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E084",
+      "family": "nbsp_money",
+      "source_path": "sources/E084.txt",
+      "source_sha256": "627a35a9d4023d98d18795816f00403aa639fa72da819e87d47eafa04ef5b536",
+      "normalized_output_sha256": "7eabd78ed7c2692259b07fee725c4165a531ae142ec8873f239198a09ac61dbb",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E085",
+      "family": "nbsp_money",
+      "source_path": "sources/E085.txt",
+      "source_sha256": "53c706f3ab13073a5f50c8dc0db0a5ae9bf3bd916ec1a0c7c7f51b01f6887b90",
+      "normalized_output_sha256": "d731c5cd11d8830f140713df61b60883bb953c55f584630f0289e1029497b062",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E086",
+      "family": "payment_is_not_balance",
+      "source_path": "sources/E086.txt",
+      "source_sha256": "f68ccd2ed1bfd14540fbc29f9418ec655eebff6ba100cb5eddb9e440ede37019",
+      "normalized_output_sha256": "0a1af30f145c3457432c2373f3c36d5bdc1724319e37e995cef2a895ba1f332a",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E087",
+      "family": "payment_is_not_balance",
+      "source_path": "sources/E087.txt",
+      "source_sha256": "31238af4c5ea54ea8b2727683212ad4f8c87f7a000565ac28b2e25c10bf28cbf",
+      "normalized_output_sha256": "f0499650af3c343aad47907daf10979f652f6fdd51ff21658fd0942afaeb4b6f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E088",
+      "family": "payment_is_not_balance",
+      "source_path": "sources/E088.txt",
+      "source_sha256": "b4f9279aafc73767a1216ac3a70be584a275bda600aac1c596609dd2a9acf83a",
+      "normalized_output_sha256": "314f778e415818ae037738cf13e472b53cbb1cf4c5cef48df4350aad0fad30b0",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E089",
+      "family": "payment_is_not_balance",
+      "source_path": "sources/E089.txt",
+      "source_sha256": "d17d9a3337eb9728b9c024faca0fae12f212894dda4a00bcf93d1381442ac13d",
+      "normalized_output_sha256": "9be7325e09ae97d0af09eea66812896f0d29ee0856600de109832abcf243f4b8",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E090",
+      "family": "payment_is_not_balance",
+      "source_path": "sources/E090.txt",
+      "source_sha256": "b726269efecbb58fd6f72dfa6e3ffe7cbb57bbd718a97f676e6f86a034f124bb",
+      "normalized_output_sha256": "bb379ea6da724af80b614ef5215ecee9a38943c82cd2a88b79129e6fb7f863dd",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E091",
+      "family": "explicit_security",
+      "source_path": "sources/E091.txt",
+      "source_sha256": "b927a89d1fea3c285a11e5abdadf9bf115984b3a0b5b470ea4cca44c010d8f97",
+      "normalized_output_sha256": "647278a962063bfcee7d97ef3fa46bc0dcd3c1573d9d49c7485fe6a278afc3a9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E092",
+      "family": "explicit_security",
+      "source_path": "sources/E092.txt",
+      "source_sha256": "4df8b099ed8af8295e373927b13bfee1be62252a705980aae0b64485467ff4e9",
+      "normalized_output_sha256": "6b08edde14e50c64a65e12c48b58584184c1eabdd5379e2e848a5453fe6fdc44",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E093",
+      "family": "explicit_security",
+      "source_path": "sources/E093.txt",
+      "source_sha256": "5b1e4980f061e4fd8557e8040cd7b6fef09262f2db8cff1d9a99dbaecb6b85ec",
+      "normalized_output_sha256": "d7b39c5e60955f4670007eb623c8fc476dfe07019fbebec5751cd494b731d3eb",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E094",
+      "family": "explicit_security",
+      "source_path": "sources/E094.txt",
+      "source_sha256": "b0d8d369612a82b3c43bad6ff4ded5b7e72326945567c6f40fb798e6816fc44d",
+      "normalized_output_sha256": "6cc595b743bf409c678b889277dd12b8377067fab9cb36069743b527f9717882",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E095",
+      "family": "explicit_security",
+      "source_path": "sources/E095.txt",
+      "source_sha256": "9943928e1720ec72ade66b32f70c672bbe57244814e79923a00f31cb8ba25b19",
+      "normalized_output_sha256": "3e65a7f990970090cbec7a1541184cb472f1bac7ef4448b7745a0cd913802eaf",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E096",
+      "family": "no_original_creditor",
+      "source_path": "sources/E096.txt",
+      "source_sha256": "d0e25f2b65887f524be04f49a84159e51e24994c8c9a5773e9bb41a08d42dcc1",
+      "normalized_output_sha256": "08e94b58eee071aa0e1a2b2094e10bd2be1984ff8bc1a668043807f4fbbc39f3",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E097",
+      "family": "no_original_creditor",
+      "source_path": "sources/E097.txt",
+      "source_sha256": "2bcd2e8c0e051a7bea6c6a0d8d2de2d77108906ed19d6408c953fa0954a1e812",
+      "normalized_output_sha256": "9167846f9b873a1c72fe42317c86f567bc42c94f4114b44d45e3cd2be4c3edcf",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E098",
+      "family": "no_original_creditor",
+      "source_path": "sources/E098.txt",
+      "source_sha256": "0c55b4150e463bf2e7ceb290e6bf4921709a7df1e4586e49a69d7eecf313e18e",
+      "normalized_output_sha256": "98a7efb96f0a208670c47b947efc80bc46e5b746ea0dbc85a7f8a06892c769fd",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E099",
+      "family": "no_original_creditor",
+      "source_path": "sources/E099.txt",
+      "source_sha256": "e5a3050f77d61044e7a0e848a090fa1a2bc81a593b37580672fd5a20dc3ade57",
+      "normalized_output_sha256": "044651194819aeb5aa9ee66d4fd526c1c910108f2075d1b9d97ec2df849a4ef0",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E100",
+      "family": "no_original_creditor",
+      "source_path": "sources/E100.txt",
+      "source_sha256": "bb00b382bb48364fc49289980219e03f7ce3f8d98b4e2734ecae9dd169932c28",
+      "normalized_output_sha256": "6eac22584d3a3fc9836b7c1791d4443205caeb70c0c25cf15271ba71caad7109",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E101",
+      "family": "invoice_remaining",
+      "source_path": "sources/E101.txt",
+      "source_sha256": "39c1aeb7b018454c3cfe1320040e2bce859b2b182400177579930535e2a3d9c7",
+      "normalized_output_sha256": "16ebb82d2a45d2749723832614e0de6882a140bfedc3f2428496e36bbb8db748",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E102",
+      "family": "invoice_remaining",
+      "source_path": "sources/E102.txt",
+      "source_sha256": "926bd1955882831fdd5e609aded983348dc177c94b995ba44330b296b3240c89",
+      "normalized_output_sha256": "1885237ee102d9d1584bbef5e3728a8b785511ef5f8d2d52908380cde1aecdb1",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E103",
+      "family": "invoice_remaining",
+      "source_path": "sources/E103.txt",
+      "source_sha256": "6f9a2f567fa063a0f73c6aababc1c938b2c2e401bb5fda2a8970d7e8e7ddb42e",
+      "normalized_output_sha256": "608fa6e89dbce22cb9f07be2d434d718105758139edc67a48f9bf94ee60514ef",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E104",
+      "family": "invoice_remaining",
+      "source_path": "sources/E104.txt",
+      "source_sha256": "d934b3559f47decf98b6cb1b0468f92e5417c1036ed3f19bc7e250611e40551b",
+      "normalized_output_sha256": "f695d8c28af906057b301eacc4ab5b603d18a58dd72f94e978c4a7ae982f6ff4",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E105",
+      "family": "invoice_remaining",
+      "source_path": "sources/E105.txt",
+      "source_sha256": "5363dbde6e51c69c79fcd6b293e209f4e09561b5c1c0a3f96d4962a8c56cae9f",
+      "normalized_output_sha256": "9938749912a6d605aac4bf202011080dda87a272ba0007ab812929a78d36962d",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E106",
+      "family": "interest_only_dispute",
+      "source_path": "sources/E106.txt",
+      "source_sha256": "fceb9493fd405732a4193d7b68657e3310c1347595277f5e5d972ce3ab9c8fef",
+      "normalized_output_sha256": "c0278160e4431f9ee26fbc99ac6f74c89bec76f4797fdbee4b597ffc29bd3786",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E107",
+      "family": "interest_only_dispute",
+      "source_path": "sources/E107.txt",
+      "source_sha256": "d52a517b7901381cb122d7de6d48271fd3d1b0da3b57a148048915d41a973b8b",
+      "normalized_output_sha256": "acda6889e8edeef2070347f14d48bb73658eeb2cac37244464f242b41f7d8a63",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E108",
+      "family": "interest_only_dispute",
+      "source_path": "sources/E108.txt",
+      "source_sha256": "18b71e9509a6518d325bfed0653347a2b14062098c8d7c3a5012bd1bfc27a78a",
+      "normalized_output_sha256": "f462053d8ac43288ab29296cb4b155516765cfa586a1187ab9536de00b6b7727",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E109",
+      "family": "interest_only_dispute",
+      "source_path": "sources/E109.txt",
+      "source_sha256": "9a22f82690903f266de7c13de8a1def43dd56ea478d833c1bd166789d2444cab",
+      "normalized_output_sha256": "3a4e716650e1de407775f2debc848a5b7fa498d6ffb893b1583bc3b1a98f26f3",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E110",
+      "family": "interest_only_dispute",
+      "source_path": "sources/E110.txt",
+      "source_sha256": "a4321811f50063f6781bb5d290503c0f852c6108e8da617ee09a8432b403787a",
+      "normalized_output_sha256": "b90553c193f1f6655ce13e4f2e85b09931f8df0254e9d88889a8599a7a328a13",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E111",
+      "family": "negated_assignment",
+      "source_path": "sources/E111.txt",
+      "source_sha256": "77f6b239c509f98221e03004966a1b922cee5fcb25a518c5cd534bc34a130ea2",
+      "normalized_output_sha256": "1df214af0fa556e029330882e94f4e5980d7fa764f1b76e36983de43435ec795",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E112",
+      "family": "negated_assignment",
+      "source_path": "sources/E112.txt",
+      "source_sha256": "976163de14a3ffdc7c8ada620940081f02fdc2d722a06071bb58bb6ecb61f821",
+      "normalized_output_sha256": "f645520a58e1037de2f22527b845288e7de91f2d7918166f2d654c85c78b490c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E113",
+      "family": "negated_assignment",
+      "source_path": "sources/E113.txt",
+      "source_sha256": "e58f8565091458c6f3a1124ab4ac770bf2da9eb90fe1e17e30494fd32c7cf70a",
+      "normalized_output_sha256": "d96e01d54704ce0d9a70159222147b9a01d1edd12c4428c1f87aa32939c5c0a0",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E114",
+      "family": "negated_assignment",
+      "source_path": "sources/E114.txt",
+      "source_sha256": "5708113f340e7efab54b45a69ddcef3d4157d7643c3eb561cd878eee83d1f5e5",
+      "normalized_output_sha256": "596345edf3199f1dfb10baee9ed2446782909f43c8d4f92224c1fdda5389f0f7",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E115",
+      "family": "negated_assignment",
+      "source_path": "sources/E115.txt",
+      "source_sha256": "0e1af6ee50f43ae163c12c940c98cf79ea7fef6cf90841466eae11dd23e5fef2",
+      "normalized_output_sha256": "013b71b2e6abb69d8fcdd02416c1249378bee0968957ba34c3397b5468647f7c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E116",
+      "family": "unknown_position",
+      "source_path": "sources/E116.txt",
+      "source_sha256": "ef12d1641653651cd5e9137ff522103d7464fea266f425d2424a646cdb394244",
+      "normalized_output_sha256": "0596e2961df08419628c7723765d2304e30ae4532417b2f3af9bad6d6f6d3712",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E117",
+      "family": "unknown_position",
+      "source_path": "sources/E117.txt",
+      "source_sha256": "a140d54e06ab6a2d425eada41bf32b360f9153a6e9261eb108ffaa4d1ba7836e",
+      "normalized_output_sha256": "f318037ba897341ec733221481b2ba0f67c9f638adf9b52078f75bdf71043c28",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E118",
+      "family": "unknown_position",
+      "source_path": "sources/E118.txt",
+      "source_sha256": "be0bc67a3a7e224cad204eda1d2cd6683fb3a92ba9eacdffb9afbbe3acdec062",
+      "normalized_output_sha256": "842f0714ee09810cd6cde0306c611fd0d8f8569d89f886c61fb3e7cfef1367fd",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E119",
+      "family": "unknown_position",
+      "source_path": "sources/E119.txt",
+      "source_sha256": "a2f238559db6ba56ee741f6a271881a772900cb350ae7840724ec5a00fcc8d34",
+      "normalized_output_sha256": "b834f4dcad7b818497c549901cfda70dfc8164a913b1ed0ae8786a4d4caea6ab",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E120",
+      "family": "unknown_position",
+      "source_path": "sources/E120.txt",
+      "source_sha256": "3323b907297c50720e4108c68b8dc2cc8b3b03a4005d3051b51a1907ac5a8865",
+      "normalized_output_sha256": "d5b5e0c946cf1ccb163a9fdd5056578dc7426d3dc164f7fad0443e48eae20e8b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E121",
+      "family": "cession_chain",
+      "source_path": "sources/E121.txt",
+      "source_sha256": "8c68d8beae6979e73da209834ca5c93051c6c24b992a73854e280e067cc849f9",
+      "normalized_output_sha256": "e781df6f6f740fa1a9594f2d2e68da7fc799113f182b3782afe5389edf192a0b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E122",
+      "family": "cession_chain",
+      "source_path": "sources/E122.txt",
+      "source_sha256": "c2b78f7d7a3215e4711725f82f03feb441f45333476611e254de93b56d82ff12",
+      "normalized_output_sha256": "e05b1713a7397be8fc8173059a298ea7da84ed064703f85d9516985e47558c0b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E123",
+      "family": "cession_chain",
+      "source_path": "sources/E123.txt",
+      "source_sha256": "a8501e51ddde888e364edfba1ba181214d26d994f79c021101d968f71e942708",
+      "normalized_output_sha256": "e77b6084fd887e133d3114ed30290b402688066bd96746087958ef9b655febca",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E124",
+      "family": "cession_chain",
+      "source_path": "sources/E124.txt",
+      "source_sha256": "e83f78b454c9166ec568921e0240bd38c31c2a06fe80c46affd5538ee0915b15",
+      "normalized_output_sha256": "3b955e3b373c57fd560ea4d001d17a9de7a405d5023af1cecb964094a92fcb54",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E125",
+      "family": "cession_chain",
+      "source_path": "sources/E125.txt",
+      "source_sha256": "5e6106ef56f197e297c72b43af625f5dd8e3573d17083fdcfcbd0b9389fff3ca",
+      "normalized_output_sha256": "8b209dc53dc55da36f9664c32765c3d268c1d52c5f31237f24c448802a2b32b3",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E126",
+      "family": "collection_agency",
+      "source_path": "sources/E126.txt",
+      "source_sha256": "b436ae1c5132abb15198b17483de8292395f5c7a0f46e29a96a13bc448ce00a3",
+      "normalized_output_sha256": "53fdce3b6528e16181af0b9fcdad3412f19323e7aba3870a9e6118b28643b76e",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E127",
+      "family": "collection_agency",
+      "source_path": "sources/E127.txt",
+      "source_sha256": "5dd2c516962b335e3b9cc3fc827693375b5aa60cc5786045f34dc915b729230c",
+      "normalized_output_sha256": "e052e2d11e7972619142166c964805a1bd8c2c30f3fb3dff2743b4452f947abe",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E128",
+      "family": "collection_agency",
+      "source_path": "sources/E128.txt",
+      "source_sha256": "4e825fc19bb821e51aa513526d656a04c380f2f3b4494680be9c8c83cfc896b5",
+      "normalized_output_sha256": "4eee32b1587039bffaa510e18785fceca0a20f55efa793b70fe591ded58e30a2",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E129",
+      "family": "collection_agency",
+      "source_path": "sources/E129.txt",
+      "source_sha256": "c0be0a58f1818e882a7b939bc68fe0c8120de98dc40446157f886c91440ceb41",
+      "normalized_output_sha256": "ef8c020287246dbaf43665df5b62b5072040077f777f4bf53a47e61dbaa8703f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E130",
+      "family": "collection_agency",
+      "source_path": "sources/E130.txt",
+      "source_sha256": "f5cee1bd5be34214b168e3e837a91694fac79bc1b2bef1805515e0490dc68462",
+      "normalized_output_sha256": "04805af962a7f6c6be1c2ff953dda5e33ba69d2085cea50567cb6e0266121dcb",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E131",
+      "family": "three_dates",
+      "source_path": "sources/E131.txt",
+      "source_sha256": "7b2a94969b8ba0a30359f84b5726fb8f5b98fcd21537b19029e264ff1c64cc3a",
+      "normalized_output_sha256": "dfe40084c24c13cb7815995742e82a3c5f3a869dbc27eac15430943744980e90",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E132",
+      "family": "three_dates",
+      "source_path": "sources/E132.txt",
+      "source_sha256": "22028bf79d01b27d3104737125aa5cb656a2312b3bb33d0ee78e390509a51faa",
+      "normalized_output_sha256": "650a38983409b8b391e64485200293b30799acf3af974cefbccc220aea7a689f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E133",
+      "family": "three_dates",
+      "source_path": "sources/E133.txt",
+      "source_sha256": "98b0607d1afe021e5b4844a18a13636c1e276f1a9950d34c5a06c66d844d90df",
+      "normalized_output_sha256": "48c727a077c59d4e9e99de60c0cdca4194b0b08d86bba792b7bb936276f34c8c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E134",
+      "family": "three_dates",
+      "source_path": "sources/E134.txt",
+      "source_sha256": "bfdbb178dc59b7bf250c2320b735fea4f5e5c3a737859d7277c515188bc55cd6",
+      "normalized_output_sha256": "22c189cfc2b57b74a0dff6aff65aacfb2e530279c429ad4c288cdac83138fd22",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E135",
+      "family": "three_dates",
+      "source_path": "sources/E135.txt",
+      "source_sha256": "95c0f8b97c996dbe3a93f690176b04de124ba93115c4f29da85f3e608935a627",
+      "normalized_output_sha256": "1ea772b5e1563f757179aae833b1f4d0515c6ce317a77a30ba00b18afd674175",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E136",
+      "family": "same_due_and_balance_date",
+      "source_path": "sources/E136.txt",
+      "source_sha256": "1f1d1d510184cf4c45da649d21d94100e95baffab25604243ae4bcaf8b770889",
+      "normalized_output_sha256": "817054fb6675a578511cc3587b235771c2f282c8bfe8b8fc99e6293ce8a01c27",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E137",
+      "family": "same_due_and_balance_date",
+      "source_path": "sources/E137.txt",
+      "source_sha256": "81f16a5d640e3cdf6c2346e4408cd9625a7fc9cbb6a4bcae1100cfc39eae2ee9",
+      "normalized_output_sha256": "25c963ea871295e40417d69955e54ca4f60b792b460087fce8c7c0efad22ab77",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E138",
+      "family": "same_due_and_balance_date",
+      "source_path": "sources/E138.txt",
+      "source_sha256": "c97e59ae1145985affe8d4b341d22061586a7b7a3787f990459ad74d7028a3db",
+      "normalized_output_sha256": "c8c2e0887ead196890cee88f7fc34345ff6a0da0f0d24ec01c542052066fce8c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E139",
+      "family": "same_due_and_balance_date",
+      "source_path": "sources/E139.txt",
+      "source_sha256": "efdc49b3cd53e6557b07a9e385996c313b6ed8ec54e0075617427e7061aa38f8",
+      "normalized_output_sha256": "4145688d890e0a89cf11ba6bb8aab9d6a5fb4bf86b475d770d047b24d4fb291d",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E140",
+      "family": "same_due_and_balance_date",
+      "source_path": "sources/E140.txt",
+      "source_sha256": "91278949841afb5d36e06cf42de6e395ca2ac7f9c9d6562b8ebe8ed33a8f9b96",
+      "normalized_output_sha256": "bf805cbd3fe8bdb9690e569b4b5b6fc8e348125dd5ff391b8b205d0195cebe15",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E141",
+      "family": "foreign_currency",
+      "source_path": "sources/E141.txt",
+      "source_sha256": "dac58caab3817c95786b9a4b8bfe9a54f5bcade42a483ab956b0440f3e9c91a2",
+      "normalized_output_sha256": "b98c2e526157f9b77b2438c249b078b9236e6d796a28ea6aa354d5dc93fbba6e",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E142",
+      "family": "foreign_currency",
+      "source_path": "sources/E142.txt",
+      "source_sha256": "02e048123999bc88620415dce05b0e895d9cec47ad7a54a6e24613b11b36c6e6",
+      "normalized_output_sha256": "80f4fb8fa48e80c3b15afb5366a280dd2e17c1fc74880befb651474c1320f0ca",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E143",
+      "family": "foreign_currency",
+      "source_path": "sources/E143.txt",
+      "source_sha256": "a7cffd55ad655c558b80fcc8474a363ecd7fdbec992c05d1712e60102e4913ee",
+      "normalized_output_sha256": "c1ecee826c4dd1ea863aef83b75325b4c44396187914f958586db862ac42f934",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E144",
+      "family": "foreign_currency",
+      "source_path": "sources/E144.txt",
+      "source_sha256": "eb1c78212ca950256cc0683c423eae40b9743743b37d5433e70d6265a601d0cf",
+      "normalized_output_sha256": "89a7851aa693c55c83295b1bb83422a477193acde362f39981f8321ad7f808f6",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E145",
+      "family": "foreign_currency",
+      "source_path": "sources/E145.txt",
+      "source_sha256": "f69ee76786f4f2384a0b76a7618c223c9998e52d38f75a674faeb4e5bdef103d",
+      "normalized_output_sha256": "54ca5e1827b3b5456c2bee684ad6fbef8c12e9e00c09fa14d2f39f36eff31377",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E146",
+      "family": "negative_balance",
+      "source_path": "sources/E146.txt",
+      "source_sha256": "0f6b7fcdb2be43c761aa04ab22a6ba544c3d42133890a0a418b04704c92529cd",
+      "normalized_output_sha256": "cdadd726030dad18b2474df32f12f2c08deb9aa495cc8ac1698f623bb5f48eb9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E147",
+      "family": "negative_balance",
+      "source_path": "sources/E147.txt",
+      "source_sha256": "d3fd3cf0b9f1941e3bd45fcb1279a19b36af8f822f5c0732569343af07dfad99",
+      "normalized_output_sha256": "2ea83e23815e8af95965a49eb8edea4496787374875bde404ddfe091505ce6c0",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E148",
+      "family": "negative_balance",
+      "source_path": "sources/E148.txt",
+      "source_sha256": "d15ec7592ba18a8af435eb5b5107a939799c60e39df748ae7bdc890a0e25d9eb",
+      "normalized_output_sha256": "dab411de2ee04410c6edb0f12e54970b7fad8a4fe029b886dff3b4dfd8cbadba",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E149",
+      "family": "negative_balance",
+      "source_path": "sources/E149.txt",
+      "source_sha256": "20353f0e6aa9ca94a074637f73c135ce6f4519ff2f005c58e3e4acbd2675b2f2",
+      "normalized_output_sha256": "fea8de837516f9d2ffaf6a8565296206bd8b018295c54ad838b8cace5b0af7bf",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E150",
+      "family": "negative_balance",
+      "source_path": "sources/E150.txt",
+      "source_sha256": "85ad409be6f5596e26cbaddcacf50a5bf78e3429c9a958a62779fe4fc0f6b238",
+      "normalized_output_sha256": "7e11d42c41752b0bb1cf412cd378a6b4efac225ea3dd24b55a73986f24b6834c",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E151",
+      "family": "range_not_point",
+      "source_path": "sources/E151.txt",
+      "source_sha256": "dcc573f628b2ee252c9ea4d9378eaa36741dbb817d3d992362dc890d13100846",
+      "normalized_output_sha256": "a5fd02541cc3bd0a895060c8d43a68d97f118050ea71b72d2b6d08525426ca27",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E152",
+      "family": "range_not_point",
+      "source_path": "sources/E152.txt",
+      "source_sha256": "062ccd3146daeb958e834b5650fed0e33218d7925205c1c514394fa1b06a85e3",
+      "normalized_output_sha256": "2f72c5707d88ddcc83a930e323c0eb993999b76f63251f358777bd2005f9f8d1",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E153",
+      "family": "range_not_point",
+      "source_path": "sources/E153.txt",
+      "source_sha256": "6d90481d5ffc905db9c7d9252598a7ea8bf3243f8313aa306112c419e251dfb7",
+      "normalized_output_sha256": "0ccc533a929ebb89d6c7fb4ed372693efce69d1a4641eab12fdd213b6b399870",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E154",
+      "family": "range_not_point",
+      "source_path": "sources/E154.txt",
+      "source_sha256": "737da5cadd91194e0d6e534c9595723e498fcc92503f89f22a4e939f08bf5582",
+      "normalized_output_sha256": "926ec616b862814931a917585880fbcf0d049564c269ff1c0756d4811ca14c8e",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E155",
+      "family": "range_not_point",
+      "source_path": "sources/E155.txt",
+      "source_sha256": "8a2548a9be697eed41046699add6b999b94b31705d36bd9324292e50a137bad9",
+      "normalized_output_sha256": "72e64395f184b488bb58d02c24dd3f4a870c8ecb263f34074c7dc6fa7b805f90",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E156",
+      "family": "fee_without_total",
+      "source_path": "sources/E156.txt",
+      "source_sha256": "905f6916754274abc8101535d4f67192109709e1f1196320e34f04cefcecefba",
+      "normalized_output_sha256": "457bc16e10b38d2141288ae64e96d0ca921ec0dd0fa803951303ba5eaa8cfc07",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E157",
+      "family": "fee_without_total",
+      "source_path": "sources/E157.txt",
+      "source_sha256": "d767f8c71d0d8d7d4e45d58de819ddc463303760e9275d3716a5c96b222b71b3",
+      "normalized_output_sha256": "00bba8e92ff5cacca96cf3ef8e7919df5a8974c2e4dc818abfd350b79301aba9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E158",
+      "family": "fee_without_total",
+      "source_path": "sources/E158.txt",
+      "source_sha256": "97e9fa93507d3ef9215a46e4bc4f8b3af07b6da046daec95ce82a2d871ebf0e1",
+      "normalized_output_sha256": "4493b379d27f6b273985c1cea2eb1ceabe426df97726f2e4d8b1928be7f0725b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E159",
+      "family": "fee_without_total",
+      "source_path": "sources/E159.txt",
+      "source_sha256": "6422203e679418255ec9d39e3ed2792b2686aab5a9d6581b2e7977aeb88785bb",
+      "normalized_output_sha256": "162138fba65e65f87c6dab18175875c8aaffdb4f29acfc2d47f539d0014ff1c3",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E160",
+      "family": "fee_without_total",
+      "source_path": "sources/E160.txt",
+      "source_sha256": "8fa74a1048caa82e60033c5df5d3b86da5729c451bed3f1ebc9ec9aeead008a9",
+      "normalized_output_sha256": "99c9da980f3388ca30c72386c2cc73ef4dcb576b68b8beb3d812d443b5fc5aaf",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E161",
+      "family": "two_contracts",
+      "source_path": "sources/E161.txt",
+      "source_sha256": "084bae26c9f9159b8dcb858262c037c163d8244720918e77e6db510c2549a0e1",
+      "normalized_output_sha256": "1f03e74d29767ea3f0aedf1a36deb005288b12c12a5bfb39d8dedc63b32c2f27",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E162",
+      "family": "two_contracts",
+      "source_path": "sources/E162.txt",
+      "source_sha256": "6fa7b8fa4e6e6291200ddb2302bd112fe437592daeae18148662fc9583b82369",
+      "normalized_output_sha256": "37d0e5aab62d103b58ac1160cde5919ad3ec45fc7bad49d1a080ec90420b7ee7",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E163",
+      "family": "two_contracts",
+      "source_path": "sources/E163.txt",
+      "source_sha256": "f20ca6d47e0ca703f2a9191c2718cc786e178b40149b10ac3e82bf9dbbac4e72",
+      "normalized_output_sha256": "1cc82e441e2fdaa73b5f0f4fb85b279804bc758e74aa46b7e565a9993dd775d9",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E164",
+      "family": "two_contracts",
+      "source_path": "sources/E164.txt",
+      "source_sha256": "07083d48ba7ce1c31a4f3da13937a203dd06259ecda3ee07f489300ea1569b50",
+      "normalized_output_sha256": "5760d8425c90a873cb484a9ca65af2533142624575b05ccfa51c6f078d3c2d93",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E165",
+      "family": "two_contracts",
+      "source_path": "sources/E165.txt",
+      "source_sha256": "da4c37340ac1ec950951e09dfa98ad60649484a5569091582c08792b93a6cd6b",
+      "normalized_output_sha256": "582e2da5278563e46d2e2d44c45e49060b106adc462fa2537a8f1beb57fcb334",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E166",
+      "family": "two_currencies",
+      "source_path": "sources/E166.txt",
+      "source_sha256": "a3bd687dfd4df84214e3387ca45c73c35d5a2e47a5e7eac0d34481f9a5618445",
+      "normalized_output_sha256": "687f1498dd0da11b0ce02c282599a02a5690ef0427d19615264d5c29b050e775",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E167",
+      "family": "two_currencies",
+      "source_path": "sources/E167.txt",
+      "source_sha256": "3f52c02d0766369e95ec9d6ed2332d7640dcbee888c9469a4e465b096186aa11",
+      "normalized_output_sha256": "e2cb98170eb8c44dafe4286e73e6bef48957f4cc3679f2118269e350b11d9eeb",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E168",
+      "family": "two_currencies",
+      "source_path": "sources/E168.txt",
+      "source_sha256": "771f2ae30748dee06978125ec0c617326aa7bd42e2cc94d39d874ca177ab2193",
+      "normalized_output_sha256": "6ef02fb33fe270f4a6258a6ce255a39fbe8610f49f6cf634b371fab02ec4bb1b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E169",
+      "family": "two_currencies",
+      "source_path": "sources/E169.txt",
+      "source_sha256": "e28445cd0eb94fd2becce51f07d9e0f8f89c7abcb388fde266853c5939e61708",
+      "normalized_output_sha256": "646575add650175044f7b900bb75ef5903da16caec20bd27d00143358edc2afb",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E170",
+      "family": "two_currencies",
+      "source_path": "sources/E170.txt",
+      "source_sha256": "b17936d41a4f8752986f1f5452965848221e9393bc9b26a50966a4e1aacc135d",
+      "normalized_output_sha256": "52ea5116010d296a9aeb66617942ca184e4ad4f9a5dd398e9b01ea14c407765a",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E171",
+      "family": "historical_table",
+      "source_path": "sources/E171.txt",
+      "source_sha256": "45a6ca879629153b4bda52c8d0aec122c214bc84343eb46e85b79bce4fb01173",
+      "normalized_output_sha256": "b3a904925433b3e8a30c10afff26c96faa536fee50452ef8f8b2b73dd0be4991",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E172",
+      "family": "historical_table",
+      "source_path": "sources/E172.txt",
+      "source_sha256": "b0eb73099e57e2bc9a41c6a74801bc850f49491d5a41f65b04d883a61b9d8292",
+      "normalized_output_sha256": "f25f498de8cd5cde767aad86f49e05fc7530dd56a2ea83e3fac48e8a65880263",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E173",
+      "family": "historical_table",
+      "source_path": "sources/E173.txt",
+      "source_sha256": "d07bf77989546895b46d39ece1af059b3c99f7e8be6da8d7c88c537ab071668e",
+      "normalized_output_sha256": "8c148e41652fddcf5664108323f37f98bbcdf8dff9b20e1aa9f75a793f7ec98d",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E174",
+      "family": "historical_table",
+      "source_path": "sources/E174.txt",
+      "source_sha256": "d9bc4101e5fe82be0cb0ea9ebcdd06ab08ce60089f60ac3087cfdf2c09a3366f",
+      "normalized_output_sha256": "d5fb6331bb06f503ed00b9664366dd462c1fcd661fd29fbdd1818b7757877d2f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E175",
+      "family": "historical_table",
+      "source_path": "sources/E175.txt",
+      "source_sha256": "dcb7e0db6f4a20d8eb554046a91ae19a93bf8df090cddc16033c2718206d6d9e",
+      "normalized_output_sha256": "fd2162ab075624d9ec1072f4804ac54cca83359f20fb08bae867c9aeb54ca94b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E176",
+      "family": "explicit_correction",
+      "source_path": "sources/E176.txt",
+      "source_sha256": "a70d514503f546cde395aeed203fd656b8335389320fb161fa16367eced81918",
+      "normalized_output_sha256": "5d4b6b6605c59e85bc0d6e30b2f8878e347dab5f9d7c76956373639abcb36aa8",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E177",
+      "family": "explicit_correction",
+      "source_path": "sources/E177.txt",
+      "source_sha256": "bd80d4cb16155674ec062902ad444be6f586251f132478e932a73f550e317846",
+      "normalized_output_sha256": "6bd8dad7cddcd7e9763052f5385d58e03994e0818ec55e28c4a786c9d6d30452",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E178",
+      "family": "explicit_correction",
+      "source_path": "sources/E178.txt",
+      "source_sha256": "459fb43e1669c6a1243ef8dc07ac0c01700ef551e8372db9db1dc0bb8a0eeb91",
+      "normalized_output_sha256": "f396ca100b035035d10b2296bbb688fc0377256cb9f0f2731f33bce3dc35045b",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E179",
+      "family": "explicit_correction",
+      "source_path": "sources/E179.txt",
+      "source_sha256": "ffc80193fdb028711107281a778bb5e276a87cf9d117181b0c2703419a0dd8f8",
+      "normalized_output_sha256": "8f2b20f94267689dbb5f50198d1f00bd8fcacfac692f8cb434e92c03c679fb08",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E180",
+      "family": "explicit_correction",
+      "source_path": "sources/E180.txt",
+      "source_sha256": "7e54bf4e94fe0365663c01baefeaebbfdadbf88796780142feef27e56c526679",
+      "normalized_output_sha256": "8e3dbeaec1ce3c333ff0ed25bd0fe2300dbd4e869764dab09498552a8b55fd0a",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E181",
+      "family": "json_instruction_attack",
+      "source_path": "sources/E181.txt",
+      "source_sha256": "3763b87e3ffe5ef86dd0390f414ee1a27f77e24cff48e85689b61c37e8688131",
+      "normalized_output_sha256": "cd64620fdb64bb36a6fb0ebd0545fa71a0f72db3338245e43e7ab8a1e37ea3db",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E182",
+      "family": "json_instruction_attack",
+      "source_path": "sources/E182.txt",
+      "source_sha256": "9f9f93893f711384b320d74634f7c2bf2857a14ffcabaf03df0fbfff75cdbd4f",
+      "normalized_output_sha256": "5852bf41812923ef711130b77a90922c1ec11684940c47c6d70702e44e363f38",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E183",
+      "family": "json_instruction_attack",
+      "source_path": "sources/E183.txt",
+      "source_sha256": "03b2fc0a5342e70e004a088505a35bdb472faa84887ea97f9c86b1cb385e7535",
+      "normalized_output_sha256": "d7739d05609909ad040d6839f7c3a95dbcbdea0ec33a80ba546f669affe64012",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E184",
+      "family": "json_instruction_attack",
+      "source_path": "sources/E184.txt",
+      "source_sha256": "13bbbb7575f74d7b6d7a9f76f7cc5b59bf367dd4492ccb85798d3f275f1e8718",
+      "normalized_output_sha256": "483056296cff2cba8b8c386f13e4fef54fb53ae27beda9c5170244200925827a",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E185",
+      "family": "json_instruction_attack",
+      "source_path": "sources/E185.txt",
+      "source_sha256": "13e9f29adbda53e2231d94458578e4d13f998e784c2b282b7d3ed5df2dd2902a",
+      "normalized_output_sha256": "492639fb0aef442afcc19b9ab4974393f5b31d2389aef7a49ddc7d95735c24a6",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E186",
+      "family": "conditional_dispute",
+      "source_path": "sources/E186.txt",
+      "source_sha256": "c517f724f82889b43f7524a5ef84f0b42f9e36476305148a7059b7ebc320707b",
+      "normalized_output_sha256": "e3ae77430d64be88fb58af3aab40682e1ee230295f809e5959632169f92a9fad",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E187",
+      "family": "conditional_dispute",
+      "source_path": "sources/E187.txt",
+      "source_sha256": "cb54e2bbfe9822228a83dcc19dd6fc71fa748c7b3ec6e9e5615194f97277945c",
+      "normalized_output_sha256": "b1a2760db23ab0c3c5c38cd0c817798f9579d818abf6ced85da91c02f08f504f",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E188",
+      "family": "conditional_dispute",
+      "source_path": "sources/E188.txt",
+      "source_sha256": "dffdfc46e3247b3192835e0210d86e644ea6347d3dbd738e64b65df3a603df78",
+      "normalized_output_sha256": "384c31381056ba4ee605443b24b0a489d6da7e9229f216b34ec36b7baf758513",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E189",
+      "family": "conditional_dispute",
+      "source_path": "sources/E189.txt",
+      "source_sha256": "240bfcf23d9c79a2e3e27b05b1030615369eacd8ef8d2aa31062b8a1a5aeed60",
+      "normalized_output_sha256": "37f5fa3c33225cea4a86ada9cf6606f31d5e0d6ec33efccd7dbb86f26087f65d",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E190",
+      "family": "conditional_dispute",
+      "source_path": "sources/E190.txt",
+      "source_sha256": "c64d0c4e554f2d69b704826c18a4124bdddbfa5c03c4c568e645211f63aa1d69",
+      "normalized_output_sha256": "197c7aebf57a0271ea2da35300c9283f6533cacdde2728fb4822ca5b321b3c29",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E191",
+      "family": "negated_non_dispute",
+      "source_path": "sources/E191.txt",
+      "source_sha256": "a759eb2e73647f79cfd8f80d354ed79322203578634dc88e447ebea1ec581a4e",
+      "normalized_output_sha256": "1f6057cc3bf3cdcbd5760d323abbe6a4dbe9a7d92abbf58a9c9b2e32431eb110",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E192",
+      "family": "negated_non_dispute",
+      "source_path": "sources/E192.txt",
+      "source_sha256": "ef32296a33f8041b122d5eecced2117d1af3fbbdea4ec73322d524e13a2bd7d2",
+      "normalized_output_sha256": "329d2a8cc00e7f6f72b0ad579eee8b0ba92ba533958ad5c087927498680f4fc3",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E193",
+      "family": "negated_non_dispute",
+      "source_path": "sources/E193.txt",
+      "source_sha256": "78a88afb7c0a332760155d7566d179d3a4aaa22d4697ba38c3682634a98162f2",
+      "normalized_output_sha256": "f652861662fe2e6e786facc6964eae9c32db81efdac718932e08bfc5af145d6b",
+      "agent_comparison": "Explicit dispute in source; result unknown due to duplicate boolean_value keys (true/null). Manual correction required.",
+      "mismatches": [
+        {
+          "field": "disputed",
+          "correct": false,
+          "exact": false,
+          "expected": {
+            "type": "boolean",
+            "boolean_value": true
+          },
+          "actual": {
+            "type": "unknown",
+            "boolean_value": null
+          },
+          "category": "abstained"
+        }
+      ]
+    },
+    {
+      "id": "E194",
+      "family": "negated_non_dispute",
+      "source_path": "sources/E194.txt",
+      "source_sha256": "322eed951a350b7959dccc8553de2ed853a2d77b93d1643a53fcb00b9c0ee77a",
+      "normalized_output_sha256": "6b78aed1ae19600321727eda0a0908bec8572580fd19df79f2cb651c62da5c09",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E195",
+      "family": "negated_non_dispute",
+      "source_path": "sources/E195.txt",
+      "source_sha256": "bfa373e6d8f12186694a8366d5db270050603a412c69d9e1c8352be1f15c2fc8",
+      "normalized_output_sha256": "cef8db5f6ffbe7918c951ab67f55ff606b048b4a96baf957e20deaed97b09360",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E196",
+      "family": "explicit_absence_security",
+      "source_path": "sources/E196.txt",
+      "source_sha256": "10cd0eed81d0049e3754ba37c5e413c55575dec5d9d1fcaef5d900ac615007ac",
+      "normalized_output_sha256": "e37ea3ee8b098330d2a31ae3de9bf39c3a77a3bdf84d5d844b3103f673f9bcec",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E197",
+      "family": "explicit_absence_security",
+      "source_path": "sources/E197.txt",
+      "source_sha256": "7f8d228883df16555157e0b923ebf7cfb80b23b2b2230b4b899681b07b0a8234",
+      "normalized_output_sha256": "53ab4f675d6d64e49add22bd4ca4cebcfc270eb4c82d9c59614d50541ba6b456",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E198",
+      "family": "explicit_absence_security",
+      "source_path": "sources/E198.txt",
+      "source_sha256": "109346ecc2ea3727335e5644a45e1c5aa8144c87ac97b36ad4eddc7671475097",
+      "normalized_output_sha256": "ce3a004f1831b7a3eb8a1cbea600b75fba567a1692e16c6948a017c058014fa8",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E199",
+      "family": "explicit_absence_security",
+      "source_path": "sources/E199.txt",
+      "source_sha256": "250bf9f18a68add1e12528e7eff5aaedfcd18071ce9882b056b6c4ed39076924",
+      "normalized_output_sha256": "15cd6236ddbd5f149262dff15a457cf9ab272df12cdff55cd86bf37cf5d754d5",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    },
+    {
+      "id": "E200",
+      "family": "explicit_absence_security",
+      "source_path": "sources/E200.txt",
+      "source_sha256": "f805fd2acae06c7f7352085ebc549c1b2fa99003af292b59c2ec158c59b9fe63",
+      "normalized_output_sha256": "b5c038fd4300b2c6e316ca792379fbdbf194b9f37840b7192f1f4f34471efc1e",
+      "agent_comparison": "No additional unsupported known value or omission beyond the defined seven-field representation identified in comparison.",
+      "mismatches": []
+    }
+  ]
+}

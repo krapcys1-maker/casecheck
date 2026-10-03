@@ -1,0 +1,4 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Dłużnik: Firma Testowa Odbiorca. Sprzedawca i wierzyciel: Fikcyjny Wierzyciel Sosna
+Identyfikator umowy: TEST/105/2026
+Potwierdzenie rozrachunków według stanu z 16.09.2026. Całość pozostałej należności: 1,01 zł.

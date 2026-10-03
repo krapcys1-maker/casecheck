@@ -1,0 +1,4 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Dłużnik: Firma Testowa Odbiorca. Sprzedawca i wierzyciel: Fikcyjny Wierzyciel Cedr
+Identyfikator umowy: TEST/102/2026
+Potwierdzenie rozrachunków według stanu z 2026-09-13. Całość pozostałej należności: 99,99 zł.

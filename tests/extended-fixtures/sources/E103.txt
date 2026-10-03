@@ -1,0 +1,4 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Dłużnik: Firma Testowa Odbiorca. Sprzedawca i wierzyciel: Fikcyjny Wierzyciel Dąb
+Identyfikator umowy: TEST/103/2026
+Potwierdzenie rozrachunków według stanu z 14.09.2026. Całość pozostałej należności: 1000,01 zł.

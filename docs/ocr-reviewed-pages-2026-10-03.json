@@ -1,0 +1,26 @@
+{
+  "schema": "casecheck-agent-page-review-v1",
+  "date": "2026-10-03T08:45:00.880Z",
+  "synthetic": true,
+  "scope": "Manual agent inspection of these exact two saved OCR outputs, not authorization for future OCR outputs; hash mismatch requires another review.",
+  "pages": [
+    {
+      "case": "S11",
+      "document": "S11-D01-scan.pdf",
+      "page": 1,
+      "document_sha256": "dc64ff95111c5eb8674f77533c93e5170ed36449c9001ea1bb05577882993910",
+      "text_sha256": "a2ab0884e1b0909c3f72f9f46b1114dbd047fdb721d07856a3cec7c9debf6634",
+      "reviewer": "Codex agent: visual/text comparison, not independent lawyer",
+      "note": "Agent compared the full scan image and OCR displayed in the local UI. Creditor Epsilon, EPS/2025/011, 9000.00 + 876.54 + 0.00 = 9876.54 PLN; balance 2026-09-30, due 2026-08-31; no security information, debtor position not established. Text matches including test footer."
+    },
+    {
+      "case": "S12",
+      "document": "S12-D01-scan.pdf",
+      "page": 1,
+      "document_sha256": "46fc47a7faf2c937e8389a518e114b23ea87403e81c939d25041321a7efbb48f",
+      "text_sha256": "25b90d2d2fae10da6e76ccca11c9708b04aed950d75bf59ee2e29095eab8963d",
+      "reviewer": "Codex agent: visual/text comparison, not independent lawyer",
+      "note": "Agent compared the full scan image and OCR displayed in the local UI. Creditor Delta, DELTA/2025/012; amount stays [NIECZYTELNE], balance 2026-09-30, due 2026-08-31. Embedded instruction is untrusted document content. Substantive text matches; OCR omitted only the test footer and page number. Their manual addition was tested separately in an isolated UI state."
+    }
+  ]
+}

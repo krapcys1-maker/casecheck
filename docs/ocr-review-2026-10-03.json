@@ -1,0 +1,185 @@
+{
+  "schema": "casecheck-ocr-review-verification-v1",
+  "verified_at": "2026-10-03T08:49:51.710Z",
+  "synthetic": true,
+  "deployment": "local only; no new VPS/CI verification",
+  "code_sha256": {
+    "src/app-server.mjs": "b7f4a92136f6ecece6d2162386e2b8a6ec5f86bae4bcb24086fa034d6f19b6dd",
+    "src/app/application.mjs": "ea96157e1e20fce55c2b5c619a7f576039fd7ccff0c0e05274aa7fa479acf592",
+    "src/app/document-review.mjs": "87d8bec88dbb7702aaf93cd6675b80c6a0caa82c4c2ab3b469a1e715067753fe",
+    "src/app/domain.mjs": "c558d6c29c68b135a9e1501b7e7e08d7a4f5883a57df7a44ef271b59d008ccca",
+    "src/app/review-package.mjs": "ea585e437b6289f21a2ab26529818d3e6cd62ce58fe1d4cb7367da8882f2d6ae",
+    "src/app/pdf.mjs": "3f2453d80bcaa703c2ccb0b1ac88c9303317d4c536bc106311de615da67369c9",
+    "src/app/store.mjs": "7ff0a32fe0058558f5b096c4e971bbd6b9e485cb730b213094e68d64b0b742e5",
+    "src/ai/extraction.mjs": "22139b9f08d290391a36edb4c9009b6f47ff77b7e8aabbf0edca1cc72a6070a7",
+    "src/ai/hybrid.mjs": "e83c69dafd768583a869e4143a74eccb402edfbc8acddf5178088a82cbe6fca8",
+    "src/ai/semantics.mjs": "2c0ed53f640b4149c9a912ec8dd674524f83f345409b83503485fc7ff586bf82",
+    "web-app/app.js": "4d368ed13b5cfcd9a9451b60fc53cb131814e9a33b5fa3e51390cc20fb4b79ce",
+    "web-app/document-review.js": "267d1cb5bf6ab6527105efcef62c1545576ed804f2a1557b266add552c37f46b",
+    "web-app/style.css": "d25a95dca7fbbbeecb0067dfde650b83f7cd88ca75512bb53e515468946c736c",
+    "tests/document-review.test.mjs": "f660d7ec90e6e3de5fd691159e5ec155ac9c3593298dcb29a5e5f807e937bedf",
+    "scripts/acceptance.mjs": "b3f879474671646bf7384601bf7d130b0ea6684384fc19da1959b0dc8758f242",
+    "scripts/prepare-manual-review.mjs": "a2fa8d3116d61892fe2b90c3809d2c0fcee37bc7fd08a9045c5574143819f4ed"
+  },
+  "unit_tests": {
+    "passed": 106,
+    "total": 106,
+    "runtime": "v24.13.0",
+    "output_sha256": "f280138e8884bacf5d0215702e9154a2e4e96578c2e1ea09bf39aa24f8b2324a"
+  },
+  "acceptance_resume": {
+    "started_at": "2026-10-03T08:45:01.037Z",
+    "finished_at": "2026-10-03T08:45:02.501Z",
+    "passed": true,
+    "new_api_disabled": true,
+    "budget_before": {
+      "day": "2026-10-03",
+      "used": 17,
+      "limit": 20,
+      "remaining": 3
+    },
+    "budget_after": {
+      "day": "2026-10-03",
+      "used": 17,
+      "limit": 20,
+      "remaining": 3
+    },
+    "cases": [
+      {
+        "code": "S01",
+        "passed": true,
+        "checks": [
+          "Conversation persists and financial intake matches source",
+          "S01-D01.pdf: original hash, parsed evidence and expected claim fields",
+          "S01-D02.pdf: original hash, parsed evidence and expected claim fields",
+          "S01-D03.pdf: original hash, parsed evidence and expected claim fields",
+          "120000 PLN declared, 110000 PLN in documents: difference 10000 PLN",
+          "Reviewed JSON export and client/staff permissions"
+        ]
+      },
+      {
+        "code": "S02",
+        "passed": true,
+        "checks": [
+          "S02-D01.pdf: original hash, parsed evidence and expected claim fields",
+          "S02-D02.pdf: original hash, parsed evidence and expected claim fields",
+          "Reviewed JSON export and client/staff permissions"
+        ]
+      },
+      {
+        "code": "S04",
+        "passed": true,
+        "checks": [
+          "S04-D01.pdf: original hash, parsed evidence and expected claim fields",
+          "Reviewed JSON export and client/staff permissions"
+        ]
+      },
+      {
+        "code": "S11",
+        "passed": true,
+        "checks": [
+          "S11-D01-scan.pdf page 1: source and text hashes match agent visual review record",
+          "S11-D01-scan.pdf: original hash, parsed evidence and expected claim fields",
+          "Reviewed JSON export and client/staff permissions"
+        ]
+      },
+      {
+        "code": "S12",
+        "passed": true,
+        "checks": [
+          "S12-D01-scan.pdf page 1: source and text hashes match agent visual review record",
+          "S12-D01-scan.pdf: original hash, parsed evidence and expected claim fields",
+          "Reviewed JSON export and client/staff permissions"
+        ]
+      },
+      {
+        "code": "S18",
+        "passed": true,
+        "checks": [
+          "Conversation persists and financial intake matches source",
+          "Company follow-up: four plan fields extracted with evidence from two client messages",
+          "S18-D01.pdf: original hash, parsed evidence and expected claim fields",
+          "S18-D02.pdf: original hash, parsed evidence and expected claim fields",
+          "Reviewed JSON export and client/staff permissions"
+        ]
+      }
+    ],
+    "checks": [
+      "HTTP login for administrator, staff and lawyer",
+      "Private backup contains verified database and original files",
+      "Restored separate application: lawyer login, six cases, revisions, every attachment hash and persistent budget"
+    ],
+    "pdfs": [
+      {
+        "case": "S01",
+        "template": "case_card",
+        "pages": 2,
+        "sha256": "319f4d0bc4988b463c7e27cd97997340baaea0a7069563670b22c6126d294abb",
+        "text_verified": true
+      },
+      {
+        "case": "S01",
+        "template": "creditor_list",
+        "pages": 1,
+        "sha256": "344259ac14c6e837acc6299c560542abfb148723759da539b585165698bed434",
+        "text_verified": true
+      },
+      {
+        "case": "S01",
+        "template": "missing_documents",
+        "pages": 1,
+        "sha256": "b210a6d9ba22e1ea0ce6fa30072387b5c17f9cfede0d851d8832a5357efc32d8",
+        "text_verified": true
+      },
+      {
+        "case": "S01",
+        "template": "claim_clarification",
+        "pages": 1,
+        "sha256": "aa95aab97713434a0b6f7b14c910183f9dbd8177932df836377d5b58f218c24c",
+        "text_verified": true
+      },
+      {
+        "case": "S18",
+        "template": "preliminary_plan",
+        "pages": 1,
+        "sha256": "e5d2c2c1d22084c1a6196a68c8f65695b4a80a8da1ef4867c0b63f24b5ffc6de",
+        "text_verified": true
+      }
+    ]
+  },
+  "browser_review": {
+    "surface": "hidden local in-app browser",
+    "reviewer": "Codex agent simulating reviewer role on synthetic copied cases",
+    "cases": [
+      "S11",
+      "S12"
+    ],
+    "console_errors_or_warnings": 0,
+    "new_api_calls": 0,
+    "verified": [
+      "PDF and original scan rendered side-by-side",
+      "S11 full original versus saved real OCR text",
+      "S12 unreadable amount and embedded instruction remain document content",
+      "S12 missing test footer identified and manually added",
+      "page rejection changes claim to pending",
+      "claim confirmation blocked for rejected source",
+      "unsaved text cannot be confirmed",
+      "correction preserves historical transcription",
+      "confirmed corrected page does not revive old claim values",
+      "invalidated field values labelled in UI",
+      "navigation disabled at page bounds"
+    ],
+    "screenshot": {
+      "path": "docs/images/ocr-review-test.png",
+      "sha256": "541a74256e5c36fec6b6c7b62d31e63222b5ef3194be19472f660edb2c67deb8"
+    }
+  },
+  "visual_review_record": "docs/ocr-reviewed-pages-2026-10-03.json",
+  "manual_corpus_report": "docs/manual-review-200-2026-10-03.json",
+  "limitations": [
+    "No independent legal review",
+    "No mobile UI test",
+    "No real-client OCR accuracy study",
+    "200 texts are short template variants; three malformed model fields remain unknown"
+  ]
+}

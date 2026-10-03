@@ -21,6 +21,8 @@ W podsumowaniu sprawy konto prawnika wybiera **Pobierz pakiet JSON**. Odpowiada 
 
 Pakiet może zawierać dane osobowe i finansowe. Dostępne pobranie nie uprawnia do przekazania go dowolnemu odbiorcy. W repozytorium są tylko syntetyczne przykłady; nie publikować eksportów rzeczywistych spraw.
 
+Przegląd OCR dodaje do `sources` opcjonalne `page_review`: status, konto, czas i hashe tekstu oraz oryginału. Blokady `ocr_page_requires_review`, `ocr_page_rejected`, `superseded_source` i `claim_source_requires_review` oznaczają konieczność ponownego sprawdzenia źródła. Zależne wartości, sumy i zatwierdzenia są pomijane. Korekta strony nie zmienia historycznego cytatu; tworzy nowe źródło. [Obsługa przeglądu](PRZEGLAD-OCR.md).
+
 Przykładowy importer powinien wymagać właściwego schematu, zachować `synthetic`, blokady i braki, sprawdzić wersję sprawy oraz hash i stosować klucz idempotencji `(case_id, data_revision, payload_sha256)`. Przy blokadach można importować zgłoszenie do kolejki przeglądu, ale nie zmieniać go w kompletny spis wierzytelności ani gotowe pismo. Potwierdzenie w CaseCheck dotyczy odczytu; nie oznacza uznania długu.
 
 Nie wdrożono odbiornika, webhooka ani bezpośredniego połączenia do LegalFlow. Po wyborze docelowego CRM trzeba uzgodnić mapowanie pól, uwierzytelnienie, odbiorcę, retencję, obsługę błędów i audyt transmisji. Format JSON jest punktem startowym dla takiej integracji.

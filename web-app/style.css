@@ -26,8 +26,22 @@ summary { cursor: pointer; font-size: 13px; font-weight: 600; }
 .demo-guide { padding-left: 24px; }
 .demo-guide li { margin: 18px 0; font-size: 14px; line-height: 1.7; }
 .small { font-size: 12px; }
+.message.staff { border-left: 3px solid #56784e; background: #eef3e9; }
+#firm-content { font: 13px/1.7 ui-monospace, monospace; min-height: 320px; }
 .case-top h2 { overflow-wrap: anywhere; }
 .case-view { min-width: 0; }
+dialog.document-review { max-width: 1400px; width: 96%; }
+.ocr-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 20px; }
+.ocr-columns section { min-width: 0; }
+.ocr-original { overflow: auto; max-height: 65vh; min-height: 200px; background: #e7e9e3; border: 1px solid var(--line); }
+.ocr-original canvas, .ocr-original img { display: block; width: 100%; height: auto; max-width: none; }
+.ocr-original.zoomed canvas, .ocr-original.zoomed img { width: 200%; }
+.ocr-original pre { padding: 16px; white-space: pre-wrap; }
+#ocr-text { height: 46vh; min-height: 260px; font: 13px/1.65 system-ui; }
+#ocr-note { min-height: 64px; }
+[data-ocr-error] { color: #943d32; }
+.ocr-columns .row { flex-wrap: wrap; gap: 8px; }
+@media (max-width: 900px) { .ocr-columns { grid-template-columns: 1fr; } .ocr-original { max-height: 45vh; } dialog.document-review { padding: 18px; } }
 @media (max-width: 1200px) { .workspace-summary > div { padding: 18px; gap: 12px; } .demo-cards { grid-template-columns: 1fr; } .demo-cards p { min-height: auto; } }
 @media (max-width: 720px) {
   .workspace-summary { grid-template-columns: 1fr; margin-bottom: 24px; }

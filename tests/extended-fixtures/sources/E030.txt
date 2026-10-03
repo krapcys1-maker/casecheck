@@ -1,0 +1,6 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Nadawca: Kancelaria Testowa Omega, pełnomocnik. Nie jest wierzycielem.
+
+Wierzyciel: Fikcyjny Wierzyciel Sosna
+Umowa: TEST/30/2026
+Saldo całkowite na 16.09.2026: 1,01 PLN.

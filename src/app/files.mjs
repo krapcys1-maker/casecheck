@@ -44,6 +44,13 @@ export async function readDocument(directory, document) {
   });
 }
 
+export function validateOCRPages(pages, document) {
+  requireValue(Array.isArray(pages) && pages.length > 0 &&
+    pages.length === (document.kind === 'pdf' ? document.pages : 1) && pages.every((p, i) =>
+      p && p.page === i + 1 && typeof p.text === 'string' && p.text.length <= 20000 && Object.keys(p).length === 2) &&
+    pages.reduce((n, p) => n + p.text.length, 0) <= 80000, 'OCR_INVALID_OUTPUT', 502);
+}
+
 export async function ocrDocument(directory, document, env, fetchImpl = fetch) {
   requireValue(document.size <= 3 * 1024 * 1024 && document.pages <= 5, 'OCR_FILE_LIMIT', 413);
   const config = providerConfig('openai', env);
@@ -67,9 +74,7 @@ export async function ocrDocument(directory, document, env, fetchImpl = fetch) {
   let output;
   try { output = JSON.parse(data.output.flatMap(i => i.content || []).filter(c => c.type === 'output_text').map(c => c.text).join('')); }
   catch { throw new AppError(502, 'OCR_INVALID_OUTPUT'); }
-  requireValue(output && Object.keys(output).length === 1 && Array.isArray(output.pages) && output.pages.length > 0 &&
-    output.pages.length === (document.kind === 'pdf' ? document.pages : 1) && output.pages.every((p, i) =>
-      p.page === i + 1 && typeof p.text === 'string' && p.text.length <= 20000 && Object.keys(p).length === 2) &&
-    output.pages.reduce((n, p) => n + p.text.length, 0) <= 80000, 'OCR_INVALID_OUTPUT', 502);
+  requireValue(output && Object.keys(output).length === 1, 'OCR_INVALID_OUTPUT', 502);
+  validateOCRPages(output.pages, document);
   return { pages: output.pages, model: data.model, usage: data.usage, read_method: 'ai_ocr_requires_image_review' };
 }

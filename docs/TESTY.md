@@ -1,8 +1,49 @@
 # Testy i dowody działania
 
-## Aktualizacja po audycie: 3 października 2026
+## Bieżąca weryfikacja lokalna: 3 października 2026
 
-Aktualnie `npm test` obejmuje **70 testów**. Dodano 22 sprawdzenia od poprzednich 48: kontakt z człowiekiem, odrzucone dane, porównywanie sald, walidacja dat, równoległa praca, awarie transakcji, limity źródeł, aktualność bazy wiedzy, eksport po przeglądzie, kotwiczenie cytatów i zachowawcze filtry semantyczne. [Audyt](AUDYT.md) opisuje odtworzone problemy i naprawy; wcześniejsza sekcja poniżej zachowuje wynik poprzedniego etapu.
+**Aktualnie 119/119 testów**. Pięć najnowszych regresji dotyczy ręcznego wycofania wartości, zależności roszczenia, częściowej odpowiedzi AI, pustej edycji i starego pustego zatwierdzenia. Cztery najpierw odtworzyły błąd na wcześniejszym kodzie. [Ręczna kontrola korekt i eksportów](RECZNE-TESTY-KOREKT.md) oraz [raport](correction-review-2026-10-03.json) obejmują rzeczywisty interfejs, restart i odtworzenie 6/6 scenariuszy HTTP, bez nowego API.
+
+Poprzedni etap: 114/114. Osiem nowych sprawdzeń dotyczy portalu/wzorów (6), kwarantanny typu pola (1) i związku adresu z wierzycielem (1). [Ręczny przegląd najnowszego etapu](RECZNY-PRZEGLAD-PORTALU.md) opisuje rzeczywiste odczyty, błędy, korekty i cały obieg portalu. Trzy dodatkowe operacje API podniosły licznik kopii z 17 do 20; żadnego wywołania nie wykonuje `npm test`.
+
+Poprzedni etap obejmował osiem sprawdzeń [stron OCR](PRZEGLAD-OCR.md). Ręcznie sprawdzono ekran na kopiach S11/S12, odrzucenie, korektę, historię oraz blokadę dawnych pól. Ponowienie sześciu scenariuszy HTTP bez nowego API: **6/6**, budżet w tamtej próbie 17/20 bez zmiany. [Raport etapu OCR](ocr-review-2026-10-03.json). Wykonano również [porównanie wszystkich 200 krótkich tekstów z siedmioma wartościami odczytu](RECZNY-PRZEGLAD-200.md); bez niezależnej oceny prawnika. Sekcje poniżej zachowują wyniki wcześniejszych etapów.
+
+Etap przed dodaniem przeglądu stron: `npm test` **98/98**, Node 24.13.0. Na początku tej kontynuacji przechodziło 85 testów; dodano 11 testów trwałego zapisu i odzyskiwania wyników oraz dwa testy braku danych o zabezpieczeniu. Nowe sprawdzenia obejmują awarię końcowej transakcji, nagłe zakończenie osobnego procesu po zapisie wyniku, restart, brak drugiego API, ochronę ręcznej korekty i aktualnych zatwierdzeń, jedno roszczenie po odzyskaniu, OCR bez podwójnych stron, błędny wynik, kopię/odtworzenie oraz izolację kancelarii i linku klienta. Zobacz [testy](../tests/job-recovery.test.mjs) i [mechanizm](ODZYSKIWANIE-WYNIKOW.md).
+
+Istniejący zestaw obejmuje też odczyt hybrydowy, walidację częściowych odpowiedzi i odtworzenie 200 dokumentów z wcześniej zapisanych odpowiedzi bez API. [Raport](extended-evaluation-2026-10-03.json): 1397/1400 pól zgodnych z anotacjami, 3 pozostawione do przeglądu, 0 błędnych znanych wartości. To kontrola reguł na fikcyjnych tekstach UTF-8, na których rozwijano rozwiązanie; nie badanie niezależnej skuteczności, OCR ani wywiadu. `npm run ai:bench:extended` pokazuje plan bez API. Najnowszych zmian nie zweryfikowano jeszcze w CI/VPS.
+
+Sprawdzenie odzyskiwania w przeglądarce na odrębnej, tymczasowej fikcyjnej sprawie: podsumowanie wskazało oczekujący wynik, przycisk w Historii odzyskał dane, status zmienił się na „Wykonano”, a licznik pozostał 1/20. [Zrzut po odzyskaniu](images/odzyskany-wynik-test.jpg). Późniejszy ręczny przegląd treści 200 materiałów opisano powyżej; pełnego obiegu każdego z nich nie wykonano.
+
+## Odbiór z rzeczywistymi API: 3 października 2026
+
+[Raport JSON](acceptance-2026-10-03.json): **6/6 scenariuszy końcowo przechodzi**, 10 dokumentów źródłowych i 17 nowych wywołań: 9 DeepSeek, 2 Anthropic, 6 OpenAI. To żądania do lokalnego serwera HTTP i rzeczywistych dostawców, z osobnymi kontami oraz stanem. Źródłem są pliki przesłane przez upload i odczytane parserem lub OCR; model nie dostaje oczekiwanych odpowiedzi. Konta prawnika i pracownika służą do testowania ról, bez niezależnej oceny merytorycznej.
+
+| Przypadek | Zweryfikowane działanie |
+|---|---|
+| S01: konsument | Rozmowa i finanse, trzy PDF-y, różnica 10 000 PLN, korekta z historią, cztery wzory, role, zadanie i zamknięcie |
+| S02: cesja | Dwa dokumenty, ręczne powiązanie i jedno aktywne saldo 53 200 PLN |
+| S04: spór | Odczyt Anthropic, naprawa błędnej interpretacji zabezpieczenia i odzyskanie opłaconej odpowiedzi po błędzie SQLite bez kolejnego API |
+| S11: skan | Rzeczywisty OCR OpenAI, odczyt transkrypcji, kontrola kwoty i cytatów |
+| S12: nieczytelna kwota | OCR i pozostawienie nieczytelnej kwoty jako `unknown` |
+| S18: firma | Finanse przez OpenAI, dwa dokumenty, dalsza wiadomość klienta i cztery sekcje planu z cytatami; tekst trafia do PDF |
+
+Pierwszy przebieg: 15 wywołań, 5/6 scenariuszy. Anthropic skrócił „Informacja o zabezpieczeniu: brak danych.” do wartości „brak”, błędnie sugerując brak zabezpieczenia. Po dodaniu filtra `NO_SECURITY_INFORMATION` i dwóch regresji świadomie powtórzono S04: jedno wywołanie, właściwe `unknown` i zachowany cytat. Dodatkowe wywołanie rozszerzyło kontrolę firmowego planu. Łącznie **17/20** rezerwacji w odrębnym stanie testu; nie podnoszono limitu.
+
+Pięć wygenerowanych PDF-ów sprawdzono tekstowo i wizualnie: sześć stron wyrenderowanych Popplerem, poprawne polskie znaki, numeracja oraz brak obcięć i nakładania tekstu. Pakiet JSON po przeglądzie działa we wszystkich sześciu sprawach. Sprawdzono blokady uprawnień, brak danych wewnętrznych w widoku klienta i odrzucenie unieważnionego linku. Kopię odtworzono w osobnej aplikacji i porównano logowanie, liczbę spraw, wersje, hashe wszystkich załączników i trwały licznik API.
+
+Uruchamianie:
+
+- `npm run test:acceptance` — plan bez połączeń i kosztu.
+- `node scripts/acceptance.mjs --run` — nowy stan, do 16 wywołań, klucze z `.env`, bez otwierania przeglądarki.
+- `node scripts/acceptance.mjs --resume` — kontynuacja; zapisane odczyty są używane ponownie, brakujące kroki mogą wywołać API.
+- `node scripts/acceptance.mjs --resume --no-api` — kontynuacja z zablokowanym nowym API. Przegląd stron OCR korzysta wyłącznie z dokładnie zgodnych hashami zapisów rzeczywistego porównania agenta w `docs/ocr-reviewed-pages-2026-10-03.json`. Nowy/zmieniony wynik wymaga nowego porównania; runner go nie zatwierdza automatycznie.
+- `node scripts/acceptance.mjs --resume --retry-case S04` — jawne powtórzenie odczytu dokumentów wybranej sprawy, płatne.
+
+Prywatny stan i losowe hasła: `data/local/acceptance`; pełne raporty, PDF-y i kopie: `reports/local/acceptance`. Oba katalogi są ignorowane przez Git. Udostępniany raport zawiera metadane, hashe, zakres prób i znaleziony błąd, bez poświadczeń. Te sześć spraw nie potwierdza trafności na wszystkich aktach kancelarii.
+
+## Wcześniejsza aktualizacja po audycie: 3 października 2026
+
+Na tym etapie `npm test` obejmował **70 testów**. Dodano 22 sprawdzenia od poprzednich 48: kontakt z człowiekiem, odrzucone dane, porównywanie sald, walidacja dat, równoległa praca, awarie transakcji, limity źródeł, aktualność bazy wiedzy, eksport po przeglądzie, kotwiczenie cytatów i zachowawcze filtry semantyczne. [Audyt](AUDYT.md) opisuje odtworzone problemy i naprawy; wcześniejsza sekcja poniżej zachowuje wynik poprzedniego etapu.
 
 [Nowa próba jakości AI](quality-bench-2026-10-03.json): 7 rzeczywistych wywołań na tekstach odczytanych z PDF-ów, 49 zaplanowanych pól. Przed końcowymi poprawkami cytowania i filtrów: 3 odpowiedzi zablokowane, 4 przyjęte, 25/28 dokładnych zgodności w przyjętych odpowiedziach. Dwa odstępstwa są formatowaniem nazw, jedno błędem znaczenia. To mała diagnostyczna próba, nie potwierdzenie trafności całego modelu. Nieczytelne skany i wywiad konwersacyjny nie należą do tej próby. Późniejsze zabezpieczenia zweryfikowano bez API; ich efektu na całej próbie jeszcze nie zmierzono.
 

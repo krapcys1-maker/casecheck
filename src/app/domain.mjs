@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { uid, requireValue, text } from './store.mjs';
 import { validateExtraction } from '../ai/extraction.mjs';
+import { claimSourceProblem, ocrReviewIssues, sourceProblem, hasSourceReviewBlockers } from './document-review.mjs';
+import { portalView, clientFileVisible } from './portal.mjs';
 
 export const root = fileURLToPath(new URL('../../', import.meta.url));
 export const intake = JSON.parse(readFileSync(new URL('../../legal/intake.json', import.meta.url), 'utf8'));
@@ -21,7 +23,7 @@ export const currentFacts = state => Object.fromEntries(state.facts.filter(f => 
 export function missing(state) {
   const facts = currentFacts(state);
   return fieldSet(state).filter(field => !facts[field.key] || facts[field.key].type === 'unknown' ||
-    facts[field.key].review === 'rejected');
+    facts[field.key].review === 'rejected' || facts[field.key].source_invalidated);
 }
 export function nextQuestion(state) {
   if (state.handoff) return 'Zgłoszenie przekazano do obsługi przez człowieka. Możesz nadal dodać dokumenty lub informacje.';
@@ -34,7 +36,7 @@ export function addSource(state, { text: content, kind = 'message', title = 'Wia
 }
 export function putFacts(state, facts, { method = 'ai', review = 'pending', actor = null } = {}) {
   for (const fact of facts) {
-    if (fact.type === 'unknown' && currentFacts(state)[fact.field]?.type !== 'unknown' && currentFacts(state)[fact.field]) {
+    if (method !== 'manual' && fact.type === 'unknown' && currentFacts(state)[fact.field]?.type !== 'unknown' && currentFacts(state)[fact.field] && !currentFacts(state)[fact.field].source_invalidated) {
       state.facts.push({ ...fact, id: uid(), current: false, method, review, actor }); continue;
     }
     for (const previous of state.facts.filter(f => f.field === fact.field && f.current)) previous.current = false;
@@ -53,13 +55,47 @@ export function validateFieldTypes(state, facts, kind) {
     requireValue(fact.type === 'unknown' || fact.type === type, 'INVALID_FIELD_TYPE', 422);
   }
 }
+// Quarantine a mistyped API field without guessing a conversion or discarding valid siblings.
+// Manual edits and saved receipts still use strict validateFieldTypes.
+export function quarantineFieldTypes(state, output, kind) {
+  const abstentions = [];
+  for (const fact of output.facts) {
+    try { validateFieldTypes(state, [fact], kind); }
+    catch (error) {
+      if (error.code !== 'INVALID_FIELD_TYPE') throw error;
+      abstentions.push({ field: fact.field, returned_type: fact.type, method: 'invalid_field_abstention', code: error.code });
+      Object.assign(fact, { type: 'unknown', text_value: null, boolean_value: null, minor_units: null,
+        currency: null, as_of: null, precision: 'unknown' });
+      output.warnings.push(`${fact.field}: niepoprawny typ odczytu; wartość pozostaje nieznana. Wymagany przegląd źródła.`);
+    }
+  }
+  return abstentions;
+}
 export const factValue = fact => {
-  if (!fact || fact.type === 'unknown' || fact.review === 'rejected') return '[DO UZUPEŁNIENIA]';
+  if (!fact || fact.type === 'unknown' || fact.review === 'rejected' || fact.source_invalidated) return '[DO UZUPEŁNIENIA]';
   if (fact.type === 'money') return `${fact.precision === 'approximate' ? 'około ' : ''}${(fact.minor_units / 100).toLocaleString('pl-PL', { minimumFractionDigits: 2 })} ${fact.currency}${fact.as_of ? ' (saldo ' + fact.as_of + ')' : ''}`;
   if (fact.type === 'boolean') return fact.boolean_value ? 'tak' : 'nie';
   return fact.text_value;
 };
 export const claimFact = (claim, field) => claim.facts.find(f => f.field === field);
+// Partial updates must not carry an address or dispute scope across a changed subject.
+// Freshly supplied dependent fields are independently validated; retained ones need review again.
+export function invalidateClaimDependents(claim, previousFacts, replacedFields) {
+  const invalidated = [];
+  const signature = f => JSON.stringify([f?.type, f?.text_value?.replace(/\s+/gu, ' ').trim().toLocaleLowerCase('pl'), f?.boolean_value]);
+  for (const [parent, dependent] of [['creditor_name', 'creditor_address'], ['disputed', 'disputed_scope'], ['security_description', 'security_creation_date']]) {
+    if (!replacedFields.includes(parent) || replacedFields.includes(dependent) ||
+      signature(previousFacts.find(f => f.field === parent)) === signature(claimFact(claim, parent))) continue;
+    const fact = claimFact(claim, dependent);
+    if (!fact || fact.type === 'unknown') continue;
+    claim.fact_history ||= []; claim.fact_history.push({ ...fact });
+    Object.assign(fact, { type: 'unknown', text_value: null, boolean_value: null, minor_units: null, currency: null, as_of: null,
+      precision: 'unknown', invalidated_by_field: parent });
+    invalidated.push({ field: dependent, changed_field: parent, code: 'RELATED_FIELD_CHANGED' });
+  }
+  return invalidated;
+}
+
 export function controls(state) {
   const candidates = [], sums = new Map(), issues = [];
   const active = state.claims.filter(claim => !claim.merged_into && claim.review !== 'rejected');
@@ -70,7 +106,7 @@ export function controls(state) {
   const ambiguous = new Set(candidates.flat());
   for (const claim of active) {
     const total = claimFact(claim, 'total_amount');
-    if (claim.review !== 'confirmed' || ambiguous.has(claim.id) || total?.precision !== 'exact' || !total.as_of) {
+    if (claim.review !== 'confirmed' || ambiguous.has(claim.id) || total?.precision !== 'exact' || !total.as_of || claimSourceProblem(state, claim)) {
       issues.push({ claim_id: claim.id, code: ambiguous.has(claim.id) ? 'possible_duplicate' : 'amount_requires_review' }); continue;
     }
     const key = `${total.currency}/${total.as_of}`, prev = sums.get(key) || 0n;
@@ -88,7 +124,7 @@ export function controls(state) {
   const comparable = totals.find(t => declared?.type === 'money' && declared.precision === 'exact' && t.currency === declared.currency && t.as_of === declared.as_of);
   const excluded = issues.filter(i => ['possible_duplicate', 'amount_requires_review'].includes(i.code)).length;
   const reasons = [];
-  if (!comparable || declared.review === 'rejected') reasons.push('declaration_not_comparable');
+  if (!comparable || declared.review === 'rejected' || declared.source_invalidated || sourceProblem(state, declared.source_id)) reasons.push('declaration_not_comparable');
   if (totals.length > 1) reasons.push('mixed_balance_groups');
   if (excluded) reasons.push('excluded_claims');
   if (!active.length) reasons.push('no_claims');
@@ -104,28 +140,31 @@ export function controls(state) {
 // Operational counts, not a legal assessment or an AI confidence score.
 export function reviewSummary(state, today = new Date().toISOString().slice(0, 10)) {
   const checks = controls(state), facts = Object.values(currentFacts(state));
-  const known = facts.filter(f => f.type !== 'unknown' && f.review !== 'rejected');
+  const known = facts.filter(f => f.type !== 'unknown' && f.review !== 'rejected' && !f.source_invalidated);
   const active = state.claims.filter(c => !c.merged_into);
   const open = state.tasks.filter(t => t.status === 'open');
   const currentDrafts = state.drafts.filter(d => d.source_revision === state.data_revision && d.status !== 'stale');
   return { field_count: fieldSet(state).length, known_fields: known.length,
-    confirmed_fields: known.filter(f => f.review === 'confirmed').length,
-    pending_facts: known.filter(f => f.review === 'pending').length, missing_fields: checks.missing_fields.length,
-    active_claims: active.length, pending_claims: active.filter(c => c.review === 'pending').length,
+    confirmed_fields: known.filter(f => f.review === 'confirmed' && !sourceProblem(state, f.source_id)).length,
+    pending_facts: facts.filter(f => f.type !== 'unknown' && f.review !== 'rejected' && (f.review === 'pending' || f.source_invalidated || sourceProblem(state, f.source_id))).length, missing_fields: checks.missing_fields.length,
+    active_claims: active.length, pending_claims: active.filter(c => c.review !== 'rejected' && (c.review === 'pending' || claimSourceProblem(state, c))).length,
     duplicate_pairs: checks.candidates.length,
     disputed_claims: active.filter(c => claimFact(c, 'disputed')?.boolean_value === true).length,
-    unread_documents: (state.documents || []).filter(d => !['read', 'ocr_review'].includes(d.status)).length,
-    ocr_documents: (state.documents || []).filter(d => d.status === 'ocr_review').length,
+    unread_documents: (state.documents || []).filter(d => !['read', 'ocr_review', 'ocr_verified'].includes(d.status)).length,
+    ocr_documents: new Set(ocrReviewIssues(state).map(p => p.document_id)).size,
+    ocr_pages_pending: ocrReviewIssues(state).length,
     difference: checks.difference, open_tasks: open.length,
     overdue_tasks: open.filter(t => t.due && t.due < today).length,
-    current_drafts: currentDrafts.length, approved_drafts: currentDrafts.filter(d => d.status === 'approved').length };
+    client_requests_open: (state.client_requests || []).filter(r => r.status === 'open').length,
+    client_responses_pending: (state.client_requests || []).filter(r => r.status === 'submitted').length,
+    current_drafts: currentDrafts.length, approved_drafts: hasSourceReviewBlockers(state) ? 0 : currentDrafts.filter(d => d.status === 'approved').length };
 }
 export function publicCase(state, actor) {
   const checks = controls(state);
   if (actor.role === 'client') return { id: state.id, title: state.title, track: state.track, synthetic: state.synthetic,
     stage: state.stage, revision: state.revision, messages: state.messages, consent: state.consent, handoff: state.handoff,
-    documents: state.documents || [], next_question: nextQuestion(state), missing: checks.missing_fields };
-  return { ...state, controls: checks, review_summary: reviewSummary(state), current_facts: currentFacts(state), next_question: nextQuestion(state) };
+    documents: (state.documents || []).filter(clientFileVisible), portal: portalView(state), next_question: nextQuestion(state), missing: checks.missing_fields };
+  return { ...state, portal: portalView(state), controls: checks, review_summary: reviewSummary(state), current_facts: currentFacts(state), next_question: nextQuestion(state) };
 }
 export function draftSections(state, templateId, options = {}) {
   const facts = currentFacts(state), value = key => factValue(facts[key]);
@@ -150,7 +189,7 @@ export function draftSections(state, templateId, options = {}) {
     requireValue(claim.review !== 'rejected', 'CLAIM_REJECTED', 409);
     const creditor = claimFact(claim, 'creditor_name');
     const address = claimFact(claim, 'creditor_address');
-    const recipientAddress = options.recipient_address || (address?.type === 'text' ? address.text_value : '[DO UZUPEŁNIENIA: adres wierzyciela]');
+    const recipientAddress = options.recipient_address || factValue(address);
     sections.push({ heading: 'Adresat', text: `${factValue(creditor)}\n${text(recipientAddress, 500)}` });
     sections.push({ heading: 'Prośba o wyjaśnienie roszczenia', text: `W związku z informacją dotyczącą umowy lub dokumentu ${factValue(claimFact(claim, 'agreement_number'))} proszę o przedstawienie podstawy dochodzonego roszczenia, kopii umowy oraz szczegółowego rozliczenia kapitału, odsetek i kosztów, z uwzględnieniem wpłat i daty salda.\n\nJeżeli wierzytelność została nabyta od innego podmiotu, proszę również o dokumenty lub informacje pozwalające ustalić następstwo prawne i zidentyfikować wierzytelność objętą przelewem.\n\nNiniejsza prośba służy wyjaśnieniu danych i nie stanowi oświadczenia o uznaniu długu ani jego wysokości. Jej treść należy ocenić w świetle okoliczności konkretnej sprawy przed wysłaniem.\n\n[Podpis osoby uprawnionej — po zatwierdzeniu projektu]` });
   } else if (templateId === 'preliminary_plan') {

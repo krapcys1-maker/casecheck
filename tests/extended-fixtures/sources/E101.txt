@@ -1,0 +1,4 @@
+DANE FIKCYJNE — TEST PROGRAMU — NIE WYSYŁAĆ
+Dłużnik: Firma Testowa Odbiorca. Sprzedawca i wierzyciel: Fikcyjny Wierzyciel Brzoza
+Identyfikator umowy: TEST/101/2026
+Potwierdzenie rozrachunków według stanu z 12.09.2026. Całość pozostałej należności: 12 345,67 zł.

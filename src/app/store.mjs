@@ -56,8 +56,12 @@ export class Store {
       CREATE TABLE IF NOT EXISTS budget(day TEXT PRIMARY KEY,count INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS registry_budget(day TEXT PRIMARY KEY,count INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS knowledge(tenant TEXT PRIMARY KEY,state TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS job_results(job_id TEXT PRIMARY KEY,
+        case_id TEXT NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+        captured_at TEXT NOT NULL,payload TEXT NOT NULL,sha256 TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS schema_version(version INTEGER PRIMARY KEY);
-      INSERT OR IGNORE INTO schema_version VALUES(1);`);
+      INSERT OR IGNORE INTO schema_version VALUES(1);
+      INSERT OR IGNORE INTO schema_version VALUES(2);`);
   }
   tx(callback) {
     this.db.exec('BEGIN IMMEDIATE');
@@ -142,7 +146,7 @@ export class Store {
     this.db.prepare('INSERT INTO versions VALUES(?,?,?)').run(state.id, state.revision, JSON.stringify(state));
     this.db.prepare('INSERT INTO audit VALUES(?,?,?,?,?,?)').run(uid(), state.id, state.revision, actor.id, event, this.now().toISOString());
   }
-  update(actor, id, revision, event, mutate, { invalidate = true, reserveAI = false } = {}) {
+  update(actor, id, revision, event, mutate, { invalidate = true, reserveAI = false, consumeResult = null } = {}) {
     return this.tx(() => {
       const state = this.get(actor, id);
       requireValue(Number.isSafeInteger(revision) && state.revision === revision, 'VERSION_CONFLICT', 409);
@@ -154,12 +158,45 @@ export class Store {
       this.db.prepare('UPDATE cases SET revision=?,state=? WHERE id=? AND tenant=?')
         .run(state.revision, JSON.stringify(state), id, actor.tenant);
       this.record(actor, state, event);
+      // Consuming the receipt and applying its facts must commit together.
+      if (consumeResult) requireValue(this.db.prepare('DELETE FROM job_results WHERE job_id=? AND case_id=?')
+        .run(consumeResult, id).changes === 1, 'SAVED_RESULT_NOT_FOUND', 409);
       return state;
     });
   }
   history(actor, id) {
     requireValue(actor.role !== 'client', 'FORBIDDEN', 403); this.get(actor, id);
     return this.db.prepare('SELECT revision,actor,event,at FROM audit WHERE case_id=? ORDER BY rowid DESC LIMIT 200').all(id);
+  }
+  saveJobResult(actor, id, jobId, result) {
+    return this.tx(() => {
+      const state = this.get(actor, id), job = state.jobs.find(j => j.id === jobId);
+      requireValue(job?.status === 'running', 'JOB_NOT_RUNNING', 409);
+      const payload = JSON.stringify(result), sha256 = digest(payload);
+      requireValue(payload.length <= 1024 * 1024, 'RESULT_TOO_LARGE', 413);
+      // This transaction is independent of the later case/version/audit write.
+      this.db.prepare('INSERT INTO job_results VALUES(?,?,?,?,?)')
+        .run(jobId, id, this.now().toISOString(), payload, sha256);
+      return sha256;
+    });
+  }
+  jobResult(actor, id, jobId) {
+    this.get(actor, id);
+    const row = this.db.prepare('SELECT payload,sha256 FROM job_results WHERE job_id=? AND case_id=?').get(jobId, id);
+    requireValue(row, 'SAVED_RESULT_NOT_FOUND', 404);
+    requireValue(digest(row.payload) === row.sha256, 'SAVED_RESULT_INVALID', 409);
+    let payload;
+    try { payload = JSON.parse(row.payload); } catch { throw new AppError(409, 'SAVED_RESULT_INVALID'); }
+    return { payload, sha256: row.sha256 };
+  }
+  hasPendingJobResults(actor, id) {
+    this.get(actor, id);
+    return Boolean(this.db.prepare('SELECT job_id FROM job_results WHERE case_id=? LIMIT 1').get(id));
+  }
+  pendingJobResults(actor, id) {
+    requireValue(actor.role !== 'client', 'FORBIDDEN', 403); this.get(actor, id);
+    // Expose only recovery metadata, never a second copy of source text or output.
+    return this.db.prepare('SELECT job_id,captured_at,sha256 FROM job_results WHERE case_id=? ORDER BY captured_at').all(id);
   }
   link(actor, id) {
     requireValue(actor.role !== 'client', 'FORBIDDEN', 403); this.get(actor, id);
