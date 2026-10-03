@@ -1,6 +1,6 @@
 # Stan projektu — 3 października 2026
 
-**Aktualizacja 3.10.2026:** swobodny czat Asystent AI, wyłącznie DeepSeek V4.1 Flash, OCR DeepSeek i powiadomienia w aplikacji. 136/136 testów i 11 nowych rzeczywistych wywołań. [Odbiór czatu](RECZNY-ODBIOR-CZATU.md) i [porównanie LegalFlow](POROWNANIE-LEGALFLOW.md). Brakuje automatycznego NIP z rozmowy, pism po wywiadzie i reguł etapów. Poniższe wyniki wcześniejszych etapów są historyczne.
+**Aktualizacja 3.10.2026, wdrożona na VPS:** swobodny czat Asystent AI, wyłącznie DeepSeek V4.1 Flash, OCR DeepSeek i powiadomienia w aplikacji. 136/136 testów lokalnie, na VPS i w CI; 13 nowych rzeczywistych wywołań, także przez portal klienta na VPS. Konserwatywne rozliczenie 0,019782 USD z zatwierdzonych 10 USD, bez limitu liczby wywołań. [Odbiór czatu](RECZNY-ODBIOR-CZATU.md) i [porównanie LegalFlow](POROWNANIE-LEGALFLOW.md). Brakuje automatycznego NIP z rozmowy, pism po wywiadzie i reguł etapów. Poniższe wyniki wcześniejszych etapów są historyczne.
 
 CaseCheck jest działającą aplikacją pilotażową: od rozmowy i dokumentów do przeglądu sprawy, projektów Word/PDF oraz współpracy w portalu klienta. Można pokazać ją jako konkretny moduł do współpracy freelance z kancelarią lub dostawcą Legal Flow. [Porównanie](POROWNANIE-LEGALFLOW.md) wskazuje szerszy deklarowany zakres konkurenta oraz sprawdzone funkcje CaseCheck; nie mamy podstaw do porównania skuteczności obu modeli.
 

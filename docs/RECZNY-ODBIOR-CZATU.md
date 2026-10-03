@@ -31,3 +31,15 @@ Zgoda użytkownika: maksymalnie 10 USD na dalsze wywołania, bez limitu liczby. 
 136/136 testów automatycznych, w tym blokowanie innych API mimo kluczy, innych modeli, trwałość i współbieżność budżetu, kolejność stron, izolacja klientów, cytaty, kontekst, korekty i odzyskiwanie odpowiedzi. Uzupełniają ręczne próby, nie zastępują ich.
 
 ![Czat na fikcyjnych danych](images/czat-deepseek.png)
+
+## Odbiór po wdrożeniu na VPS
+
+Wdrożono commit `828a17a` pod [adresem CaseCheck](https://astrologiapoludzku.com/casecheck/). 136/136 testów przeszło również na Linux/Node 22 na serwerze oraz w [GitHub Actions](https://github.com/krapcys1-maker/casecheck/actions/runs/37127728363). Przed zmianą wykonano kopię. Zachowano 18 dotychczasowych spraw i 46 plików; porównanie ośmiu tabel przed ręczną próbą potwierdziło identyczność istniejących zapisów. Dziesięć adresów stron astrologiapoludzku.com i inproduction.dev zachowało HTTP 200 i identyczną treść. Konfiguracja nginx i strony główne nie były zmieniane.
+
+W przeglądarce utworzono dziewiętnastą sprawę: **PRZYKŁAD CZATU — fikcyjna Anna, odbiór VPS**. Wysłano dwie dodatkowe wiadomości: pierwszą z panelu kancelarii, drugą przez link klienta. Przeczytano obie odpowiedzi i zapisane pola. Asystent wskazał dokumenty do przygotowania, zachował dochód 2570,50 PLN i przybliżone saldo podane wprost przez klientkę, odróżnił samochód brata od jej własności, przyjął koszty około 2100 PLN i odpowiedział na pytanie o późniejsze dosłanie dokumentów. Odpowiedź klienta była widoczna w panelu kancelarii.
+
+Przy zmianie w drugiej sesji przycisk „Odśwież dane i zachowaj wpisy” zachował dokładnie wpisany roboczy tekst. Roboczy tekst usunięto bez wysyłania. Link testowy następnie odwołano; po odświeżeniu portal nie pokazywał już sprawy i wrócił do ekranu logowania.
+
+Łącznie w tym etapie wykonano **13 nowych wywołań DeepSeek**, w tym 11 lokalnych i 2 na VPS. Trwały rejestr rozlicza konserwatywnie **0,019782 USD z 10 USD**; nie jest to faktura dostawcy. Pozostaje 9,980218 USD. Limit liczby wywołań wyłączono. Rejestr kosztów przeniesiono na VPS, a lokalny limit ustawiono na już zużytą kwotę, aby nie stworzyć drugiego budżetu. Brak nierozliczonych rezerwacji. W środowisku aplikacji na VPS nie ma kluczy OpenAI ani Anthropic; kod dodatkowo blokuje inne API i modele.
+
+![Czat klienta na VPS — wyłącznie fikcyjne dane](images/czat-klienta-vps.png)
