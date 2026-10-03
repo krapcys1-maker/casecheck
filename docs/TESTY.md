@@ -10,6 +10,8 @@ Plan: `npm run ai:bench`. Płatne uruchomienie: `node scripts/quality-bench.mjs 
 
 ## Poprzedni etap: pokaz portfolio i 48 testów
 
+Weryfikacja po audycie: [CI 37096789137](https://github.com/krapcys1-maker/casecheck/actions/runs/37096789137) — Node 22 i 24; VPS Node 22.22.1 — 70/70. [Metadane](audit-verification-2026-10-03.json) zawierają także kontrolę publicznego pakietu S01, oryginału i PDF. Odtworzenie tylko czterech przyjętych odpowiedzi z bazy potwierdziło naprawę znalezionego błędu stanowiska klienta; nie wykonano nowej próby API i nie włączono trzech zablokowanych odpowiedzi.
+
 Stan weryfikacji: 3 października 2026 czasu Europe/Bucharest. Trzy nowe wywołania API zakończyły się 2 października według czasu UTC. Testy syntetyczne i kontrola techniczna nie zastępują oceny rzeczywistych spraw przez niezależny zespół.
 
 ## Automatyczne testy bez płatnego API

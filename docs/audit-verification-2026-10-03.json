@@ -22,5 +22,37 @@
     "src/ai/semantics.mjs": "09c9a0f3c6ba3412899fff2fd3b750199c9c4ee24c3fc5d0bf84f7390c9616f6",
     "web-app/app.js": "9fdced7aeae51eba4706a908bb9343f5260ae1ef88dc1b9ba8e403b006fa3ffb"
   },
-  "scope": "Engineering verification on synthetic data; no independent legal review or general LLM accuracy certification."
+  "scope": "Engineering verification on synthetic data; no independent legal review or general LLM accuracy certification.",
+  "verified_code_commit": "9dfdeb72466525a7b043a8610ae9e61a32a43847",
+  "github_ci": {
+    "url": "https://github.com/krapcys1-maker/casecheck/actions/runs/37096789137",
+    "node22": "success",
+    "node24": "success"
+  },
+  "vps": {
+    "node": "22.22.1",
+    "tests": 70,
+    "passed": 70,
+    "cases": 18,
+    "landing_unchanged": true,
+    "contact_ok": true,
+    "pdf_verified": true,
+    "original_hash_verified": true,
+    "review_package": {
+      "status": "reviewed_partial",
+      "confirmed_fields": 6,
+      "claims": 3,
+      "missing_fields": 9,
+      "hash_verified": true
+    },
+    "verified_at": "2026-10-03T04:33:38.910Z"
+  },
+  "ui": {
+    "public_https_login": "passed",
+    "case_overview_and_export_button": "visible",
+    "console_errors": 0,
+    "mobile_viewport": 390,
+    "mobile_scroll_width": 375,
+    "viewport_reset": true
+  }
 }

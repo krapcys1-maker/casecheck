@@ -37,6 +37,8 @@ Te poprawki przeszły testy bez API, w tym zakaz naprawiania innej kwoty i nieje
 
 ## Nowy element do pokazania
 
+Odtworzenie czterech wcześniej przyjętych odpowiedzi z zapisanej bazy, **bez nowych wywołań API**, sprawdziło filtr na rzeczywistym znalezionym błędzie. Po rozdzieleniu różnic formatowania i zastosowaniu zachowawczego filtra 28/28 pól tych czterech odpowiedzi odpowiada oczekiwaniom. Trzy zablokowane odpowiedzi nie należą do odtworzenia. To dowód poprawki na zapisanym przykładzie, nie nowy pomiar modelu; szczegóły są w `offline_replay` raportu JSON.
+
 [Pakiet danych po przeglądzie](INTEGRACJA.md) jest dostępnym dla prawnika eksportem JSON. Oddziela potwierdzone dane od blokad i braków, zachowuje cytaty, strony, hashe oryginalnych plików, wersję danych oraz aktualne zatwierdzenia pism. To konkretny punkt podłączenia do CRM lub obiegu kancelarii; eksport nie wysyła danych automatycznie.
 
 ## Pozostałe słabe punkty i kolejność rozwoju
@@ -61,6 +63,8 @@ Te poprawki przeszły testy bez API, w tym zakaz naprawiania innej kwoty i nieje
 `npm audit --omit=dev` w dniu audytu: **0 zgłoszonych podatności** w zainstalowanych zależnościach. Nie oznacza to braku nieznanych luk. Dla produkcji potrzebne są również testy obciążenia, przegląd konfiguracji dostawców i niezależny test bezpieczeństwa.
 
 ## Jak to teraz sprawdzać
+
+Weryfikacja kodu: **70/70 lokalnie, w CI na Node 22 i 24 oraz na VPS**. [Potwierdzony CI](https://github.com/krapcys1-maker/casecheck/actions/runs/37096789137), [metadane weryfikacji](audit-verification-2026-10-03.json). Publiczny test potwierdził pakiet S01: 6 pól po przeglądzie, 3 roszczenia, 9 braków i 3 aktualne zatwierdzenia. Oryginalny plik zachował hash, PDF działa, strona główna i formularz kontaktowy pozostały sprawne.
 
 1. `npm ci && npm test` — regresje, izolacja, role, race conditions, pliki, kopie, eksport, cytaty i semantyczne filtry; bez API.
 2. `npm run ai:bench` — plan 7 syntetycznych dokumentów, bez wywołań. `node scripts/quality-bench.mjs --run` — płatna próba, maksymalnie 9 prób/dzień UTC w osobnej trwałej bazie, bez automatycznego ponowienia.

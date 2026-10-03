@@ -772,5 +772,47 @@
   "formatting_deviations": 2,
   "semantic_deviations": 1,
   "validation_blocked_documents": 3,
-  "normalized_scoring_policy": "Original exact scores preserved; names differing only by whitespace or one trailing sentence period are formatting deviations."
+  "normalized_scoring_policy": "Original exact scores preserved; names differing only by whitespace or one trailing sentence period are formatting deviations.",
+  "offline_replay": {
+    "scope": "Offline replay of ONLY the four previously accepted outputs; no new API calls. Blocked outputs were not retained and are not included. Format normalization and semantic guards do not demonstrate general model accuracy.",
+    "results": [
+      {
+        "id": "S02-D02",
+        "checked": 7,
+        "before_exact": 5,
+        "before_normalized": 6,
+        "after_normalized": 7,
+        "flags": [
+          {
+            "field": "disputed",
+            "code": "NO_EXPLICIT_NON_DISPUTE_STATEMENT"
+          }
+        ]
+      },
+      {
+        "id": "S05-D01",
+        "checked": 7,
+        "before_exact": 7,
+        "before_normalized": 7,
+        "after_normalized": 7,
+        "flags": []
+      },
+      {
+        "id": "S10-D01",
+        "checked": 7,
+        "before_exact": 7,
+        "before_normalized": 7,
+        "after_normalized": 7,
+        "flags": []
+      },
+      {
+        "id": "S17-D01",
+        "checked": 7,
+        "before_exact": 6,
+        "before_normalized": 7,
+        "after_normalized": 7,
+        "flags": []
+      }
+    ]
+  }
 }
