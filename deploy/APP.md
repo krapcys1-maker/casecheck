@@ -20,6 +20,8 @@ Publiczny routing dodaje się do wskazanego vhosta HTTPS. Zachowaj kopię nginx,
 
 Przeniesienie na nową domenę: przygotuj jej HTTPS i routing, zmień origin aplikacji, sprawdź działanie, a następnie usuń tylko dodane lokalizacje panelu z wcześniejszego vhosta. Baza i pliki pozostają w tym samym prywatnym katalogu. Strona główna działa przez cały okres tymczasowego wdrożenia, więc nie wymaga przywracania z kopii.
 
+Przygotowane przeniesienie na tymczasową podstronę portfolio opisuje [instrukcja inproduction.dev](PRZENIESIENIE-INPRODUCTION.md). Stan aktywacji i granice uprawnień są podane jawnie; samo przygotowanie konfiguracji nie oznacza opublikowania nowego adresu.
+
 Do czasu wskazania domeny usługę można sprawdzić przez tunel SSH:
 
 ```powershell
