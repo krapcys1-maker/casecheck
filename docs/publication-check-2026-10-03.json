@@ -1,0 +1,33 @@
+{
+  "schema": "casecheck-publication-check-v1",
+  "date": "2026-10-03",
+  "product_commit": "693ed7ac9f1ecf7e25d1f9470562cdce10b8e381",
+  "verified_ci": {
+    "url": "https://github.com/krapcys1-maker/casecheck/actions/runs/37119209888",
+    "node": [
+      22,
+      24
+    ],
+    "result": "success",
+    "tests_per_job": 119
+  },
+  "later_registry_fixes_local_suite": {
+    "passed": 121,
+    "failed": 0,
+    "node": "24.13.0",
+    "initial_registry_regressions": {
+      "passed": 0,
+      "failed": 2
+    }
+  },
+  "presentation": {
+    "slides": 22,
+    "reviewed_all_rendered_slides": true,
+    "native_tables": 6,
+    "pptx": "output/presentation/casecheck-funkcje-porownanie-v2.pptx",
+    "pdf": "output/presentation/casecheck-funkcje-porownanie.pdf",
+    "native_powerpoint_checked": false
+  },
+  "paid_model_api_calls_during_continuation": 0,
+  "vps_updated": false
+}

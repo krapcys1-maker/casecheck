@@ -14,9 +14,11 @@ Dostęp do panelu wymaga konta; danych logowania nie publikujemy. Pokaz korzysta
 
 [Aktualny audyt i plan testów](docs/AUDYT.md) · [Przygotowanie rozmowy z Booster](docs/ROZMOWA-BOOSTER.md) · [Pakiet do integracji](docs/INTEGRACJA.md). Portfolio PDF zachowuje wcześniejszy pokaz; audyt opisuje późniejsze naprawy i trudniejszą próbę AI, również jej niepowodzenia.
 
-[Stan bieżących prac](docs/STATUS-PROJEKTU.md): lokalnie **119/119 testów**. Najnowszy [ręczny przegląd korekt](docs/RECZNE-TESTY-KOREKT.md) obejmuje wycofanie błędnych danych, zależności wierzyciela, sporu i zabezpieczenia, odrzucanie pustych pism, restart oraz PDF/Word. Ponowiono sześć scenariuszy HTTP z zapisanymi odpowiedziami. W tym etapie nie wykonywano nowego API, budżet pozostał 20/20. [Porównanie z LegalFlow](docs/POROWNANIE-LEGALFLOW.md) oddziela deklaracje producenta od sprawdzonych funkcji. Wcześniejsze dowody: [portal i nowe odczyty API](docs/RECZNY-PRZEGLAD-PORTALU.md), [OCR](docs/ocr-review-2026-10-03.json), [odbiór 17 wywołań API](docs/acceptance-2026-10-03.json), [ręczne porównanie 200 krótkich tekstów](docs/RECZNY-PRZEGLAD-200.md). Najnowsze zmiany nie są jeszcze wdrożone na VPS.
+[Stan bieżących prac](docs/STATUS-PROJEKTU.md): lokalnie **121/121 testów**. Najnowszy [ręczny przegląd korekt](docs/RECZNE-TESTY-KOREKT.md) obejmuje wycofanie błędnych danych, zależności wierzyciela, sporu i zabezpieczenia, odrzucanie pustych pism, restart oraz PDF/Word. Ponowiono sześć scenariuszy HTTP z zapisanymi odpowiedziami. W tym etapie nie wykonywano nowego API, budżet pozostał 20/20. [Porównanie z LegalFlow](docs/POROWNANIE-LEGALFLOW.md) oddziela deklaracje producenta od sprawdzonych funkcji. Wcześniejsze dowody: [portal i nowe odczyty API](docs/RECZNY-PRZEGLAD-PORTALU.md), [OCR](docs/ocr-review-2026-10-03.json), [odbiór 17 wywołań API](docs/acceptance-2026-10-03.json), [ręczne porównanie 200 krótkich tekstów](docs/RECZNY-PRZEGLAD-200.md). Najnowsze zmiany nie są jeszcze wdrożone na VPS.
 
 ![Podsumowanie S01 w działającym panelu, wyłącznie fikcyjne dane](docs/images/podsumowanie-S01.png)
+
+[Prezentacja PowerPoint i PDF, 22 slajdy](output/presentation/README.md) · [Katalog wszystkich funkcji i zakres sprawdzenia](docs/FUNKCJE-I-WERYFIKACJA.md) · [Dodatkowe ręczne testy zadań i rejestrów](docs/REJESTRY-I-ZADANIA-PRZEGLAD.md).
 
 ## Działające moduły
 
@@ -66,7 +68,7 @@ Wybrane źródła trafiają do wskazanego API. OCR przekazuje cały wskazany pli
 
 `npm test` działa bez kluczy i płatnych wywołań. GitHub Actions sprawdza Node 22 i 24. Testy obejmują izolację, role, linki, wyścig wersji, awarię AI, PDF/skany, kopię i odtworzenie, integralność danych, waluty i duplikaty.
 
-Aktualny zestaw zawiera **119 testów**. `npm run ai:bench` pokazuje plan bez API, a `node scripts/quality-bench.mjs --run` wykonuje płatną próbę na siedmiu syntetycznych PDF-ach. Osobny trwały limit runnera: 9 prób/dzień UTC. [Wyniki próby przed ostatnimi poprawkami](docs/quality-bench-2026-10-03.json) zawierają także odrzucone odczyty i błędną interpretację; nie są pomiarem ogólnej skuteczności.
+Aktualny zestaw zawiera **121 testów**. `npm run ai:bench` pokazuje plan bez API, a `node scripts/quality-bench.mjs --run` wykonuje płatną próbę na siedmiu syntetycznych PDF-ach. Osobny trwały limit runnera: 9 prób/dzień UTC. [Wyniki próby przed ostatnimi poprawkami](docs/quality-bench-2026-10-03.json) zawierają także odrzucone odczyty i błędną interpretację; nie są pomiarem ogólnej skuteczności.
 
 `npm run test:acceptance` pokazuje bezpłatny plan testu całej aplikacji. `node scripts/acceptance.mjs --run` korzysta z kluczy z `.env` i osobnego stanu `data/local/acceptance`: do 16 wywołań, trwały limit 20/dzień UTC. `--resume` kontynuuje istniejący stan, a świadome ponowienie odczytu dokumentów jednej sprawy wymaga `--resume --retry-case S04`. Nie ma automatycznego logowania przez przeglądarkę ani ponawiania błędów w pętli. Test używa wyłącznie fikcyjnych danych; konta ról nie stanowią niezależnego przeglądu prawnego. [Zakres i wynik](docs/TESTY.md).
 

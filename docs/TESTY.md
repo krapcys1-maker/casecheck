@@ -1,8 +1,10 @@
 # Testy i dowody działania
 
+Dalsza ręczna kontrola ujawniła błędną klasyfikację HTTP 400 z KRS i niewłaściwą etykietę środowiska. Oba problemy odtworzono przed poprawką, naprawiono i ponowiono zapytania. Udany publiczny KRS i testowy wykaz VAT działają. [Pełny zapis](REJESTRY-I-ZADANIA-PRZEGLAD.md). [Prezentacja](../output/presentation/README.md) oraz [katalog funkcji](FUNKCJE-I-WERYFIKACJA.md) zawierają aktualny zakres.
+
 ## Bieżąca weryfikacja lokalna: 3 października 2026
 
-**Aktualnie 119/119 testów**. Pięć najnowszych regresji dotyczy ręcznego wycofania wartości, zależności roszczenia, częściowej odpowiedzi AI, pustej edycji i starego pustego zatwierdzenia. Cztery najpierw odtworzyły błąd na wcześniejszym kodzie. [Ręczna kontrola korekt i eksportów](RECZNE-TESTY-KOREKT.md) oraz [raport](correction-review-2026-10-03.json) obejmują rzeczywisty interfejs, restart i odtworzenie 6/6 scenariuszy HTTP, bez nowego API.
+**Aktualnie 121/121 testów**. Pięć najnowszych regresji dotyczy ręcznego wycofania wartości, zależności roszczenia, częściowej odpowiedzi AI, pustej edycji i starego pustego zatwierdzenia. Cztery najpierw odtworzyły błąd na wcześniejszym kodzie. [Ręczna kontrola korekt i eksportów](RECZNE-TESTY-KOREKT.md) oraz [raport](correction-review-2026-10-03.json) obejmują rzeczywisty interfejs, restart i odtworzenie 6/6 scenariuszy HTTP, bez nowego API.
 
 Poprzedni etap: 114/114. Osiem nowych sprawdzeń dotyczy portalu/wzorów (6), kwarantanny typu pola (1) i związku adresu z wierzycielem (1). [Ręczny przegląd najnowszego etapu](RECZNY-PRZEGLAD-PORTALU.md) opisuje rzeczywiste odczyty, błędy, korekty i cały obieg portalu. Trzy dodatkowe operacje API podniosły licznik kopii z 17 do 20; żadnego wywołania nie wykonuje `npm test`.
 
@@ -10,7 +12,7 @@ Poprzedni etap obejmował osiem sprawdzeń [stron OCR](PRZEGLAD-OCR.md). Ręczni
 
 Etap przed dodaniem przeglądu stron: `npm test` **98/98**, Node 24.13.0. Na początku tej kontynuacji przechodziło 85 testów; dodano 11 testów trwałego zapisu i odzyskiwania wyników oraz dwa testy braku danych o zabezpieczeniu. Nowe sprawdzenia obejmują awarię końcowej transakcji, nagłe zakończenie osobnego procesu po zapisie wyniku, restart, brak drugiego API, ochronę ręcznej korekty i aktualnych zatwierdzeń, jedno roszczenie po odzyskaniu, OCR bez podwójnych stron, błędny wynik, kopię/odtworzenie oraz izolację kancelarii i linku klienta. Zobacz [testy](../tests/job-recovery.test.mjs) i [mechanizm](ODZYSKIWANIE-WYNIKOW.md).
 
-Istniejący zestaw obejmuje też odczyt hybrydowy, walidację częściowych odpowiedzi i odtworzenie 200 dokumentów z wcześniej zapisanych odpowiedzi bez API. [Raport](extended-evaluation-2026-10-03.json): 1397/1400 pól zgodnych z anotacjami, 3 pozostawione do przeglądu, 0 błędnych znanych wartości. To kontrola reguł na fikcyjnych tekstach UTF-8, na których rozwijano rozwiązanie; nie badanie niezależnej skuteczności, OCR ani wywiadu. `npm run ai:bench:extended` pokazuje plan bez API. Najnowszych zmian nie zweryfikowano jeszcze w CI/VPS.
+Istniejący zestaw obejmuje też odczyt hybrydowy, walidację częściowych odpowiedzi i odtworzenie 200 dokumentów z wcześniej zapisanych odpowiedzi bez API. [Raport](extended-evaluation-2026-10-03.json): 1397/1400 pól zgodnych z anotacjami, 3 pozostawione do przeglądu, 0 błędnych znanych wartości. To kontrola reguł na fikcyjnych tekstach UTF-8, na których rozwijano rozwiązanie; nie badanie niezależnej skuteczności, OCR ani wywiadu. `npm run ai:bench:extended` pokazuje plan bez API. Najnowsze zmiany pozostają poza VPS. Bieżący zakres CI wskazuje status projektu.
 
 Sprawdzenie odzyskiwania w przeglądarce na odrębnej, tymczasowej fikcyjnej sprawie: podsumowanie wskazało oczekujący wynik, przycisk w Historii odzyskał dane, status zmienił się na „Wykonano”, a licznik pozostał 1/20. [Zrzut po odzyskaniu](images/odzyskany-wynik-test.jpg). Późniejszy ręczny przegląd treści 200 materiałów opisano powyżej; pełnego obiegu każdego z nich nie wykonano.
 

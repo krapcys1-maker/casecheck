@@ -6,7 +6,9 @@ Etap portalu: **114/114 testów**, portal, własne wzory z historią i zatwierdz
 
 Wykonano trzy dodatkowe operacje API (Anthropic 2, DeepSeek 1): jedna nieudana z błędem typu, jedna poprawna i jedna z błędnym adresem starego wierzyciela. Błąd adresu poprawiono ręcznie; nowy filtr potwierdzono na zapisanych odpowiedziach, bez nowego API. Budżet kopii lokalnej wynosi 20/20 po przeniesieniu bazowych 17 rezerwacji. Historyczne raporty poniżej zachowują swoje pierwotne zakresy.
 
-Najnowszy przegląd wykrył błędy wycofywania danych, zależności pól i pustego pisma. Naprawiono je, ponowiono operacje w interfejsie po restarcie i przeczytano oba końcowe eksporty. **119/119 testów oraz 6/6 odtworzonych scenariuszy HTTP**, bez nowego API. [Pełny zapis napraw i obserwacji](RECZNE-TESTY-KOREKT.md), [raport JSON](correction-review-2026-10-03.json).
+Najnowszy przegląd wykrył błędy wycofywania danych, zależności pól i pustego pisma. Naprawiono je, ponowiono operacje w interfejsie po restarcie i przeczytano oba końcowe eksporty. **121/121 testów oraz 6/6 odtworzonych scenariuszy HTTP**, bez nowego API. [Pełny zapis napraw i obserwacji](RECZNE-TESTY-KOREKT.md), [raport JSON](correction-review-2026-10-03.json).
+
+Dalsza ręczna kontrola ujawniła błędną klasyfikację HTTP 400 z KRS i niewłaściwą etykietę środowiska. Oba problemy odtworzono przed poprawką, naprawiono i ponowiono zapytania. Udany publiczny KRS i testowy wykaz VAT działają. [Pełny zapis](REJESTRY-I-ZADANIA-PRZEGLAD.md). [Prezentacja](../output/presentation/README.md) oraz [katalog funkcji](FUNKCJE-I-WERYFIKACJA.md) zawierają aktualny zakres.
 
 ## Co już jest
 
@@ -18,7 +20,7 @@ Przy rozpoczęciu tej kontynuacji repozytorium zawierało niezacommitowane popra
 
 Trwały zapis zweryfikowanych wyników AI/OCR przed końcowym zastosowaniem do sprawy. Po awarii lub restarcie zespół odzyskuje wynik z Historii bez nowego API. Odzyskanie jest atomowe, chroni nowsze korekty, nie dodaje drugi raz roszczeń/stron i ma audyt. Zapis jest objęty kopią oraz usuwaniem sprawy. [Opis](ODZYSKIWANIE-WYNIKOW.md).
 
-Dodano 11 testów odzyskiwania, dwa testy błędnej interpretacji braku danych o zabezpieczeniu oraz osiem testów nowego przeglądu OCR. **Na etapie OCR: 106/106 na Node 24.13.0**; obecnie 119/119, bez płatnych wywołań w `npm test`. Dodano bezpłatne plany większej próby (`npm run ai:bench:extended`) i testu całej aplikacji (`npm run test:acceptance`).
+Dodano 11 testów odzyskiwania, dwa testy błędnej interpretacji braku danych o zabezpieczeniu oraz osiem testów nowego przeglądu OCR. **Na etapie OCR: 106/106 na Node 24.13.0**; obecnie 121/121, bez płatnych wywołań w `npm test`. Dodano bezpłatne plany większej próby (`npm run ai:bench:extended`) i testu całej aplikacji (`npm run test:acceptance`).
 
 Sprawdzono działanie odzyskiwania w przeglądarce na fikcyjnej sprawie: wynik odzyskany, licznik nadal 1/20. [Dowód](images/odzyskany-wynik-test.jpg). Następnie dodano [porównanie oryginału i OCR](PRZEGLAD-OCR.md): strony, korekty z historią, blokowanie nieaktualnych danych i eksportu. Ręcznie przetestowano ekran na kopiach rzeczywistych wyników S11/S12. Ponowiono sześć scenariuszy HTTP z wyłączonym nowym API: 6/6, budżet nadal 17/20. [Bieżący raport](ocr-review-2026-10-03.json).
 
@@ -38,13 +40,19 @@ Sprawdzono tekst i wszystkie sześć stron pięciu PDF-ów. Dodatkowa wiadomoś�
 
 To dowód działania filtrów na tych materiałach. Anotacje są inżynierskie, reguły rozwijano na zestawie, a badanie nie obejmuje OCR ani oceny prawnej. Do oceny rzeczywistych spraw potrzebny jest osobny, zamrożony zestaw uzgodniony z kancelarią.
 
+## GitHub i prezentacja
+
+Kod portalu i korekt opublikowano w `693ed7a`. [GitHub Actions](https://github.com/krapcys1-maker/casecheck/actions/runs/37119209888) potwierdził 119/119 na Node 22 oraz 24. Kolejne poprawki rejestrów mają lokalnie 121/121. [Raport publikacji](publication-check-2026-10-03.json) zachowuje zakres kolejnych prób.
+
+Gotowa [prezentacja 22 slajdy](../output/presentation/README.md) opisuje działanie, funkcje, porównanie z oficjalną ofertą LegalFlow i kierunki poprawy.
+
 ## Wdrożenie i następny etap
 
-Dokumentacja zawiera istniejący [panel HTTPS](https://astrologiapoludzku.com/casecheck/) i wcześniejsze dowody wdrożenia. Najnowsze zmiany w tej kontynuacji zweryfikowano lokalnie; nie potwierdzono ich w nowym CI ani na VPS. Nie publikowano danych dostępu i nie zmieniano prywatnego stanu działającego serwera.
+Dokumentacja zawiera istniejący [panel HTTPS](https://astrologiapoludzku.com/casecheck/) i wcześniejsze dowody wdrożenia. Najnowsze zmiany w tej kontynuacji zweryfikowano lokalnie; pierwszy commit tej aktualizacji przeszedł CI na Node 22 i 24, a na VPS nie wdrażano tych zmian. Nie publikowano danych dostępu i nie zmieniano prywatnego stanu działającego serwera.
 
 Kolejność dalszej pracy:
 
-1. Opublikować sprawdzony kod i zweryfikować CI; zrobić prywatną kopię przed aktualizacją VPS i sprawdzić odtworzenie oraz nową funkcję na fikcyjnej sprawie.
+1. Przed aktualizacją VPS wykonać prywatną kopię, sprawdzić odtworzenie i nową funkcję na fikcyjnej sprawie. Kod oraz materiały są publikowane na GitHubie, zakres CI jest jawny.
 2. Uzgodnić z kancelarią jeden proces i osobny zestaw dokumentów do oceny. Zmierzyć błędy, czas ręcznego przeglądu, czas poprawek i koszt API.
 3. Wykonać niezależny przegląd pytań/wzorów, przygotować dostęp z MFA/SSO oraz zasady danych i kopii przed przyjęciem rzeczywistych spraw.
 4. Rozwinąć jeden przydatny adapter do CRM/obiegu kancelarii na istniejącym pakiecie JSON, po uzgodnieniu odbiorcy i formatu.

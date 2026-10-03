@@ -8,7 +8,11 @@ export async function registryLookup({ kind, identifier, date, test = false }, f
   let response;
   try { response = await fetchImpl(url, { redirect: 'error', signal: AbortSignal.timeout(15000), headers: { Accept: 'application/json' } }); }
   catch { throw new AppError(502, 'REGISTRY_UNAVAILABLE'); }
-  requireValue(response.ok, response.status === 404 ? 'REGISTRY_NOT_FOUND' : 'REGISTRY_UNAVAILABLE', response.status === 404 ? 404 : 502);
+  if (!response.ok) {
+    const rejected = response.status === 400, missing = response.status === 404;
+    throw new AppError(rejected ? 400 : missing ? 404 : 502,
+      rejected ? 'REGISTRY_QUERY_REJECTED' : missing ? 'REGISTRY_NOT_FOUND' : 'REGISTRY_UNAVAILABLE');
+  }
   const reader = response.body.getReader(), parts = []; let size = 0;
   try {
     while (true) { const { done, value } = await reader.read(); if (done) break; size += value.length;
@@ -27,5 +31,5 @@ export async function registryLookup({ kind, identifier, date, test = false }, f
       as_of: record.naglowekA?.stanZDnia || 'odpis aktualny w chwili pobrania' };
   }
   requireValue(typeof summary.name === 'string', 'REGISTRY_INVALID_RESPONSE', 502);
-  return { kind, identifier, test: test === true, url, fetched_at: new Date().toISOString(), summary };
+  return { kind, identifier, test: kind === 'vat' && test === true, url, fetched_at: new Date().toISOString(), summary };
 }
